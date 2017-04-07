@@ -1,0 +1,35 @@
+{
+  "name": "codevs-admin",
+  "version": "0.0.1",
+  "description": "Desktop app to adminsitrate codevs enviroment",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Joseba Carral <jcarraldc@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^6.4.1",
+    "babel-preset-latest-minimal": "^1.1.2",
+    "babel-preset-react": "^6.24.1",
+    "chai": "^3.5.0",
+    "css-loader": "^0.28.0",
+    "electron": "^1.6.2",
+    "electron-builder": "^16.7.1",
+    "electron-mocha": "^3.4.0",
+    "mocha": "^3.2.0",
+    "sass-loader": "^6.0.3",
+    "style-loader": "^0.16.1",
+    "webpack": "^2.3.3",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "dependencies": {
+    "firebase": "^3.7.5",
+    "node-sass": "^4.5.2",
+    "path": "^0.12.7",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-router-dom": "^4.0.0"
+  }
+}
