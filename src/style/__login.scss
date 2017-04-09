@@ -1,0 +1,24 @@
+@import '__variables';
+
+.login-page {
+    background-color: $mainColour;
+    justify-content: center !important;
+
+    > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        > p {
+            font-size: 0.7em;
+            color: white;
+        }
+    }
+}
+
+.button-login {
+    margin-top: 20px;
+    width: 150%;
+    line-height: 1em;
+    font-size: 1em;
+}
