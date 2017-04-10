@@ -5,7 +5,7 @@ import React from 'react';
 import { Home } from './components/home/Home.js';
 import  Profile  from './components/profile/Profile.js';
 import { Users } from './components/users/Users.js';
-import { Menu } from './components/layout/Menu.js';
+import  Menu  from './components/layout/Menu.js';
 
 export const AppRouter = ({handleLogout}) => (
   <Router>

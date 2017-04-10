@@ -17,7 +17,7 @@ function createWindow() {
     // Open the DevTools.
     mainWindow.webContents.openDevTools()
     mainWindow.on('close', function(event) {
-        mainWindow.webContents.session.clearStorageData()
+        //mainWindow.webContents.session.clearStorageData()
     });
     mainWindow.on('closed', function() {
         mainWindow = null
