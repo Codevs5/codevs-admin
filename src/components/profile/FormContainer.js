@@ -1,8 +1,39 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
+import '../../style/__profile.scss';
 
 import SimpleInput from './SimpleInput.js';
 import SimpleTextarea from './SimpleTextarea.js';
+import SocialInput from './SocialInput.js';
+
+const socialNetworks = [
+    {
+        name: 'twitter',
+        icon: 'twitter'
+    }, {
+        name: 'facebook',
+        icon: 'facebook'
+    }, {
+        name: 'linkedin',
+        icon: 'linkedin'
+    }, {
+        name: 'github',
+        icon: 'github'
+    }, {
+        name: 'googleplus',
+        icon: 'google-plus'
+    },
+    {
+        name: 'youtube',
+        icon: 'youtube'
+    },{
+        name: 'instagram',
+        icon: 'instagram'
+    }, {
+        name: 'web',
+        icon: 'globe'
+    }
+];
 
 //User default data
 const createUserDefaultData = (user) => {
@@ -44,6 +75,7 @@ export default class FormContainer extends Component {
         this.handleCityChange = this.handleCityChange.bind(this);
         this.handleBioChange = this.handleBioChange.bind(this);
         this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
+        this.handleSocialChange = this.handleSocialChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
@@ -51,7 +83,7 @@ export default class FormContainer extends Component {
         const user = firebase.auth().currentUser;
         const dbRef = firebase.database().ref(`/users/${user.uid}`);
         dbRef.on('value', (data) => {
-          let metadata;
+            let metadata;
             if (!data.val()) { //No tiene perfil aún en la DB
                 const defaultUserData = createUserDefaultData(user);
                 dbRef.set(defaultUserData);
@@ -60,12 +92,13 @@ export default class FormContainer extends Component {
                 metadata = data.val().metadata
             }
             this.setState({
-              bio: metadata.bio,
-              city: metadata.city,
-              firstname: metadata.firstname,
-              lastname: metadata.lastname,
-              avatar: metadata.avatar,
-              birthdate: metadata.birthdate
+                bio: metadata.bio,
+                city: metadata.city,
+                firstname: metadata.firstname,
+                lastname: metadata.lastname,
+                avatar: metadata.avatar,
+                birthdate: metadata.birthdate,
+                social: metadata.social
             });
         })
     }
@@ -86,6 +119,9 @@ export default class FormContainer extends Component {
     handleBioChange(e) {
         this.setState({bio: e.target.value});
     }
+    handleSocialChange(e, newSocial) {
+        this.setState({social: Object.assign({}, this.state.social, newSocial)})
+    }
     //TODO: Avatar && social
 
     handleFormSubmit(e) {
@@ -103,8 +139,16 @@ export default class FormContainer extends Component {
     }
 
     render() {
+        const socialInputs = socialNetworks.map((current, i) => {
+            const content = this.state.social[current.name] || '';
+            return <SocialInput key={i} icon={current.icon} content={content} controller={this.handleSocialChange} name={current.name}/>;
+        });
+
         return (
             <div className="form-container">
+                <h2 className="form-title">Basic information
+                </h2>
+                <div className="form-divider"></div>
                 <div className="row">
                     <SimpleInput inputType={'text'} labeltitle={'Firstname'} content={this.state.firstname} controller={this.handleFirstNameChange}/>
                     <SimpleInput inputType={'text'} labeltitle={'Lasttname'} content={this.state.lastname} controller={this.handleLastnameChange}/>
@@ -116,7 +160,13 @@ export default class FormContainer extends Component {
                 <div className="row">
                     <SimpleTextarea labeltitle={'Bio'} resize={false} rows={5} content={this.state.bio} controller={this.handleBioChange}/>
                 </div>
-                <input type="submit" value="Update profile" onClick={this.handleFormSubmit}/>
+                <h2 className="form-title">Social links
+                </h2>
+                <div className="form-divider"></div>
+                <div className="row social-row">
+                    {socialInputs}
+                </div>
+                <input className="button-submit-profile" type="submit" value="Update profile" onClick={this.handleFormSubmit}/>
             </div>
         );
     }

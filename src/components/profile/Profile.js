@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
 import FormContainer from './FormContainer.js';
-
+import { Header } from '../layout/Header.js';
 
 
 export default class Profile extends Component {
@@ -11,8 +11,8 @@ export default class Profile extends Component {
 
   render(){
     return (
-      <div className="profile-container">
-        <h2> Profile </h2>
+      <div className="profile-container container">
+        <Header title="Profile" />
         <FormContainer />
       </div>
     );

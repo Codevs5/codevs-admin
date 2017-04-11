@@ -1,0 +1,55 @@
+@import '../__variables';
+
+.input-container{
+  display: flex;
+  flex-direction: column;
+
+
+  >input{
+    height: 20px;
+    width: 275px;
+  }
+
+  >textarea, >input{
+    background-color: $grayInputColour;
+    border: 0;
+    padding: 1em;
+    margin-top: 10px;
+    color: #333;
+    font-size: 16px;
+  }
+
+  &.input-container-textarea{
+    width: 100%;
+    padding: 0 12px;
+  }
+}
+
+.button-submit-profile{
+  background-color: $mainColour;
+  border: 0;
+  width: 93%;
+  margin: 10px 25px;
+  transition: 0.3s ease-in all;
+  color: white;
+  cursor: pointer;
+  padding: 13px 25px;
+  font-size: 1em;
+
+  &:hover{
+    background-color: darken($mainColour, 10%);
+  }
+}
+
+.form{
+  &-title{
+    font-weight: bold;
+  }
+
+  &-divider{
+    width: 100%;
+    height: 4px;
+    background-color: $mainColour;
+    display: block;
+  }
+}

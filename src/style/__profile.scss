@@ -1,0 +1,117 @@
+@import '__variables';
+
+.form-container{
+  margin-top: 80px;
+  width: 100%;
+  display:flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+.input-container{
+  display: flex;
+  flex-direction: column;
+
+
+  >input{
+    height: 20px;
+    width: 275px;
+  }
+
+  >textarea, >input{
+    background-color: $grayInputColour;
+    border: 0;
+    padding: 1em;
+    margin-top: 10px;
+    color: #333;
+    font-size: 16px;
+  }
+
+  &.input-container-textarea{
+    width: 100%;
+    padding: 0 12px;
+  }
+}
+
+.button-submit-profile{
+  background-color: $mainColour;
+  border: 0;
+  width: 93%;
+  margin: 20px 25px;
+  transition: 0.3s ease-in all;
+  color: white;
+  cursor: pointer;
+  padding: 13px 25px;
+  font-size: 1em;
+
+  &:hover{
+    background-color: darken($mainColour, 10%);
+  }
+}
+
+.form{
+  &-title{
+    font-weight: bold;
+    padding-left: 20px;
+    margin: 5px;
+  }
+
+  &-divider{
+    width: 95%;
+    height: 4px;
+    background-color: $mainColour;
+    display: block;
+    align-self: center;
+  }
+}
+
+.social-row{
+  flex-wrap: wrap;
+  &-box{
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+.social-icon{
+  width: 10px;
+  height: 52px;
+  color: white;
+  line-height: 52px;
+  background-color: #5d5d5d;
+  margin-top: 10px;
+  width: 30px;
+  text-align: center;
+  &>i{
+    margin: auto;
+  }
+  &.facebook{
+    background-color: $facebookColour;
+  }
+  &.twitter{
+    background-color: $twitterColour;
+  }
+  &.googleplus{
+    background-color: $googlePlusColour;
+  }
+  &.linkedin{
+    background-color: $linkedinColour;
+  }
+  &.youtube{
+    background-color: $youtubeColour;
+  }
+  &.github{
+    background-color: $githubColour;
+  }
+  &.instagram{
+    background-color: $instagramColour;
+  }
+  &.website{
+    background-color: #5d5d5d;
+  }
+}
+
+.social-input{
+  width: 230px !important;
+}

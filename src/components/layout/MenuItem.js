@@ -19,6 +19,6 @@ export const MenuItem = ({info, handleActive}) => {
 }
 
 MenuItem.propTypes = {
-    info: React.PropTypes.string.isRequired,
+    info: React.PropTypes.object.isRequired,
     handleActive: React.PropTypes.func.isRequired
 }

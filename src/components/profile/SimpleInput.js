@@ -1,9 +1,9 @@
 import React from 'react';
 
 const SimpleInput = (props) => (
-    <div>
+    <div className="input-container">
         <label>
-            {props.labeltitle}
+            {props.labeltitle}:
         </label>
         <input type={props.inputType} value={props.content} onChange={props.controller}/>
     </div>

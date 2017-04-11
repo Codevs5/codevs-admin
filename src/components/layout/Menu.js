@@ -50,7 +50,7 @@ export default class Menu extends Component {
     render() {
         const menuItems = this.state.menuItemsData.map((data, i) => <MenuItem info={data} handleActive={this.handleActive} key={i}/>);
         return (
-            <header className="menu">
+            <div className="menu">
               <div className="menu-top">
                 <div className="menu-logo">
                   <img src="./images/logo.png" height="64px" width="56px" />
@@ -60,9 +60,9 @@ export default class Menu extends Component {
                 </nav>
               </div>
                 <button className="button-logout" onClick={this.props.handleLogout}>
-                    LogoOut
+                    Log Out
                 </button>
-            </header>
+            </div>
         );
     }
 }

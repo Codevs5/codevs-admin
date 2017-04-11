@@ -1,7 +1,7 @@
 import React from 'react';
 
 const SimpleTextarea = (props) => (
-    <div>
+    <div className="input-container input-container-textarea" >
         <label>
             {props.labeltitle}
         </label>

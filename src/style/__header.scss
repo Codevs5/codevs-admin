@@ -1,0 +1,14 @@
+@import '__variables';
+
+
+.header{
+  width: 100%;
+  height: 64px;
+  position: fixed;
+  border-bottom: 1px solid darken($lightColour, 15%);
+  box-shadow: $simpleShadow;
+  background-color: white;
+  line-height: 64px;
+  padding-left: 10px;
+  box-sizing: border-box;
+}
