@@ -27,7 +27,13 @@ export default class Menu extends Component {
                     isActive: false
                 },
                 {
-                    path: '/users',
+                    path: '/entries',
+                    name: 'Entries',
+                    iconName: 'file-text',
+                    isActive: false
+                },
+                {
+                    path: '/user',
                     name: 'New Post',
                     iconName: 'file-text',
                     isActive: false

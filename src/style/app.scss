@@ -35,6 +35,9 @@ a {
   margin-left: $menu-size;
   align-items: center;
   min-height: 100vh;
+   &-wHeader{
+     margin-top: 64px;
+   }
 }
 
 .row{

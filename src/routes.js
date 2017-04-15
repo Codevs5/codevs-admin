@@ -6,6 +6,7 @@ import { Home } from './components/home/Home.js';
 import  Profile  from './components/profile/Profile.js';
 import { Users } from './components/users/Users.js';
 import  Menu  from './components/layout/Menu.js';
+import  Entries  from './components/entries/Entries.js';
 
 export const AppRouter = ({handleLogout}) => (
   <Router>
@@ -15,7 +16,7 @@ export const AppRouter = ({handleLogout}) => (
         <Route exact path="/" component={Home} />
         <Route exact path="/profile" component={Profile} />
         <Route exact path="/users" component={Users} />
-
+        <Route exact path="/entries" component={Entries} />
       </Switch>
     </div>
   </Router>
