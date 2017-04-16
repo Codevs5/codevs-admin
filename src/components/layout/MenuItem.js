@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-export const MenuItem = ({info, handleActive}) => {
+const MenuItem = ({info, handleActive}) => {
     const classIcon = `fa fa-${info.iconName}`;
     const classItem = `menu-item ${ (info.isActive)
         ? 'current'
@@ -22,3 +22,5 @@ MenuItem.propTypes = {
     info: React.PropTypes.object.isRequired,
     handleActive: React.PropTypes.func.isRequired
 }
+
+export default MenuItem;

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import '../../style/__header.scss';
 
-export const Header = ({title}) => (
+const Header = ({title}) => (
   <header className="header">
     {title}
   </header>
@@ -10,3 +10,5 @@ export const Header = ({title}) => (
 Header.propTypes = {
   title : PropTypes.string.isRequired
 }
+
+export default Header;

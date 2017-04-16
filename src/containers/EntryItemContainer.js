@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
-import ExpandedEntryInfo from './ExpandedEntryInfo.js';
-import ResumeEntry from './ResumeEntry.js';
+import ExpandedEntryInfoContainer from './ExpandedEntryInfoContainer.js';
+import ResumeEntry from '../components/entries/ResumeEntry.js';
 
-export default class EntryItem extends Component {
+export default class EntryItemContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -31,13 +31,13 @@ export default class EntryItem extends Component {
         return (
             <div className="entry-item">
                 <ResumeEntry changeVisibility={changeVisibility} title={data.title} id={data.id} visible={data.visible} icons={classIcons} toggleInfo={this.toggleInfo}/>
-                <ExpandedEntryInfo data={data} visible={this.state.expanded}/>
+                <ExpandedEntryInfoContainer data={data} visible={this.state.expanded}/>
             </div>
         );
     }
 }
 
-EntryItem.propTypes = {
+EntryItemContainer.propTypes = {
     data: PropTypes.shape({title: PropTypes.string, visible: PropTypes.bool, author: PropTypes.string, url: PropTypes.string, id: PropTypes.string.isRequired}),
     changeVisibility: PropTypes.func.isRequired
 };

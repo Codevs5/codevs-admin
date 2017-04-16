@@ -1,20 +1,13 @@
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
-import FormContainer from './FormContainer.js';
-import { Header } from '../layout/Header.js';
+import FormProfileContainer from '../../containers/FormProfileContainer.js';
+import  Header  from '../layout/Header.js';
 
+const Profile = () => (
+  <div className="profile-container container">
+    <Header title="Profile" />
+    <FormProfileContainer />
+  </div>
+);
 
-export default class Profile extends Component {
-  constructor(){
-    super();
-  }
-
-  render(){
-    return (
-      <div className="profile-container container">
-        <Header title="Profile" />
-        <FormContainer />
-      </div>
-    );
-  }
-}
+export default Profile;

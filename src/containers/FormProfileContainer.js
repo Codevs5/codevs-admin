@@ -1,10 +1,7 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
-import '../../style/__profile.scss';
 
-import SimpleInput from '../form/SimpleInput.js';
-import SimpleTextarea from '../form/SimpleTextarea.js';
-import SocialInput from '../form/SocialInput.js';
+import FormProfile from '../components/profile/FormProfile.js';
 
 const socialNetworks = [
     {
@@ -139,35 +136,17 @@ export default class FormContainer extends Component {
     }
 
     render() {
-        const socialInputs = socialNetworks.map((current, i) => {
-            const content = this.state.social[current.name] || '';
-            return <SocialInput key={i} icon={current.icon} content={content} controller={this.handleSocialChange} name={current.name}/>;
-        });
 
-        return (
-            <div className="form-container">
-                <h2 className="form-title">Basic information
-                </h2>
-                <div className="form-divider"></div>
-                <div className="row">
-                    <SimpleInput inputType={'text'} labeltitle={'Firstname'} content={this.state.firstname} controller={this.handleFirstNameChange}/>
-                    <SimpleInput inputType={'text'} labeltitle={'Lasttname'} content={this.state.lastname} controller={this.handleLastnameChange}/>
-                </div>
-                <div className="row">
-                    <SimpleInput inputType={'text'} labeltitle={'City'} content={this.state.city} controller={this.handleCityChange}/>
-                    <SimpleInput inputType={'date'} labeltitle={'Birthdate'} content={this.state.birthdate} controller={this.handleBirthdateChange}/>
-                </div>
-                <div className="row">
-                    <SimpleTextarea labeltitle={'Bio'} resize={false} rows={5} content={this.state.bio} controller={this.handleBioChange}/>
-                </div>
-                <h2 className="form-title">Social links
-                </h2>
-                <div className="form-divider"></div>
-                <div className="row social-row">
-                    {socialInputs}
-                </div>
-                <input className="button-submit-profile" type="submit" value="Update profile" onClick={this.handleFormSubmit}/>
-            </div>
-        );
+
+        const controllers = {
+          handleLastnameChange : this.handleLastnameChange,
+          handleFirstNameChange : this.handleFirstNameChange,
+          handleBioChange : this.handleBioChange,
+          handleSocialChange : this.handleSocialChange,
+          handleFormSubmit : this.handleFormSubmit,
+          handleCityChange : this.handleCityChange,
+          handleBirthdateChange : this.handleBirthdateChange
+        }
+        return (<FormProfile userData={this.state} handleFunctions={controllers}  socialNetworks={socialNetworks}/>);
     }
 }

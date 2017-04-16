@@ -7850,7 +7850,6 @@ module.exports = getIteratorFn;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Header = undefined;
 
 var _react = __webpack_require__(4);
 
@@ -7860,7 +7859,7 @@ __webpack_require__(250);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const Header = exports.Header = ({ title }) => _react2.default.createElement(
+const Header = ({ title }) => _react2.default.createElement(
   'header',
   { className: 'header' },
   title
@@ -7869,6 +7868,8 @@ const Header = exports.Header = ({ title }) => _react2.default.createElement(
 Header.propTypes = {
   title: _react.PropTypes.string.isRequired
 };
+
+exports.default = Header;
 
 /***/ }),
 /* 68 */
@@ -10954,13 +10955,21 @@ var _Profile2 = _interopRequireDefault(_Profile);
 
 var _Users = __webpack_require__(112);
 
-var _Menu = __webpack_require__(105);
+var _MenuContainer = __webpack_require__(273);
 
-var _Menu2 = _interopRequireDefault(_Menu);
+var _MenuContainer2 = _interopRequireDefault(_MenuContainer);
 
-var _Entries = __webpack_require__(102);
+var _EntriesContainer = __webpack_require__(268);
 
-var _Entries2 = _interopRequireDefault(_Entries);
+var _EntriesContainer2 = _interopRequireDefault(_EntriesContainer);
+
+var _PublishedEntriesContainer = __webpack_require__(269);
+
+var _PublishedEntriesContainer2 = _interopRequireDefault(_PublishedEntriesContainer);
+
+var _ValidatorEntriesContainer = __webpack_require__(270);
+
+var _ValidatorEntriesContainer2 = _interopRequireDefault(_ValidatorEntriesContainer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -10970,14 +10979,16 @@ const AppRouter = exports.AppRouter = ({ handleLogout }) => _react2.default.crea
   _react2.default.createElement(
     'div',
     null,
-    _react2.default.createElement(_Menu2.default, { handleLogout: handleLogout }),
+    _react2.default.createElement(_MenuContainer2.default, { handleLogout: handleLogout }),
     _react2.default.createElement(
       _reactRouterDom.Switch,
       null,
       _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/', component: _Home.Home }),
       _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/profile', component: _Profile2.default }),
       _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/users', component: _Users.Users }),
-      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/entries', component: _Entries2.default })
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/entries', component: _EntriesContainer2.default }),
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/entries/published', component: _PublishedEntriesContainer2.default }),
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/entries/validator', component: _ValidatorEntriesContainer2.default })
     )
   )
 );
@@ -11035,139 +11046,29 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Header = __webpack_require__(67);
-
-var _EntryItem = __webpack_require__(103);
-
-var _EntryItem2 = _interopRequireDefault(_EntryItem);
-
-var _firebase = __webpack_require__(33);
-
-var firebase = _interopRequireWildcard(_firebase);
-
-__webpack_require__(249);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _reactRouterDom = __webpack_require__(59);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Entries extends _react.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      entries: []
-    };
-    this.changeVisibility = this.changeVisibility.bind(this);
-  }
+const Entries = () => _react2.default.createElement(
+  'div',
+  { className: 'container' },
+  _react2.default.createElement(
+    _reactRouterDom.Link,
+    { to: '/entries/published' },
+    'Published entries'
+  ),
+  _react2.default.createElement(
+    _reactRouterDom.Link,
+    { to: '/entries/validator' },
+    'Validate Entries'
+  )
+);
 
-  componentDidMount() {
-    const dbRef = firebase.database().ref('/entries');
-    dbRef.orderByChild('date').once('value', data => {
-      data = data.val();
-      let items = [];
-      for (let key in data) {
-        items.push({
-          title: data[key].title,
-          author: data[key].author,
-          visible: data[key].visible,
-          url: data[key].url,
-          id: key,
-          date: data[key].date
-        });
-      }
-      this.setState({ entries: items });
-    });
-  }
-
-  changeVisibility(id, visible) {
-    const dbRef = firebase.database().ref(`/entries/${id}`);
-    dbRef.update({ visible: visible });
-    const index = this.state.entries.findIndex(item => item.id === id);
-    const size = this.state.entries.length;
-    this.setState({
-      entries: [...this.state.entries.slice(0, index), Object.assign({}, this.state.entries[index], { visible }), ...this.state.entries.slice(index + 1, size)]
-    });
-  }
-
-  render() {
-    const entries = this.state.entries.map((entry, i) => _react2.default.createElement(_EntryItem2.default, { data: entry, key: i, changeVisibility: this.changeVisibility }));
-    return _react2.default.createElement(
-      'div',
-      { className: 'container ' },
-      _react2.default.createElement(_Header.Header, { title: 'Entries' }),
-      _react2.default.createElement(
-        'div',
-        { className: 'entry-list container-wHeader' },
-        entries
-      )
-    );
-  }
-}
 exports.default = Entries;
 
 /***/ }),
-/* 103 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _react = __webpack_require__(4);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _ExpandedEntryInfo = __webpack_require__(260);
-
-var _ExpandedEntryInfo2 = _interopRequireDefault(_ExpandedEntryInfo);
-
-var _ResumeEntry = __webpack_require__(261);
-
-var _ResumeEntry2 = _interopRequireDefault(_ResumeEntry);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class EntryItem extends _react.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            expanded: false
-        };
-        this.toggleInfo = this.toggleInfo.bind(this);
-    }
-
-    toggleInfo() {
-        this.setState({
-            expanded: !this.state.expanded
-        });
-    }
-
-    render() {
-        const classIcons = {
-            visibilityClass: `icon-eye icon-click fa fa-${this.props.data.visible ? 'eye' : 'eye-slash'}`,
-            toggleClass: `icon-click fa fa-${!this.state.expanded ? 'caret-down' : 'caret-up'}`
-        };
-        const data = this.props.data;
-        const changeVisibility = this.props.changeVisibility;
-        return _react2.default.createElement(
-            'div',
-            { className: 'entry-item' },
-            _react2.default.createElement(_ResumeEntry2.default, { changeVisibility: changeVisibility, title: data.title, id: data.id, visible: data.visible, icons: classIcons, toggleInfo: this.toggleInfo }),
-            _react2.default.createElement(_ExpandedEntryInfo2.default, { data: data, visible: this.state.expanded })
-        );
-    }
-}
-
-exports.default = EntryItem;
-EntryItem.propTypes = {
-    data: _react.PropTypes.shape({ title: _react.PropTypes.string, visible: _react.PropTypes.bool, author: _react.PropTypes.string, url: _react.PropTypes.string, id: _react.PropTypes.string.isRequired }),
-    changeVisibility: _react.PropTypes.func.isRequired
-};
-
-/***/ }),
+/* 103 */,
 /* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11199,100 +11100,52 @@ const Home = exports.Home = () => _react2.default.createElement(
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(59);
+var _MenuItem = __webpack_require__(106);
+
+var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
 __webpack_require__(252);
 
-var _MenuItem = __webpack_require__(106);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Menu extends _react.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            menuItemsData: [{
-                path: '/',
-                name: 'Home',
-                iconName: 'home',
-                isActive: true
-            }, {
-                path: '/profile',
-                name: 'Profile',
-                iconName: 'user-md',
-                isActive: false
-            }, {
-                path: '/users',
-                name: 'Users',
-                iconName: 'users',
-                isActive: false
-            }, {
-                path: '/entries',
-                name: 'Entries',
-                iconName: 'file-text',
-                isActive: false
-            }, {
-                path: '/user',
-                name: 'New Post',
-                iconName: 'file-text',
-                isActive: false
-            }]
-        };
-        this.handleActive = this.handleActive.bind(this);
-    }
-
-    handleActive(e, path) {
-        let newMenuItemsData = [];
-        for (let i = 0; i < this.state.menuItemsData.length; i++) {
-            newMenuItemsData.push(Object.assign({}, this.state.menuItemsData[i], {
-                isActive: path === this.state.menuItemsData[i].path
-            }));
-        }
-        this.setState({ menuItemsData: newMenuItemsData });
-    }
-
-    render() {
-        const menuItems = this.state.menuItemsData.map((data, i) => _react2.default.createElement(_MenuItem.MenuItem, { info: data, handleActive: this.handleActive, key: i }));
-        return _react2.default.createElement(
-            'div',
-            { className: 'menu' },
-            _react2.default.createElement(
-                'div',
-                { className: 'menu-top' },
-                _react2.default.createElement(
-                    'div',
-                    { className: 'menu-logo' },
-                    _react2.default.createElement('img', { src: './images/logo.png', height: '64px', width: '56px' })
-                ),
-                _react2.default.createElement(
-                    'nav',
-                    { className: 'menu-nav' },
-                    menuItems
-                )
-            ),
-            _react2.default.createElement(
-                'button',
-                { className: 'button-logout', onClick: this.props.handleLogout },
-                'Log Out'
-            )
-        );
-    }
-}
-
-exports.default = Menu;
-
-//Custom components
+const Menu = ({ menuItems, handleLogout, handleActive }) => _react2.default.createElement(
+  'div',
+  { className: 'menu' },
+  _react2.default.createElement(
+    'div',
+    { className: 'menu-top' },
+    _react2.default.createElement(
+      'div',
+      { className: 'menu-logo' },
+      _react2.default.createElement('img', { src: './images/logo.png', height: '64px', width: '56px' })
+    ),
+    _react2.default.createElement(
+      'nav',
+      { className: 'menu-nav' },
+      menuItems.map((data, i) => _react2.default.createElement(_MenuItem2.default, { info: data, handleActive: handleActive, key: i }))
+    )
+  ),
+  _react2.default.createElement(
+    'button',
+    { className: 'button-logout', onClick: handleLogout },
+    'Log Out'
+  )
+);
 
 Menu.propTypes = {
-    handleLogout: _react2.default.PropTypes.func.isRequired
+  handleLogout: _react.PropTypes.func.isRequired,
+  menuItems: _react.PropTypes.array.isRequired,
+  handleActive: _react.PropTypes.func.isRequired
 };
+
+exports.default = Menu;
 
 /***/ }),
 /* 106 */
@@ -11304,7 +11157,6 @@ Menu.propTypes = {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.MenuItem = undefined;
 
 var _react = __webpack_require__(4);
 
@@ -11314,7 +11166,7 @@ var _reactRouterDom = __webpack_require__(59);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const MenuItem = exports.MenuItem = ({ info, handleActive }) => {
+const MenuItem = ({ info, handleActive }) => {
     const classIcon = `fa fa-${info.iconName}`;
     const classItem = `menu-item ${info.isActive ? 'current' : ''}`;
     return _react2.default.createElement(
@@ -11336,223 +11188,10 @@ MenuItem.propTypes = {
     handleActive: _react2.default.PropTypes.func.isRequired
 };
 
-/***/ }),
-/* 107 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _react = __webpack_require__(4);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _firebase = __webpack_require__(33);
-
-var firebase = _interopRequireWildcard(_firebase);
-
-__webpack_require__(253);
-
-var _SimpleInput = __webpack_require__(257);
-
-var _SimpleInput2 = _interopRequireDefault(_SimpleInput);
-
-var _SimpleTextarea = __webpack_require__(258);
-
-var _SimpleTextarea2 = _interopRequireDefault(_SimpleTextarea);
-
-var _SocialInput = __webpack_require__(256);
-
-var _SocialInput2 = _interopRequireDefault(_SocialInput);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const socialNetworks = [{
-    name: 'twitter',
-    icon: 'twitter'
-}, {
-    name: 'facebook',
-    icon: 'facebook'
-}, {
-    name: 'linkedin',
-    icon: 'linkedin'
-}, {
-    name: 'github',
-    icon: 'github'
-}, {
-    name: 'googleplus',
-    icon: 'google-plus'
-}, {
-    name: 'youtube',
-    icon: 'youtube'
-}, {
-    name: 'instagram',
-    icon: 'instagram'
-}, {
-    name: 'web',
-    icon: 'globe'
-}];
-
-//User default data
-const createUserDefaultData = user => {
-    return {
-        metadata: {
-            "bio": "Soy un soso y no tengo una bio",
-            "social": {},
-            "city": "Codevs city",
-            "firstname": user.displayName || "Anonimo",
-            "lastname": "",
-            "avatar": user.photoURL || '',
-            "birthdate": new Date().toISOString().split('T')[0]
-        },
-        "stats": {
-            "joined": new Date().toISOString().split('T')[0],
-            "lastmod": new Date().toISOString().split('T')[0],
-            "role": 10
-        }
-    };
-};
-
-class FormContainer extends _react.Component {
-    constructor(props) {
-        super(props);
-        const userDefaultData = createUserDefaultData({}).metadata;
-        this.state = {
-            bio: userDefaultData.bio,
-            social: userDefaultData.social,
-            city: userDefaultData.city,
-            firstname: userDefaultData.firstname,
-            lastname: userDefaultData.lastname,
-            avatar: userDefaultData.avatar,
-            birthdate: userDefaultData.birthdate
-        };
-
-        //function bindings
-        this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
-        this.handleLastnameChange = this.handleLastnameChange.bind(this);
-        this.handleCityChange = this.handleCityChange.bind(this);
-        this.handleBioChange = this.handleBioChange.bind(this);
-        this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
-        this.handleSocialChange = this.handleSocialChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
-    }
-
-    componentDidMount() {
-        const user = firebase.auth().currentUser;
-        const dbRef = firebase.database().ref(`/users/${user.uid}`);
-        dbRef.on('value', data => {
-            let metadata;
-            if (!data.val()) {
-                //No tiene perfil a�n en la DB
-                const defaultUserData = createUserDefaultData(user);
-                dbRef.set(defaultUserData);
-                metadata = defaultUserData.metadata;
-            } else {
-                metadata = data.val().metadata;
-            }
-            this.setState({
-                bio: metadata.bio,
-                city: metadata.city,
-                firstname: metadata.firstname,
-                lastname: metadata.lastname,
-                avatar: metadata.avatar,
-                birthdate: metadata.birthdate,
-                social: metadata.social
-            });
-        });
-    }
-
-    //Handle inputs
-    handleFirstNameChange(e) {
-        this.setState({ firstname: e.target.value });
-    }
-    handleLastnameChange(e) {
-        this.setState({ lastname: e.target.value });
-    }
-    handleBirthdateChange(e) {
-        this.setState({ birthdate: e.target.value });
-    }
-    handleCityChange(e) {
-        this.setState({ city: e.target.value });
-    }
-    handleBioChange(e) {
-        this.setState({ bio: e.target.value });
-    }
-    handleSocialChange(e, newSocial) {
-        this.setState({ social: Object.assign({}, this.state.social, newSocial) });
-    }
-    //TODO: Avatar && social
-
-    handleFormSubmit(e) {
-        e.preventDefault();
-        const payload = {
-            metadata: this.state,
-            stats: {
-                'lastmod': new Date().toISOString().split('T')[0]
-            }
-        };
-        const user = firebase.auth().currentUser;
-        const dbRef = firebase.database().ref(`/users/${user.uid}`);
-        dbRef.child('/metadata').update(payload.metadata);
-        dbRef.child('/stats').update(payload.stats);
-    }
-
-    render() {
-        const socialInputs = socialNetworks.map((current, i) => {
-            const content = this.state.social[current.name] || '';
-            return _react2.default.createElement(_SocialInput2.default, { key: i, icon: current.icon, content: content, controller: this.handleSocialChange, name: current.name });
-        });
-
-        return _react2.default.createElement(
-            'div',
-            { className: 'form-container' },
-            _react2.default.createElement(
-                'h2',
-                { className: 'form-title' },
-                'Basic information'
-            ),
-            _react2.default.createElement('div', { className: 'form-divider' }),
-            _react2.default.createElement(
-                'div',
-                { className: 'row' },
-                _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Firstname', content: this.state.firstname, controller: this.handleFirstNameChange }),
-                _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Lasttname', content: this.state.lastname, controller: this.handleLastnameChange })
-            ),
-            _react2.default.createElement(
-                'div',
-                { className: 'row' },
-                _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'City', content: this.state.city, controller: this.handleCityChange }),
-                _react2.default.createElement(_SimpleInput2.default, { inputType: 'date', labeltitle: 'Birthdate', content: this.state.birthdate, controller: this.handleBirthdateChange })
-            ),
-            _react2.default.createElement(
-                'div',
-                { className: 'row' },
-                _react2.default.createElement(_SimpleTextarea2.default, { labeltitle: 'Bio', resize: false, rows: 5, content: this.state.bio, controller: this.handleBioChange })
-            ),
-            _react2.default.createElement(
-                'h2',
-                { className: 'form-title' },
-                'Social links'
-            ),
-            _react2.default.createElement('div', { className: 'form-divider' }),
-            _react2.default.createElement(
-                'div',
-                { className: 'row social-row' },
-                socialInputs
-            ),
-            _react2.default.createElement('input', { className: 'button-submit-profile', type: 'submit', value: 'Update profile', onClick: this.handleFormSubmit })
-        );
-    }
-}
-exports.default = FormContainer;
+exports.default = MenuItem;
 
 /***/ }),
+/* 107 */,
 /* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11571,30 +11210,25 @@ var _firebase = __webpack_require__(33);
 
 var firebase = _interopRequireWildcard(_firebase);
 
-var _FormContainer = __webpack_require__(107);
+var _FormProfileContainer = __webpack_require__(275);
 
-var _FormContainer2 = _interopRequireDefault(_FormContainer);
+var _FormProfileContainer2 = _interopRequireDefault(_FormProfileContainer);
 
 var _Header = __webpack_require__(67);
+
+var _Header2 = _interopRequireDefault(_Header);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Profile extends _react.Component {
-  constructor() {
-    super();
-  }
+const Profile = () => _react2.default.createElement(
+  'div',
+  { className: 'profile-container container' },
+  _react2.default.createElement(_Header2.default, { title: 'Profile' }),
+  _react2.default.createElement(_FormProfileContainer2.default, null)
+);
 
-  render() {
-    return _react2.default.createElement(
-      'div',
-      { className: 'profile-container container' },
-      _react2.default.createElement(_Header.Header, { title: 'Profile' }),
-      _react2.default.createElement(_FormContainer2.default, null)
-    );
-  }
-}
 exports.default = Profile;
 
 /***/ }),
@@ -11693,7 +11327,6 @@ class App extends _react.Component {
 
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
-            console.log(user);
             if (user) {
                 this.setState({ user: user });
             } else {
@@ -29272,16 +28905,12 @@ exports.default = TagInput;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
-
-var _firebase = __webpack_require__(33);
-
-var firebase = _interopRequireWildcard(_firebase);
 
 var _TagInput = __webpack_require__(259);
 
@@ -29295,103 +28924,62 @@ var _EntryTagList = __webpack_require__(262);
 
 var _EntryTagList2 = _interopRequireDefault(_EntryTagList);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class ExpandedEntryInfo extends _react.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            tags: []
-        };
-        this.handleTagAdded = this.handleTagAdded.bind(this);
-        this.handleTagRemoved = this.handleTagRemoved.bind(this);
-    }
+const ExpandedEntryInfo = ({ data, handleTagRemoved, handleTagAdded, tags, info }) => _react2.default.createElement(
+  'div',
+  { className: info },
+  _react2.default.createElement(
+    'div',
+    { className: 'entry-item-expanded--data row' },
+    _react2.default.createElement(
+      'p',
+      null,
+      _react2.default.createElement(
+        'span',
+        { className: 'label' },
+        _react2.default.createElement('i', { className: 'fa fa-user' }),
+        'Author:'
+      ),
+      ' ',
+      data.author
+    ),
+    _react2.default.createElement(
+      'p',
+      null,
+      _react2.default.createElement(
+        'span',
+        { className: 'label' },
+        _react2.default.createElement('i', { className: 'fa fa-calendar' }),
+        'Date:'
+      ),
+      data.date
+    ),
+    _react2.default.createElement(
+      'p',
+      null,
+      _react2.default.createElement(
+        'span',
+        { className: 'label' },
+        _react2.default.createElement('i', { className: 'fa fa-globe' }),
+        'URL:'
+      ),
+      data.url
+    )
+  ),
+  _react2.default.createElement(_EntryTagList2.default, { tags: tags, handleRemove: handleTagRemoved, label: 'Tag list:' }),
+  _react2.default.createElement(_TagInput2.default, { title: 'Add new tag:', handleTagAdded: handleTagAdded })
+);
 
-    handleTagAdded(e) {
-        if (e.key === 'Enter') {
-            const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
-            let newTag = {};
-            newTag[e.target.value] = true;
-            dbRef.update(newTag);
-            e.target.value = "";
-        }
-    }
-
-    handleTagRemoved(value) {
-        // this.setState({
-        //   tags: this.state.tags.filter((el, i) => el !== value)
-        // });
-        const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
-        dbRef.child(value).remove();
-    }
-
-    componentDidMount() {
-        const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
-        dbRef.on('value', snap => {
-            if (snap.val()) {
-                const tags = Object.keys(snap.val());
-                this.setState({ tags });
-            }
-        });
-    }
-
-    render() {
-        const data = this.props.data;
-        const info = this.props.visible ? 'entry-item-expanded' : 'hidden';
-        return _react2.default.createElement(
-            'div',
-            { className: info },
-            _react2.default.createElement(
-                'div',
-                { className: 'entry-item-expanded--data row' },
-                _react2.default.createElement(
-                    'p',
-                    null,
-                    _react2.default.createElement(
-                        'span',
-                        { className: 'label' },
-                        _react2.default.createElement('i', { className: 'fa fa-user' }),
-                        'Author:'
-                    ),
-                    ' ',
-                    data.author
-                ),
-                _react2.default.createElement(
-                    'p',
-                    null,
-                    _react2.default.createElement(
-                        'span',
-                        { className: 'label' },
-                        _react2.default.createElement('i', { className: 'fa fa-calendar' }),
-                        'Date:'
-                    ),
-                    data.date
-                ),
-                _react2.default.createElement(
-                    'p',
-                    null,
-                    _react2.default.createElement(
-                        'span',
-                        { className: 'label' },
-                        _react2.default.createElement('i', { className: 'fa fa-globe' }),
-                        'URL:'
-                    ),
-                    data.url
-                )
-            ),
-            _react2.default.createElement(_EntryTagList2.default, { tags: this.state.tags, handleRemove: this.handleTagRemoved, label: 'Tag list:' }),
-            _react2.default.createElement(_TagInput2.default, { title: 'Add new tag:', handleTagAdded: this.handleTagAdded })
-        );
-    }
-}
+ExpandedEntryInfo.propTypes = {
+  data: _react.PropTypes.object.isRequired,
+  handleTagAdded: _react.PropTypes.func.isRequired,
+  handleTagRemoved: _react.PropTypes.func.isRequired,
+  tags: _react.PropTypes.array.isRequired,
+  info: _react.PropTypes.string.isRequired
+};
 
 exports.default = ExpandedEntryInfo;
-ExpandedEntryInfo.propTypes = {
-    data: _react.PropTypes.shape({ title: _react.PropTypes.string, visible: _react.PropTypes.bool, author: _react.PropTypes.string, url: _react.PropTypes.string, id: _react.PropTypes.string.isRequired }),
-    visible: _react.PropTypes.bool.isRequired
-};
 
 /***/ }),
 /* 261 */
@@ -29566,6 +29154,687 @@ if(false) {
 	// When the module is disposed, remove the <style> tags
 	module.hot.dispose(function() { update(); });
 }
+
+/***/ }),
+/* 266 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _EntryItemContainer = __webpack_require__(271);
+
+var _EntryItemContainer2 = _interopRequireDefault(_EntryItemContainer);
+
+var _Header = __webpack_require__(67);
+
+var _Header2 = _interopRequireDefault(_Header);
+
+__webpack_require__(249);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const PublishedEntries = ({ changeVisibility, entries }) => _react2.default.createElement(
+  'div',
+  { className: 'container ' },
+  _react2.default.createElement(_Header2.default, { title: 'Entries' }),
+  _react2.default.createElement(
+    'div',
+    { className: 'entry-list container-wHeader' },
+    entries.map((entry, i) => _react2.default.createElement(_EntryItemContainer2.default, { data: entry, key: i, changeVisibility: changeVisibility }))
+  )
+);
+
+PublishedEntries.propTypes = {
+  changeVisibility: _react.PropTypes.func.isRequired,
+  entries: _react.PropTypes.array.isRequired
+};
+
+exports.default = PublishedEntries;
+
+/***/ }),
+/* 267 */,
+/* 268 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Entries = __webpack_require__(102);
+
+var _Entries2 = _interopRequireDefault(_Entries);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class EntriesContainer extends _react.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return _react2.default.createElement(_Entries2.default, null);
+  }
+}
+exports.default = EntriesContainer;
+
+/***/ }),
+/* 269 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _PublishedEntries = __webpack_require__(266);
+
+var _PublishedEntries2 = _interopRequireDefault(_PublishedEntries);
+
+var _firebase = __webpack_require__(33);
+
+var firebase = _interopRequireWildcard(_firebase);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class PublishedEntriesContainer extends _react.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            entries: []
+        };
+        this.changeVisibility = this.changeVisibility.bind(this);
+    }
+
+    componentDidMount() {
+        const dbRef = firebase.database().ref('/entries');
+        dbRef.orderByChild('date').once('value', data => {
+            data = data.val();
+            let items = [];
+            for (let key in data) {
+                items.push({
+                    title: data[key].title,
+                    author: data[key].author,
+                    visible: data[key].visible,
+                    url: data[key].url,
+                    id: key,
+                    date: data[key].date
+                });
+            }
+            this.setState({ entries: items });
+        });
+    }
+
+    changeVisibility(id, visible) {
+        const dbRef = firebase.database().ref(`/entries/${id}`);
+        dbRef.update({ visible: visible });
+        const index = this.state.entries.findIndex(item => item.id === id);
+        const size = this.state.entries.length;
+        this.setState({
+            entries: [...this.state.entries.slice(0, index), Object.assign({}, this.state.entries[index], { visible }), ...this.state.entries.slice(index + 1, size)]
+        });
+    }
+
+    render() {
+        return _react2.default.createElement(_PublishedEntries2.default, {
+            entries: this.state.entries,
+            changeVisibility: this.changeVisibility
+        });
+    }
+}
+exports.default = PublishedEntriesContainer;
+
+/***/ }),
+/* 270 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class ValidatorEntriesContainer extends _react.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      entries: []
+    };
+  }
+
+  renderEmptyList() {
+    return _react2.default.createElement(
+      "p",
+      null,
+      "There are not entries to validate!"
+    );
+  }
+
+  renderEntryList() {
+    return _react2.default.createElement("div", null);
+  }
+
+  render() {
+    return _react2.default.createElement(
+      "div",
+      { className: "container" },
+      "Weeeah!"
+    );
+  }
+}
+exports.default = ValidatorEntriesContainer;
+
+/***/ }),
+/* 271 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _ExpandedEntryInfoContainer = __webpack_require__(272);
+
+var _ExpandedEntryInfoContainer2 = _interopRequireDefault(_ExpandedEntryInfoContainer);
+
+var _ResumeEntry = __webpack_require__(261);
+
+var _ResumeEntry2 = _interopRequireDefault(_ResumeEntry);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class EntryItemContainer extends _react.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            expanded: false
+        };
+        this.toggleInfo = this.toggleInfo.bind(this);
+    }
+
+    toggleInfo() {
+        this.setState({
+            expanded: !this.state.expanded
+        });
+    }
+
+    render() {
+        const classIcons = {
+            visibilityClass: `icon-eye icon-click fa fa-${this.props.data.visible ? 'eye' : 'eye-slash'}`,
+            toggleClass: `icon-click fa fa-${!this.state.expanded ? 'caret-down' : 'caret-up'}`
+        };
+        const data = this.props.data;
+        const changeVisibility = this.props.changeVisibility;
+        return _react2.default.createElement(
+            'div',
+            { className: 'entry-item' },
+            _react2.default.createElement(_ResumeEntry2.default, { changeVisibility: changeVisibility, title: data.title, id: data.id, visible: data.visible, icons: classIcons, toggleInfo: this.toggleInfo }),
+            _react2.default.createElement(_ExpandedEntryInfoContainer2.default, { data: data, visible: this.state.expanded })
+        );
+    }
+}
+
+exports.default = EntryItemContainer;
+EntryItemContainer.propTypes = {
+    data: _react.PropTypes.shape({ title: _react.PropTypes.string, visible: _react.PropTypes.bool, author: _react.PropTypes.string, url: _react.PropTypes.string, id: _react.PropTypes.string.isRequired }),
+    changeVisibility: _react.PropTypes.func.isRequired
+};
+
+/***/ }),
+/* 272 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _firebase = __webpack_require__(33);
+
+var firebase = _interopRequireWildcard(_firebase);
+
+var _ExpandedEntryInfo = __webpack_require__(260);
+
+var _ExpandedEntryInfo2 = _interopRequireDefault(_ExpandedEntryInfo);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class ExpandedEntryInfoContainer extends _react.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            tags: []
+        };
+        this.handleTagAdded = this.handleTagAdded.bind(this);
+        this.handleTagRemoved = this.handleTagRemoved.bind(this);
+    }
+
+    handleTagAdded(e) {
+        if (e.key === 'Enter') {
+            const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
+            let newTag = {};
+            newTag[e.target.value] = true;
+            dbRef.update(newTag);
+            e.target.value = "";
+        }
+    }
+
+    handleTagRemoved(value) {
+        // this.setState({
+        //   tags: this.state.tags.filter((el, i) => el !== value)
+        // });
+        const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
+        dbRef.child(value).remove();
+    }
+
+    componentDidMount() {
+        const dbRef = firebase.database().ref(`/entries/${this.props.data.id}/tags`);
+        dbRef.on('value', snap => {
+            if (snap.val()) {
+                const tags = Object.keys(snap.val());
+                this.setState({ tags });
+            }
+        });
+    }
+
+    render() {
+        const data = this.props.data;
+        const info = this.props.visible ? 'entry-item-expanded' : 'hidden';
+        return _react2.default.createElement(_ExpandedEntryInfo2.default, {
+            handleTagAdded: this.handleTagAdded,
+            handleTagRemoved: this.handleTagRemoved,
+            data: this.props.data,
+            info: info,
+            tags: this.state.tags
+        });
+    }
+}
+
+exports.default = ExpandedEntryInfoContainer;
+ExpandedEntryInfoContainer.propTypes = {
+    data: _react.PropTypes.shape({ title: _react.PropTypes.string, visible: _react.PropTypes.bool, author: _react.PropTypes.string, url: _react.PropTypes.string, id: _react.PropTypes.string.isRequired }),
+    visible: _react.PropTypes.bool.isRequired
+};
+
+/***/ }),
+/* 273 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(59);
+
+var _Menu = __webpack_require__(105);
+
+var _Menu2 = _interopRequireDefault(_Menu);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class MenuContainer extends _react.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            menuItemsData: [{
+                path: '/',
+                name: 'Home',
+                iconName: 'home',
+                isActive: true
+            }, {
+                path: '/profile',
+                name: 'Profile',
+                iconName: 'user-md',
+                isActive: false
+            }, {
+                path: '/users',
+                name: 'Users',
+                iconName: 'users',
+                isActive: false
+            }, {
+                path: '/entries',
+                name: 'Entries',
+                iconName: 'file-text',
+                isActive: false
+            }, {
+                path: '/user',
+                name: 'New Post',
+                iconName: 'file-text',
+                isActive: false
+            }]
+        };
+        this.handleActive = this.handleActive.bind(this);
+    }
+
+    handleActive(e, path) {
+        let newMenuItemsData = [];
+        for (let i = 0; i < this.state.menuItemsData.length; i++) {
+            newMenuItemsData.push(Object.assign({}, this.state.menuItemsData[i], {
+                isActive: path === this.state.menuItemsData[i].path
+            }));
+        }
+        this.setState({ menuItemsData: newMenuItemsData });
+    }
+
+    render() {
+        return _react2.default.createElement(_Menu2.default, { handleLogout: this.props.handleLogout, menuItems: this.state.menuItemsData, handleActive: this.handleActive });
+    }
+}
+
+exports.default = MenuContainer;
+
+//Custom components
+
+_Menu2.default.propTypes = {
+    handleLogout: _react2.default.PropTypes.func.isRequired
+};
+
+/***/ }),
+/* 274 */,
+/* 275 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _firebase = __webpack_require__(33);
+
+var firebase = _interopRequireWildcard(_firebase);
+
+var _FormProfile = __webpack_require__(276);
+
+var _FormProfile2 = _interopRequireDefault(_FormProfile);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const socialNetworks = [{
+    name: 'twitter',
+    icon: 'twitter'
+}, {
+    name: 'facebook',
+    icon: 'facebook'
+}, {
+    name: 'linkedin',
+    icon: 'linkedin'
+}, {
+    name: 'github',
+    icon: 'github'
+}, {
+    name: 'googleplus',
+    icon: 'google-plus'
+}, {
+    name: 'youtube',
+    icon: 'youtube'
+}, {
+    name: 'instagram',
+    icon: 'instagram'
+}, {
+    name: 'web',
+    icon: 'globe'
+}];
+
+//User default data
+const createUserDefaultData = user => {
+    return {
+        metadata: {
+            "bio": "Soy un soso y no tengo una bio",
+            "social": {},
+            "city": "Codevs city",
+            "firstname": user.displayName || "Anonimo",
+            "lastname": "",
+            "avatar": user.photoURL || '',
+            "birthdate": new Date().toISOString().split('T')[0]
+        },
+        "stats": {
+            "joined": new Date().toISOString().split('T')[0],
+            "lastmod": new Date().toISOString().split('T')[0],
+            "role": 10
+        }
+    };
+};
+
+class FormContainer extends _react.Component {
+    constructor(props) {
+        super(props);
+        const userDefaultData = createUserDefaultData({}).metadata;
+        this.state = {
+            bio: userDefaultData.bio,
+            social: userDefaultData.social,
+            city: userDefaultData.city,
+            firstname: userDefaultData.firstname,
+            lastname: userDefaultData.lastname,
+            avatar: userDefaultData.avatar,
+            birthdate: userDefaultData.birthdate
+        };
+
+        //function bindings
+        this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
+        this.handleLastnameChange = this.handleLastnameChange.bind(this);
+        this.handleCityChange = this.handleCityChange.bind(this);
+        this.handleBioChange = this.handleBioChange.bind(this);
+        this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
+        this.handleSocialChange = this.handleSocialChange.bind(this);
+        this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    }
+
+    componentDidMount() {
+        const user = firebase.auth().currentUser;
+        const dbRef = firebase.database().ref(`/users/${user.uid}`);
+        dbRef.on('value', data => {
+            let metadata;
+            if (!data.val()) {
+                //No tiene perfil a�n en la DB
+                const defaultUserData = createUserDefaultData(user);
+                dbRef.set(defaultUserData);
+                metadata = defaultUserData.metadata;
+            } else {
+                metadata = data.val().metadata;
+            }
+            this.setState({
+                bio: metadata.bio,
+                city: metadata.city,
+                firstname: metadata.firstname,
+                lastname: metadata.lastname,
+                avatar: metadata.avatar,
+                birthdate: metadata.birthdate,
+                social: metadata.social
+            });
+        });
+    }
+
+    //Handle inputs
+    handleFirstNameChange(e) {
+        this.setState({ firstname: e.target.value });
+    }
+    handleLastnameChange(e) {
+        this.setState({ lastname: e.target.value });
+    }
+    handleBirthdateChange(e) {
+        this.setState({ birthdate: e.target.value });
+    }
+    handleCityChange(e) {
+        this.setState({ city: e.target.value });
+    }
+    handleBioChange(e) {
+        this.setState({ bio: e.target.value });
+    }
+    handleSocialChange(e, newSocial) {
+        this.setState({ social: Object.assign({}, this.state.social, newSocial) });
+    }
+    //TODO: Avatar && social
+
+    handleFormSubmit(e) {
+        e.preventDefault();
+        const payload = {
+            metadata: this.state,
+            stats: {
+                'lastmod': new Date().toISOString().split('T')[0]
+            }
+        };
+        const user = firebase.auth().currentUser;
+        const dbRef = firebase.database().ref(`/users/${user.uid}`);
+        dbRef.child('/metadata').update(payload.metadata);
+        dbRef.child('/stats').update(payload.stats);
+    }
+
+    render() {
+
+        const controllers = {
+            handleLastnameChange: this.handleLastnameChange,
+            handleFirstNameChange: this.handleFirstNameChange,
+            handleBioChange: this.handleBioChange,
+            handleSocialChange: this.handleSocialChange,
+            handleFormSubmit: this.handleFormSubmit,
+            handleCityChange: this.handleCityChange,
+            handleBirthdateChange: this.handleBirthdateChange
+        };
+        return _react2.default.createElement(_FormProfile2.default, { userData: this.state, handleFunctions: controllers, socialNetworks: socialNetworks });
+    }
+}
+exports.default = FormContainer;
+
+/***/ }),
+/* 276 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+__webpack_require__(253);
+
+var _SimpleInput = __webpack_require__(257);
+
+var _SimpleInput2 = _interopRequireDefault(_SimpleInput);
+
+var _SimpleTextarea = __webpack_require__(258);
+
+var _SimpleTextarea2 = _interopRequireDefault(_SimpleTextarea);
+
+var _SocialInput = __webpack_require__(256);
+
+var _SocialInput2 = _interopRequireDefault(_SocialInput);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const FormProfile = ({ handleFunctions, userData, socialNetworks }) => _react2.default.createElement(
+    'div',
+    { className: 'form-container' },
+    _react2.default.createElement(
+        'h2',
+        { className: 'form-title' },
+        'Basic information'
+    ),
+    _react2.default.createElement('div', { className: 'form-divider' }),
+    _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Firstname', content: userData.firstname, controller: handleFunctions.handleFirstNameChange }),
+        _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Lasttname', content: userData.lastname, controller: handleFunctions.handleLastnameChange })
+    ),
+    _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'City', content: userData.city, controller: handleFunctions.handleCityChange }),
+        _react2.default.createElement(_SimpleInput2.default, { inputType: 'date', labeltitle: 'Birthdate', content: userData.birthdate, controller: handleFunctions.handleBirthdateChange })
+    ),
+    _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        _react2.default.createElement(_SimpleTextarea2.default, { labeltitle: 'Bio', resize: false, rows: 5, content: userData.bio, controller: handleFunctions.handleBioChange })
+    ),
+    _react2.default.createElement(
+        'h2',
+        { className: 'form-title' },
+        'Social links'
+    ),
+    _react2.default.createElement('div', { className: 'form-divider' }),
+    _react2.default.createElement(
+        'div',
+        { className: 'row social-row' },
+        socialNetworks.map((current, i) => {
+            const content = userData.social[current.name] || '';
+            return _react2.default.createElement(_SocialInput2.default, { key: i, icon: current.icon, content: content, controller: handleFunctions.handleSocialChange, name: current.name });
+        })
+    ),
+    _react2.default.createElement('input', { className: 'button-submit-profile', type: 'submit', value: 'Update profile', onClick: handleFunctions.handleFormSubmit })
+);
+
+FormProfile.propTypes = {
+    handleFunctions: _react.PropTypes.object.isRequired,
+    userData: _react.PropTypes.object.isRequired,
+    socialNetworks: _react.PropTypes.array.isRequired
+};
+
+exports.default = FormProfile;
 
 /***/ })
 /******/ ]);
