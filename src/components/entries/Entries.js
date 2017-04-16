@@ -24,7 +24,8 @@ export default class Entries extends Component{
           author : data[key].author,
           visible : data[key].visible,
           url : data[key].url,
-          id: key
+          id: key,
+          date: data[key].date
         });
       }
       this.setState({entries: items});

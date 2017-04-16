@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import * as firebase from 'firebase';
 import '../../style/__profile.scss';
 
-import SimpleInput from './SimpleInput.js';
-import SimpleTextarea from './SimpleTextarea.js';
-import SocialInput from './SocialInput.js';
+import SimpleInput from '../form/SimpleInput.js';
+import SimpleTextarea from '../form/SimpleTextarea.js';
+import SocialInput from '../form/SocialInput.js';
 
 const socialNetworks = [
     {
@@ -84,7 +84,7 @@ export default class FormContainer extends Component {
         const dbRef = firebase.database().ref(`/users/${user.uid}`);
         dbRef.on('value', (data) => {
             let metadata;
-            if (!data.val()) { //No tiene perfil aún en la DB
+            if (!data.val()) { //No tiene perfil aï¿½n en la DB
                 const defaultUserData = createUserDefaultData(user);
                 dbRef.set(defaultUserData);
                 metadata = defaultUserData.metadata;

@@ -1,17 +1,48 @@
 @import './__variables.scss';
-
-.entry-list{
-  width: 100%;
-  min-height: 100%;
-  background-color: red;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
+@import './assets/__labels.scss';
+.entry-list {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.entry-item{
-  width: 100%;
-  background-color: orange;
-  border-bottom: 1px solid blue;
+.entry-item {
+    width: 100%;
+    border-bottom: 1px solid $grayBorderColour;
+    overflow: hidden;
+
+    &-resume {
+        &--image {}
+        margin-top: 0;
+        align-items: center;
+    }
+
+    &-expanded {
+        border-top: 1px solid lighten($grayBorderColour, 40%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        &--data{
+          margin-top: 0;
+          padding: 0 20px;
+          box-sizing: border-box;
+          width: 100%;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          &>p{
+            margin-right: 20px;
+          }
+        }
+    }
+}
+
+
+
+.icon-eye {
+    color: lighten($darkColour, 10%);
+    margin-right: 10px;
 }

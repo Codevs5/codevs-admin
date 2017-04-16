@@ -1,23 +1,43 @@
-import React, {PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react';
+import ExpandedEntryInfo from './ExpandedEntryInfo.js';
+import ResumeEntry from './ResumeEntry.js';
 
-const EntryItem = ({data, changeVisibility}) => {
-    const visibilityClass = `fa fa-${ (data.visible)? 'eye' : 'eye-slash'}`;
-    return (
-        <div className="entry-item">
-            <h3>{data.title}</h3>
-            <p>
-                {data.author}</p>
-            <i className={visibilityClass} onClick={function() {
-                changeVisibility(data.id, !data.visible)
-            }}/>
+export default class EntryItem extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          expanded : false,
+        }
+        this.toggleInfo = this.toggleInfo.bind(this);
+    }
 
-        </div>
-    );
+    toggleInfo() {
+        this.setState({
+            expanded: !this.state.expanded
+        });
+    }
+
+    render() {
+        const classIcons = {
+            visibilityClass: `icon-eye icon-click fa fa-${ (this.props.data.visible)
+                ? 'eye'
+                : 'eye-slash'}`,
+            toggleClass: `icon-click fa fa-${ (!this.state.expanded)
+                ? 'caret-down'
+                : 'caret-up'}`
+        };
+        const data = this.props.data;
+        const changeVisibility = this.props.changeVisibility;
+        return (
+            <div className="entry-item">
+                <ResumeEntry changeVisibility={changeVisibility} title={data.title} id={data.id} visible={data.visible} icons={classIcons} toggleInfo={this.toggleInfo}/>
+                <ExpandedEntryInfo data={data} visible={this.state.expanded}/>
+            </div>
+        );
+    }
 }
 
 EntryItem.propTypes = {
-    data: PropTypes.shape({title: PropTypes.string, visible: PropTypes.bool, author: PropTypes.string, url: PropTypes.string}),
+    data: PropTypes.shape({title: PropTypes.string, visible: PropTypes.bool, author: PropTypes.string, url: PropTypes.string, id: PropTypes.string.isRequired}),
     changeVisibility: PropTypes.func.isRequired
 };
-
-export default EntryItem;

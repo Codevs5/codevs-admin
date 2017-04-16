@@ -1,0 +1,37 @@
+@import './__variables.scss';
+.tag-container{
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  width: 100%;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+.tag-list{
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  &--item{
+    background-color: $mainColour;
+    color: $darkColour;
+    border: 1px solid darken($mainColour, 5%);
+    margin: 10px;
+    padding: 5px 10px;
+
+    >i{
+      margin-left: 10px;
+    }
+  }
+}
+
+.tag-box{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 20px 20px 20px;
+  box-sizing: border-box;
+  &>input[type=text]{
+    margin-top: 10px;
+    padding: 10px;
+  }
+}

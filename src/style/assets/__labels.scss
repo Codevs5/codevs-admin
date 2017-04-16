@@ -1,0 +1,12 @@
+.label{
+  padding: 5px 10px;
+  background-color: $grayInputColour;
+  border: 1px solid darken($grayInputColour, 10%);
+  transition: 0.3s ease all;
+  margin-right: 10px;
+
+  &>i{
+    margin-right: 5px;
+
+  }
+}
