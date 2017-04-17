@@ -37,6 +37,8 @@ export default class ExpandedEntryInfoContainer extends Component {
             if (snap.val()) {
                 const tags = Object.keys(snap.val());
                 this.setState({tags});
+            }else{
+              this.setState({tags: []})
             }
         });
 
