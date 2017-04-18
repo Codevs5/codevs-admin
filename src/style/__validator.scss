@@ -1,0 +1,29 @@
+@import '__variables.scss';
+
+.validator-container{
+  margin-top: 64px;
+}
+
+
+.pending{
+  background-color: #fff790;
+  color: darken(#fff790, 40%);
+  font-weight: bold;
+}
+
+.declined{
+  background-color: #ed6464;
+  color: darken(#ed6464, 40%);
+  font-weight: bold;
+}
+
+.accepted{
+  background-color: #52de86;
+  color: darken(#52de86, 40%);
+  font-weight: bold;
+}
+
+.validate-select--box{
+  padding: 10px 20px;
+  flex: 1;
+}

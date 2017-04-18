@@ -38,7 +38,8 @@ ul {
     display: block;
     margin-left: $menu-size;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 
     &-wHeader {
         margin-top: 64px;

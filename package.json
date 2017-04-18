@@ -18,6 +18,7 @@
     "electron": "^1.6.2",
     "electron-builder": "^16.7.1",
     "electron-mocha": "^3.4.0",
+    "json-loader": "^0.5.4",
     "mocha": "^3.2.0",
     "sass-loader": "^6.0.3",
     "style-loader": "^0.16.1",
@@ -25,6 +26,7 @@
     "webpack-dev-server": "^2.4.2"
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "express": "^4.15.2",
     "firebase": "^3.7.5",
     "fs": "0.0.1-security",
