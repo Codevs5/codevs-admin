@@ -11,7 +11,7 @@ const SimpleInput = (props) => (
 
 SimpleInput.propTypes = {
   labeltitle: React.PropTypes.string.isRequired,
-  inputType: React.PropTypes.oneOf(['text', 'number', 'date']).isRequired,
+  inputType: React.PropTypes.oneOf(['text', 'number', 'date', 'email', 'password']).isRequired,
   content: React.PropTypes.string.isRequired,
   controller: React.PropTypes.func.isRequired
 };

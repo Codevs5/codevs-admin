@@ -1,3 +1,4 @@
 {
-  "gasEntriesValidator" : "https://script.google.com/macros/s/AKfycbwTrFYLLslF_L5pktEcLDbqFVq5XmdQYvNygFjlclybEqJYiWOn/exec"
+  "gasEntriesValidator" : "https://script.google.com/macros/s/AKfycbwTrFYLLslF_L5pktEcLDbqFVq5XmdQYvNygFjlclybEqJYiWOn/exec",
+  "updateEntriesValidator": "https://script.google.com/macros/s/AKfycbyYs5FvGWa4rk9wbHMpc6m56uEhgwm9q656Goh-D49JgCPgUYwA/exec"
 }

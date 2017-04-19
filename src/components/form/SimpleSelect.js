@@ -1,7 +1,6 @@
 import React, {PropTypes} from 'react';
 
 const SimpleSelect = ({title, options, handleChange, selected}) => {
-  console.log(options, selected);
     const listOptions = options.map((opt, i) => (
         <option value={opt} key={i}>
             {opt}
