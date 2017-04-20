@@ -14,7 +14,8 @@ const ProfilePassword = ({
     handleChangeVisibility,
     data,
     validPassword,
-    updated
+    updated,
+    handleChangeCurrentPassword
 }) => {
     const typeInput = (visibility)
         ? 'text'
@@ -32,19 +33,24 @@ const ProfilePassword = ({
     if (updated === 'error')
         alert = (<Alert type='error' message="Error: Can't update the password, you're doing something wrong" icon="fa fa-exclamation-triangle"/>)
     else if (updated === 'updated')
-        alert = (<Alert type='success' message="Error: Can't update the password, you're doing something wrong" icon="fa fa-exclamation-triangle"/>)
+        alert = (<Alert type='success' message="Cool! You updated the password succesfully" icon="fa fa-check"/>)
     return (
         <div className="container">
             <Header title="Update password"/>
             <div className="update-pwd">
                 {alert}
                 <div className="row">
+                    <SimpleInput controller={handleChangeCurrentPassword} content={data.current} labeltitle='Insert current password' inputType={typeInput}/>
+                </div>
+                <div className="row">
                     <SimpleInput controller={handleChangePassword1} content={data.password} labeltitle='Insert new password' inputType={typeInput}/>
                     <button onClick={handleChangeVisibility}>
                         <i className={classVisility}/> {visibleLabel}
                     </button>
                 </div>
-                <SimpleInput controller={handleChangePassword2} content={data.password2} labeltitle='Repeat the password' inputType={typeInput} design={design}/>
+                <div className="row">
+                    <SimpleInput controller={handleChangePassword2} content={data.password2} labeltitle='Repeat the password' inputType={typeInput} design={design}/>
+                </div>
                 <button onClick={handleUpdatePassword}>
                     Update password
                 </button>
@@ -61,7 +67,8 @@ ProfilePassword.propTypes = {
     handleChangeVisibility: PropTypes.func.isRequired,
     data: PropTypes.object.isRequired,
     validPassword: PropTypes.bool.isRequired,
-    updated: PropTypes.string.isRequired
-};
+    updated: PropTypes.string.isRequired,
+    handleChangeCurrentPassword: PropTypes.func.isRequired
+}
 
 export default ProfilePassword;

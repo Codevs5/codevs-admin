@@ -27597,11 +27597,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 const validateUser = exports.validateUser = data => {
-  console.log(validateEmail(data.email));
-  console.log(validatePassword(data.password));
-  console.log(validateRole(data.role), data.role);
-  console.log(validateName(data.name));
-
   return validateEmail(data.email) && validatePassword(data.password) && validateRole(data.role) && validateName(data.name);
 };
 
@@ -27610,7 +27605,7 @@ const validateEmail = email => {
   return re.test(email);
 };
 
-const validatePassword = password => {
+const validatePassword = exports.validatePassword = password => {
   return password.length >= 6;
 };
 
@@ -53030,9 +53025,17 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _firebase = __webpack_require__(22);
+
+var firebase = _interopRequireWildcard(_firebase);
+
 var _ProfilePassword = __webpack_require__(471);
 
 var _ProfilePassword2 = _interopRequireDefault(_ProfilePassword);
+
+var _validateUserProfile = __webpack_require__(242);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53042,7 +53045,8 @@ class ProfilePasswordContainer extends _react.Component {
         this.state = {
             pwd: {
                 password: '',
-                password2: ''
+                password2: '',
+                current: ''
             },
             visibility: false,
             validPassword: false,
@@ -53053,20 +53057,40 @@ class ProfilePasswordContainer extends _react.Component {
         this.handleChangePassword2 = this.handleChangePassword2.bind(this);
         this.handleUpdatePassword = this.handleUpdatePassword.bind(this);
         this.handleChangeVisibility = this.handleChangeVisibility.bind(this);
+        this.handleChangeCurrentPassword = this.handleChangeCurrentPassword.bind(this);
     }
 
     handleChangePassword1(e) {
+
         const tmpPwd = Object.assign({}, this.state.pwd, { password: e.target.value });
+
+        if (e.target.value === this.state.pwd.password2) this.setState({ validPassword: true });else this.setState({ validPassword: false });
+
         this.setState({ pwd: tmpPwd });
     }
 
     handleChangePassword2(e) {
+        if (e.target.value === this.state.pwd.password) this.setState({ validPassword: true });else this.setState({ validPassword: false });
+
         const tmpPwd = Object.assign({}, this.state.pwd, { password2: e.target.value });
         this.setState({ pwd: tmpPwd });
     }
 
+    handleChangeCurrentPassword(e) {
+        const tmpPwd = Object.assign({}, this.state.pwd, { current: e.target.value });
+        this.setState({ pwd: tmpPwd });
+    }
+
     handleUpdatePassword() {
-        console.log(this.state);
+        const user = firebase.auth().currentUser;
+        console.log(user);
+        if (this.state.validPassword && (0, _validateUserProfile.validatePassword)(this.state.pwd.password)) {
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, this.state.pwd.current);
+            user.reauthenticate(credential).then(() => user.updatePassword(this.state.pwd.password)).then(() => this.setState({ updated: 'updated' })).catch(e => {
+                this.setState({ updated: 'error' });
+                console.log(e);
+            });
+        }
     }
 
     handleChangeVisibility() {
@@ -53076,7 +53100,17 @@ class ProfilePasswordContainer extends _react.Component {
     }
 
     render() {
-        return _react2.default.createElement(_ProfilePassword2.default, { handleChangePassword1: this.handleChangePassword1, handleChangePassword2: this.handleChangePassword2, handleUpdatePassword: this.handleUpdatePassword, handleChangeVisibility: this.handleChangeVisibility, data: this.state.pwd, visibility: this.state.visibility, validPassword: this.state.validPassword, updated: this.state.updated });
+        return _react2.default.createElement(_ProfilePassword2.default, {
+            handleChangePassword1: this.handleChangePassword1,
+            handleChangePassword2: this.handleChangePassword2,
+            handleUpdatePassword: this.handleUpdatePassword,
+            handleChangeVisibility: this.handleChangeVisibility,
+            data: this.state.pwd,
+            visibility: this.state.visibility,
+            validPassword: this.state.validPassword,
+            updated: this.state.updated,
+            handleChangeCurrentPassword: this.handleChangeCurrentPassword
+        });
     }
 }
 exports.default = ProfilePasswordContainer;
@@ -53120,14 +53154,15 @@ const ProfilePassword = ({
     handleChangeVisibility,
     data,
     validPassword,
-    updated
+    updated,
+    handleChangeCurrentPassword
 }) => {
     const typeInput = visibility ? 'text' : 'password';
     const classVisility = visibility ? 'fa fa-eye-slash' : 'fa fa-eye';
     const visibleLabel = visibility ? 'Hide the password' : 'Set visible';
     const design = validPassword ? 'valid' : 'invalid';
     let alert = '';
-    if (updated === 'error') alert = _react2.default.createElement(_Alert2.default, { type: 'error', message: 'Error: Can\'t update the password, you\'re doing something wrong', icon: 'fa fa-exclamation-triangle' });else if (updated === 'updated') alert = _react2.default.createElement(_Alert2.default, { type: 'success', message: 'Error: Can\'t update the password, you\'re doing something wrong', icon: 'fa fa-exclamation-triangle' });
+    if (updated === 'error') alert = _react2.default.createElement(_Alert2.default, { type: 'error', message: 'Error: Can\'t update the password, you\'re doing something wrong', icon: 'fa fa-exclamation-triangle' });else if (updated === 'updated') alert = _react2.default.createElement(_Alert2.default, { type: 'success', message: 'Cool! You updated the password succesfully', icon: 'fa fa-check' });
     return _react2.default.createElement(
         'div',
         { className: 'container' },
@@ -53136,6 +53171,11 @@ const ProfilePassword = ({
             'div',
             { className: 'update-pwd' },
             alert,
+            _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangeCurrentPassword, content: data.current, labeltitle: 'Insert current password', inputType: typeInput })
+            ),
             _react2.default.createElement(
                 'div',
                 { className: 'row' },
@@ -53148,7 +53188,11 @@ const ProfilePassword = ({
                     visibleLabel
                 )
             ),
-            _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword2, content: data.password2, labeltitle: 'Repeat the password', inputType: typeInput, design: design }),
+            _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword2, content: data.password2, labeltitle: 'Repeat the password', inputType: typeInput, design: design })
+            ),
             _react2.default.createElement(
                 'button',
                 { onClick: handleUpdatePassword },
@@ -53166,7 +53210,8 @@ ProfilePassword.propTypes = {
     handleChangeVisibility: _react.PropTypes.func.isRequired,
     data: _react.PropTypes.object.isRequired,
     validPassword: _react.PropTypes.bool.isRequired,
-    updated: _react.PropTypes.string.isRequired
+    updated: _react.PropTypes.string.isRequired,
+    handleChangeCurrentPassword: _react.PropTypes.func.isRequired
 };
 
 exports.default = ProfilePassword;

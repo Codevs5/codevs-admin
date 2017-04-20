@@ -1,9 +1,4 @@
 export const validateUser = (data) => {
-  console.log(validateEmail(data.email));
-  console.log(validatePassword(data.password) );
-  console.log(validateRole(data.role), data.role);
-  console.log(validateName(data.name));
-
   return validateEmail(data.email) && validatePassword(data.password) && validateRole(data.role) && validateName(data.name);
 }
 
@@ -12,7 +7,7 @@ const validateEmail = (email) => {
     return re.test(email);
 };
 
-const validatePassword = (password) => {
+export const validatePassword = (password) => {
   return password.length >= 6;
 };
 
