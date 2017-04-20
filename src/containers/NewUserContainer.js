@@ -39,7 +39,8 @@ export default class NewUserContainer extends Component {
             metadata: {
                 bio: '',
                 firstname: this.state.name,
-                lastname: this.state.lastname
+                lastname: this.state.lastname,
+                social: {}
             }
         };
         return user.updateProfile({photoURL: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'})

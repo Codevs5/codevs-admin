@@ -10,6 +10,7 @@ body {
     width: 100%;
     min-height: 100vh;
     display: flex;
+    font-family: 'Lato', 'Roboto';
 }
 
 #app {
@@ -39,7 +40,7 @@ ul {
     margin-left: $menu-size;
     align-items: center;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
 
     &-wHeader {
         margin-top: 64px;

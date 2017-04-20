@@ -1,0 +1,52 @@
+@import './__variables.scss';
+
+.menu-card{
+  display: flex;
+  flex-flow: column wrap;
+  background-color: #fbfbfb;
+  height: 100%;
+  &--title{
+    //width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    margin: 10px 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid $mainColour;
+  }
+  &-list{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+
+.menu-card-item{
+  box-shadow: $simpleShadow;
+  background-color: white;
+  width: 180px;
+  height: 180px;
+  margin: 10px;
+  cursor: pointer;
+  transition: 0.25s ease-in all;
+  padding: 20px;
+  &:hover{
+    box-shadow: $simpleShadowHover;
+  }
+
+  &-container{
+    border: 1px solid lighten($darkColour, 70%);
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    &>h4{
+      width: 100%;
+      text-align: center;
+      margin: 10px 0;
+    }
+  }
+}

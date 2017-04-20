@@ -30,9 +30,14 @@ export default class MenuContainer extends Component {
                     iconName: 'file-text',
                     isActive: false
                 }, {
-                    path: '/user',
-                    name: 'New Post',
-                    iconName: 'file-text',
+                    path: '/stats',
+                    name: 'Stats',
+                    iconName: 'line-chart',
+                    isActive: false
+                },{
+                    path: '/calendar',
+                    name: 'Calendar',
+                    iconName: 'calendar',
                     isActive: false
                 }
             ]

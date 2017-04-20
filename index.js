@@ -6,13 +6,14 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
-require('./server');
-
+//require('./server');
+require('electron-reload')(__dirname);
 let mainWindow
 
 function createWindow() {
     mainWindow = new BrowserWindow({width: 750, height: 600, resizable: false})
-    mainWindow.loadURL('http://localhost:3007');
+    //mainWindow.loadURL('http://localhost:3007');
+    mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools()

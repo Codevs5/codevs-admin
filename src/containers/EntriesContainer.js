@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Entries from '../components/entries/Entries.js';
+import MenuCard from '../components/layout/MenuCard.js';
 
 export default class EntriesContainer extends Component{
   constructor(props){
@@ -8,6 +8,21 @@ export default class EntriesContainer extends Component{
   }
 
   render(){
-    return (<Entries />);
+    const entries = [
+        {
+            linkPath: '/entries/published',
+            title: 'Published entries',
+            imagePath: 'publishedEntries.png'
+        }, {
+            linkPath: '/entries/validator',
+            title: 'Validate entries',
+            imagePath: 'entryValidator.png'
+        }, {
+          linkPath: '/entries/add',
+          title: 'Create new entry',
+          imagePath: 'addEntry.png'
+        }
+    ];
+    return (<MenuCard title="Entries" cards={entries} />);
   }
 }
