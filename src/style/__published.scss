@@ -1,0 +1,98 @@
+@import './__variables.scss';
+
+.published-list {
+    & > div:nth-child(even) {
+        background-color: #F6F6F6;
+    }
+
+    & > div:nth-child(odd) {
+        background-color: #FFFFFF;
+    }
+}
+
+.published-entry-item {
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+
+    &--info {
+        margin-left: 25px;
+        flex: 1;
+        & > h5 {
+            font-size: 1.2em;
+            color: #F26959;
+            padding: 0;
+            margin: 0;
+        }
+
+        & > div {
+            font-size: 0.7em;
+            margin-top: 5px;
+            color: #4a4a4a;
+            justify-content: flex-start;
+
+            & > div {
+                margin-right: 20px;
+
+                & > i {
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+
+    & > .view-more {
+        background-color: #F26959;
+        padding: 5px 10px;
+        color: white;
+        transition: 0.25s ease-in all;
+
+        &:hover {
+            background-color: darken(#F26959, 10%);
+        }
+    }
+}
+
+.hexagon {
+    position: relative;
+    width: 30px;
+    height: 17.32px;
+    background-color: #64C7CC;
+    margin: 8.66px 0;
+    text-align: center;
+    line-height: 1em;
+}
+
+.hexagon-hidden {
+    background-color: #83ABE1;
+
+    &.hexagon:after {
+        border-top: 8.66px solid #83ABE1;
+    }
+
+    &.hexagon:before {
+        border-bottom: 8.66px solid #83ABE1;
+    }
+}
+
+.hexagon:after,
+.hexagon:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    left: 0;
+}
+
+.hexagon:before {
+    bottom: 100%;
+    border-bottom: 8.66px solid #64C7CC;
+}
+
+.hexagon:after {
+    top: 100%;
+    width: 0;
+    border-top: 8.66px solid #64C7CC;
+}

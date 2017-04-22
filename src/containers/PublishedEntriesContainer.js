@@ -1,19 +1,22 @@
 import React, {Component, PropTypes} from 'react';
-import PublishedEntries from '../components/entries/PublishedEntries.js';
+import PublishedEntries from '../components/entries/published/PublishedEntries.js';
 import * as firebase from 'firebase';
 
 export default class PublishedEntriesContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            entries: []
+            entries: [],
+            loading: true,
+            error: false
         };
         this.changeVisibility = this.changeVisibility.bind(this);
     }
 
     componentDidMount() {
-        const dbRef = firebase.database().ref('/entries');
-        dbRef.orderByChild('date').once('value', (data) => {
+        const dbRef = firebase.database().ref('/entries/info');
+        dbRef.orderByChild('date').once('value')
+        .then((data) => {
             data = data.val();
             let items = []
             for (let key in data) {
@@ -21,17 +24,17 @@ export default class PublishedEntriesContainer extends Component {
                     title: data[key].title,
                     author: data[key].author,
                     visible: data[key].visible,
-                    url: data[key].url,
                     id: key,
                     date: data[key].date
                 });
             }
-            this.setState({entries: items});
-        });
+            this.setState({entries: items, loading: false});
+        })
+        .catch((err) => this.setState({error: true, loading: false}));
     }
 
     changeVisibility(id, visible) {
-        const dbRef = firebase.database().ref(`/entries/${id}`);
+        const dbRef = firebase.database().ref(`/entries/info/${id}`);
         dbRef.update({visible: visible});
         const index = this.state.entries.findIndex(item => item.id === id);
         const size = this.state.entries.length;
@@ -48,6 +51,8 @@ export default class PublishedEntriesContainer extends Component {
         return (<PublishedEntries
           entries={this.state.entries}
           changeVisibility={this.changeVisibility}
+          loading={this.state.loading}
+          error={this.state.error}
           />);
     }
 }

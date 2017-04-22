@@ -9,6 +9,11 @@
     align-items: center;
 }
 
+
+
+
+
+
 .entry-item {
     width: 100%;
     border-bottom: 1px solid $grayBorderColour;
@@ -39,8 +44,6 @@
         }
     }
 }
-
-
 
 .icon-eye {
     color: lighten($darkColour, 10%);

@@ -1,5 +1,6 @@
 module.exports = {
   entry: './src/index.js',
+  target: "electron",
   output: {
     filename: 'build.js',
     path: __dirname + '/../app/'

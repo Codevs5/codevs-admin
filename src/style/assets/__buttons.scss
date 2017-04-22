@@ -13,3 +13,19 @@
     background-color: darken($mainColour, 15%);
   }
 }
+
+.btn-back{
+  padding: 15px;
+  border-radius: 0;
+  box-shadow: $simpleShadow;
+  background-color: white;
+  border: none;
+  margin-right: 15px;
+  font-size: 1.1em;
+  box-sizing: border-box;
+  transition: 0.25 ease-in all;
+  cursor: pointer;
+  &:hover{
+    background-color: darken(white, 10%);
+  }
+}

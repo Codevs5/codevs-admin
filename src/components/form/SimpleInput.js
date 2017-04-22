@@ -1,12 +1,13 @@
 import React, {PropTypes} from 'react';
 
 const SimpleInput = (props) => {
+  const designClass = `input-container ${props.design}`;
     return (
-        <div className="input-container">
+        <div className={designClass}>
             <label>
-                {props.labeltitle}:
+                {props.labeltitle}
             </label>
-            <input type={props.inputType} value={props.content} onChange={props.controller} className={props.design}/>
+            <input type={props.inputType} value={props.content} onChange={props.controller} />
         </div>
     );
 };

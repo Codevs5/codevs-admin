@@ -1,0 +1,166 @@
+@import './__variables.scss';
+//MIXINS
+//
+@mixin buttonSize ($fSize, $mWidth, $lSpacing, $bRadius) {
+    font-size: $fSize;
+    min-width: $mWidth;
+    letter-spacing: $lSpacing;
+    border-radius: $bRadius;
+}
+@mixin buttonColor  ($bgcolor, $amount: 5%, $color: #fff) {
+    background: $bgcolor;
+    color: $color;
+
+    &:hover {
+        background: darken($bgcolor, $amount);
+    }
+
+    &.gradient {
+        background-image: -webkit-linear-gradient(top, lighten($bgcolor, $amount), darken($bgcolor, $amount*3));
+
+        &:hover {
+            background-image: -webkit-linear-gradient(top, lighten($bgcolor, $amount), darken($bgcolor, $amount*5));
+        }
+    }
+}
+
+// Design
+
+.entry-container {
+    padding: 5px 20px;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.entry-title {
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    border-bottom: 4px solid $activeMenuColour;
+    //padding: 10px 0
+    padding: 0;
+    margin: 0;
+    color: #393939;
+    box-sizing: border-box;
+    margin-top: 5px;
+    overflow: hidden;
+
+    & > h2 {
+        padding: 10px 5px;
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: normal;
+        height: 50px;
+        box-sizing: border-box;
+    }
+
+    & > .btn-edit {
+        height: 50px;
+        width: 50px;
+        background-color: darken($activeMenuColour, 25%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        & > i {
+            border-radius: 100%;
+            background-color: white;
+            color: #004153;
+            padding: 6px;
+        }
+    }
+}
+
+.title-input {
+    flex: 1;
+    box-sizing: border-box;
+
+    & > input {
+        width: 100%;
+        padding: 10px 5px;
+        font-size: 1.25rem;
+        height: 50px;
+        box-sizing: border-box;
+        margin-top: 0;
+    }
+}
+
+.entry-info {
+    margin: 10px 20px;
+    padding: 10px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+
+    &--item {
+        & > span {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 5px 10px;
+            background-color: $darkColour;
+            color: darken(white, 10%);
+            font-size: 0.7em;
+            width: 100px;
+
+            & > i {
+                margin-right: 10px;
+            }
+        }
+        display: flex;
+        align-items: center;
+        width: 250px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid $darkColour;
+    }
+}
+
+.entry-btns{
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.entry-btn-item {
+    display: inline-block;
+    border: none;
+    margin: 0 4px;
+    color: #fff;
+    background: #999;
+    font-size: 1em;
+    padding: 0.7em 0.5em;
+    text-decoration: none;
+    letter-spacing: -1px;
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
+    border-radius: 0px !important;
+    cursor: pointer;
+    &>i{
+      margin-right: 10px;
+    }
+
+    @include buttonSize (0.95em, 7em, 0, 3px);
+    &.carrot{
+      @include buttonColor ($c-carrot);
+    }
+
+    &.green-sea{
+      @include buttonColor ($c-green-sea);
+    }
+
+    &.belize-hole{
+      @include buttonColor ($c-belize-hole);
+    }
+    &.alizarin{
+      @include buttonColor ($c-alizarin);
+    }
+}
+
+.entry-toggles{
+  margin-bottom: 20px;
+}

@@ -13,9 +13,9 @@
   margin: 0;
   &--item{
     background-color: $mainColour;
-    color: $darkColour;
-    border: 1px solid darken($mainColour, 5%);
-    margin: 10px;
+    color: white;
+    //border: 1px solid darken($mainColour, 5%);
+    margin: 5px;
     padding: 5px 10px;
 
     >i{

@@ -1,9 +1,11 @@
 import React, {PropTypes} from 'react';
 import EntryTag from './EntryTag.js';
-import '../../style/__tags.scss';
+import '../../../style/__tags.scss';
 
 const EntryTagList = ({handleRemove, tags, label}) => {
-    const tagList = tags.map((tag, i) => <EntryTag handleRemove={handleRemove} value={tag} key={i}/>);
+    let tagList;
+    if(tags.length >= 1) tagList = tags.map((tag, i) => <EntryTag handleRemove={handleRemove} value={tag} key={i}/>);
+    else tagList = (<div className="empty-list"> There are not tags to show. Try adding one. </div>);
     return (
         <div className="tag-container">
             {label}
