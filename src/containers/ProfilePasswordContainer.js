@@ -13,39 +13,36 @@ export default class ProfilePasswordContainer extends Component {
                 password2: '',
                 current: ''
             },
-            visibility: false,
-            validPassword: false,
+            visibilityCurrent: false,
+            visibilityNew: false,
+            visibilityRepeat: false,
+            validPassword: true,
             updated: ''
         };
 
         this.handleChangePassword1 = this.handleChangePassword1.bind(this);
         this.handleChangePassword2 = this.handleChangePassword2.bind(this);
         this.handleUpdatePassword = this.handleUpdatePassword.bind(this);
-        this.handleChangeVisibility = this.handleChangeVisibility.bind(this);
+        this.handleChangeVisibilityCurrent = this.handleChangeVisibilityCurrent.bind(this);
+        this.handleChangeVisibilityNew = this.handleChangeVisibilityNew.bind(this);
+        this.handleChangeVisibilityRepeat = this.handleChangeVisibilityRepeat.bind(this);
         this.handleChangeCurrentPassword = this.handleChangeCurrentPassword.bind(this);
 
     }
 
     handleChangePassword1(e) {
-
-        const tmpPwd = Object.assign({}, this.state.pwd, {password: e.target.value});
-
-        if (e.target.value === this.state.pwd.password2)
-            this.setState({validPassword: true});
-        else
-            this.setState({validPassword: false});
-
-        this.setState({pwd: tmpPwd});
+        this.setState({pwd: Object.assign({}, this.state.pwd, {password: e.target.value})});
     }
 
     handleChangePassword2(e) {
-        if (e.target.value === this.state.pwd.password)
-            this.setState({validPassword: true});
-        else
-            this.setState({validPassword: false});
+        console.log(this.state);
+        this.setState({pwd: Object.assign({}, this.state.pwd, {password2: e.target.value})});
+        this.setState({validPassword: (e.target.value === this.state.pwd.password)});
 
-        const tmpPwd = Object.assign({}, this.state.pwd, {password2: e.target.value});
-        this.setState({pwd: tmpPwd});
+    }
+
+    componentDidUpdate(){
+
     }
 
     handleChangeCurrentPassword(e) {
@@ -55,7 +52,6 @@ export default class ProfilePasswordContainer extends Component {
 
     handleUpdatePassword() {
         const user = firebase.auth().currentUser;
-        console.log(user);
         if (this.state.validPassword && validatePassword(this.state.pwd.password)) {
             const credential = firebase.auth.EmailAuthProvider.credential(user.email, this.state.pwd.current);
             user.reauthenticate(credential)
@@ -70,20 +66,35 @@ export default class ProfilePasswordContainer extends Component {
 
     }
 
-    handleChangeVisibility() {
+    handleChangeVisibilityCurrent() {
         this.setState({
-            visibility: !this.state.visibility
+            visibilityCurrent: !this.state.visibilityCurrent
         });
     }
 
+    handleChangeVisibilityNew(){
+      this.setState({
+          visibilityNew: !this.state.visibilityNew
+      });
+    }
+
+    handleChangeVisibilityRepeat(){
+      this.setState({
+          visibilityRepeat: !this.state.visibilityRepeat
+      });
+    }
     render() {
       return (<ProfilePassword
         handleChangePassword1={this.handleChangePassword1}
         handleChangePassword2={this.handleChangePassword2}
         handleUpdatePassword={this.handleUpdatePassword}
-        handleChangeVisibility={this.handleChangeVisibility}
+        handleChangeVisibilityCurrent={this.handleChangeVisibilityCurrent}
+        handleChangeVisibilityRepeat={this.handleChangeVisibilityRepeat}
+        handleChangeVisibilityNew={this.handleChangeVisibilityNew}
         data={this.state.pwd}
-        visibility={this.state.visibility}
+        visibilityNew={this.state.visibilityNew}
+        visibilityCurrent={this.state.visibilityCurrent}
+        visibilityRepeat={this.state.visibilityRepeat}
         validPassword={this.state.validPassword}
         updated={this.state.updated}
         handleChangeCurrentPassword={this.handleChangeCurrentPassword}

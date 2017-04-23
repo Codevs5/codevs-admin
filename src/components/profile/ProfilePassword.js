@@ -7,25 +7,21 @@ import SimpleInput from '../form/SimpleInput.js';
 import '../../style/__password.scss';
 
 const ProfilePassword = ({
-    visibility,
+    visibilityCurrent,
+    visibilityNew,
+    visibilityRepeat,
     handleChangePassword1,
     handleChangePassword2,
     handleUpdatePassword,
-    handleChangeVisibility,
+    handleChangeVisibilityCurrent,
+    handleChangeVisibilityNew,
+    handleChangeVisibilityRepeat,
     data,
     validPassword,
     updated,
     handleChangeCurrentPassword
 }) => {
-    const typeInput = (visibility)
-        ? 'text'
-        : 'password';
-    const classVisility = (visibility)
-        ? 'fa fa-eye-slash'
-        : 'fa fa-eye';
-    const visibleLabel = (visibility)
-        ? 'Hide the password'
-        : 'Set visible';
+    console.log(validPassword);
     const design = (validPassword)
         ? 'valid'
         : 'invalid';
@@ -40,31 +36,42 @@ const ProfilePassword = ({
             <div className="update-pwd">
                 {alert}
                 <div className="row">
-                    <SimpleInput controller={handleChangeCurrentPassword} content={data.current} labeltitle='Insert current password' inputType={typeInput}/>
-                </div>
-                <div className="row">
-                    <SimpleInput controller={handleChangePassword1} content={data.password} labeltitle='Insert new password' inputType={typeInput}/>
-                    <button onClick={handleChangeVisibility}>
-                        <i className={classVisility}/> {visibleLabel}
+                    <SimpleInput controller={handleChangeCurrentPassword} content={data.current} labeltitle='Insert current password' inputType={getTypeVisibility(visibilityCurrent)}/>
+                    <button className="btn-pwd" onClick={handleChangeVisibilityCurrent}>
+                        <i className={getIconVisibility(visibilityCurrent)}/> {getLabelVisibility(visibilityCurrent)}
                     </button>
                 </div>
                 <div className="row">
-                    <SimpleInput controller={handleChangePassword2} content={data.password2} labeltitle='Repeat the password' inputType={typeInput} design={design}/>
+                    <SimpleInput controller={handleChangePassword1} content={data.password} labeltitle='Insert new password' inputType={getTypeVisibility(visibilityNew)}/>
+                    <button className="btn-pwd" onClick={handleChangeVisibilityNew}>
+                        <i className={getIconVisibility(visibilityNew)}/> {getLabelVisibility(visibilityNew)}
+                    </button>
                 </div>
-                <button onClick={handleUpdatePassword}>
+                <div className="row">
+                    <SimpleInput controller={handleChangePassword2} content={data.password2} labeltitle='Repeat the password' inputType={getTypeVisibility(visibilityRepeat)} design={design}/>
+                    <button className="btn-pwd" onClick={handleChangeVisibilityRepeat}>
+                        <i className={getIconVisibility(visibilityRepeat)}/> {getLabelVisibility(visibilityRepeat)}
+                    </button>
+                </div>
+                <button className="btn-pwd btn-pwd--update" onClick={handleUpdatePassword}>
                     Update password
                 </button>
+                <p className="required-warning"> * Password must contain at least 6 characters * </p>
             </div>
         </div>
     );
 }
 
 ProfilePassword.propTypes = {
-    visibility: PropTypes.bool.isRequired,
+    visibilityCurrent: PropTypes.bool.isRequired,
+    visibilityNew: PropTypes.bool.isRequired,
+    visibilityRepeat: PropTypes.bool.isRequired,
     handleChangePassword1: PropTypes.func.isRequired,
     handleChangePassword2: PropTypes.func.isRequired,
     handleUpdatePassword: PropTypes.func.isRequired,
-    handleChangeVisibility: PropTypes.func.isRequired,
+    handleChangeVisibilityCurrent: PropTypes.func.isRequired,
+    handleChangeVisibilityNew: PropTypes.func.isRequired,
+    handleChangeVisibilityRepeat: PropTypes.func.isRequired,
     data: PropTypes.object.isRequired,
     validPassword: PropTypes.bool.isRequired,
     updated: PropTypes.string.isRequired,
@@ -72,3 +79,16 @@ ProfilePassword.propTypes = {
 }
 
 export default ProfilePassword;
+
+//
+const getIconVisibility = (visible) => (visible)
+    ? 'fa fa-eye-slash'
+    : 'fa fa-eye';
+
+const getLabelVisibility = (visible) => (visible)
+    ? 'Hide the password'
+    : 'Set visible';
+
+const getTypeVisibility = (visible) => (visible)
+    ? 'text'
+    : 'password';

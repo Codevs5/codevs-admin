@@ -58131,19 +58131,21 @@ __webpack_require__(739);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const ProfilePassword = ({
-    visibility,
+    visibilityCurrent,
+    visibilityNew,
+    visibilityRepeat,
     handleChangePassword1,
     handleChangePassword2,
     handleUpdatePassword,
-    handleChangeVisibility,
+    handleChangeVisibilityCurrent,
+    handleChangeVisibilityNew,
+    handleChangeVisibilityRepeat,
     data,
     validPassword,
     updated,
     handleChangeCurrentPassword
 }) => {
-    const typeInput = visibility ? 'text' : 'password';
-    const classVisility = visibility ? 'fa fa-eye-slash' : 'fa fa-eye';
-    const visibleLabel = visibility ? 'Hide the password' : 'Set visible';
+    console.log(validPassword);
     const design = validPassword ? 'valid' : 'invalid';
     let alert = '';
     if (updated === 'error') alert = _react2.default.createElement(_Alert2.default, { type: 'error', message: 'Error: Can\'t update the password, you\'re doing something wrong', icon: 'fa fa-exclamation-triangle' });else if (updated === 'updated') alert = _react2.default.createElement(_Alert2.default, { type: 'success', message: 'Cool! You updated the password succesfully', icon: 'fa fa-check' });
@@ -58158,40 +58160,63 @@ const ProfilePassword = ({
             _react2.default.createElement(
                 'div',
                 { className: 'row' },
-                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangeCurrentPassword, content: data.current, labeltitle: 'Insert current password', inputType: typeInput })
-            ),
-            _react2.default.createElement(
-                'div',
-                { className: 'row' },
-                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword1, content: data.password, labeltitle: 'Insert new password', inputType: typeInput }),
+                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangeCurrentPassword, content: data.current, labeltitle: 'Insert current password', inputType: getTypeVisibility(visibilityCurrent) }),
                 _react2.default.createElement(
                     'button',
-                    { onClick: handleChangeVisibility },
-                    _react2.default.createElement('i', { className: classVisility }),
+                    { className: 'btn-pwd', onClick: handleChangeVisibilityCurrent },
+                    _react2.default.createElement('i', { className: getIconVisibility(visibilityCurrent) }),
                     ' ',
-                    visibleLabel
+                    getLabelVisibility(visibilityCurrent)
                 )
             ),
             _react2.default.createElement(
                 'div',
                 { className: 'row' },
-                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword2, content: data.password2, labeltitle: 'Repeat the password', inputType: typeInput, design: design })
+                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword1, content: data.password, labeltitle: 'Insert new password', inputType: getTypeVisibility(visibilityNew) }),
+                _react2.default.createElement(
+                    'button',
+                    { className: 'btn-pwd', onClick: handleChangeVisibilityNew },
+                    _react2.default.createElement('i', { className: getIconVisibility(visibilityNew) }),
+                    ' ',
+                    getLabelVisibility(visibilityNew)
+                )
+            ),
+            _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(_SimpleInput2.default, { controller: handleChangePassword2, content: data.password2, labeltitle: 'Repeat the password', inputType: getTypeVisibility(visibilityRepeat), design: design }),
+                _react2.default.createElement(
+                    'button',
+                    { className: 'btn-pwd', onClick: handleChangeVisibilityRepeat },
+                    _react2.default.createElement('i', { className: getIconVisibility(visibilityRepeat) }),
+                    ' ',
+                    getLabelVisibility(visibilityRepeat)
+                )
             ),
             _react2.default.createElement(
                 'button',
-                { onClick: handleUpdatePassword },
+                { className: 'btn-pwd btn-pwd--update', onClick: handleUpdatePassword },
                 'Update password'
+            ),
+            _react2.default.createElement(
+                'p',
+                { className: 'required-warning' },
+                ' * Password must contain at least 6 characters * '
             )
         )
     );
 };
 
 ProfilePassword.propTypes = {
-    visibility: _react.PropTypes.bool.isRequired,
+    visibilityCurrent: _react.PropTypes.bool.isRequired,
+    visibilityNew: _react.PropTypes.bool.isRequired,
+    visibilityRepeat: _react.PropTypes.bool.isRequired,
     handleChangePassword1: _react.PropTypes.func.isRequired,
     handleChangePassword2: _react.PropTypes.func.isRequired,
     handleUpdatePassword: _react.PropTypes.func.isRequired,
-    handleChangeVisibility: _react.PropTypes.func.isRequired,
+    handleChangeVisibilityCurrent: _react.PropTypes.func.isRequired,
+    handleChangeVisibilityNew: _react.PropTypes.func.isRequired,
+    handleChangeVisibilityRepeat: _react.PropTypes.func.isRequired,
     data: _react.PropTypes.object.isRequired,
     validPassword: _react.PropTypes.bool.isRequired,
     updated: _react.PropTypes.string.isRequired,
@@ -58199,6 +58224,14 @@ ProfilePassword.propTypes = {
 };
 
 exports.default = ProfilePassword;
+
+//
+
+const getIconVisibility = visible => visible ? 'fa fa-eye-slash' : 'fa fa-eye';
+
+const getLabelVisibility = visible => visible ? 'Hide the password' : 'Set visible';
+
+const getTypeVisibility = visible => visible ? 'text' : 'password';
 
 /***/ }),
 /* 448 */
@@ -58955,33 +58988,33 @@ class ProfilePasswordContainer extends _react.Component {
                 password2: '',
                 current: ''
             },
-            visibility: false,
-            validPassword: false,
+            visibilityCurrent: false,
+            visibilityNew: false,
+            visibilityRepeat: false,
+            validPassword: true,
             updated: ''
         };
 
         this.handleChangePassword1 = this.handleChangePassword1.bind(this);
         this.handleChangePassword2 = this.handleChangePassword2.bind(this);
         this.handleUpdatePassword = this.handleUpdatePassword.bind(this);
-        this.handleChangeVisibility = this.handleChangeVisibility.bind(this);
+        this.handleChangeVisibilityCurrent = this.handleChangeVisibilityCurrent.bind(this);
+        this.handleChangeVisibilityNew = this.handleChangeVisibilityNew.bind(this);
+        this.handleChangeVisibilityRepeat = this.handleChangeVisibilityRepeat.bind(this);
         this.handleChangeCurrentPassword = this.handleChangeCurrentPassword.bind(this);
     }
 
     handleChangePassword1(e) {
-
-        const tmpPwd = Object.assign({}, this.state.pwd, { password: e.target.value });
-
-        if (e.target.value === this.state.pwd.password2) this.setState({ validPassword: true });else this.setState({ validPassword: false });
-
-        this.setState({ pwd: tmpPwd });
+        this.setState({ pwd: Object.assign({}, this.state.pwd, { password: e.target.value }) });
     }
 
     handleChangePassword2(e) {
-        if (e.target.value === this.state.pwd.password) this.setState({ validPassword: true });else this.setState({ validPassword: false });
-
-        const tmpPwd = Object.assign({}, this.state.pwd, { password2: e.target.value });
-        this.setState({ pwd: tmpPwd });
+        console.log(this.state);
+        this.setState({ pwd: Object.assign({}, this.state.pwd, { password2: e.target.value }) });
+        this.setState({ validPassword: e.target.value === this.state.pwd.password });
     }
+
+    componentDidUpdate() {}
 
     handleChangeCurrentPassword(e) {
         const tmpPwd = Object.assign({}, this.state.pwd, { current: e.target.value });
@@ -58990,7 +59023,6 @@ class ProfilePasswordContainer extends _react.Component {
 
     handleUpdatePassword() {
         const user = firebase.auth().currentUser;
-        console.log(user);
         if (this.state.validPassword && (0, _validateUserProfile.validatePassword)(this.state.pwd.password)) {
             const credential = firebase.auth.EmailAuthProvider.credential(user.email, this.state.pwd.current);
             user.reauthenticate(credential).then(() => user.updatePassword(this.state.pwd.password)).then(() => this.setState({ updated: 'updated' })).catch(e => {
@@ -59000,20 +59032,35 @@ class ProfilePasswordContainer extends _react.Component {
         }
     }
 
-    handleChangeVisibility() {
+    handleChangeVisibilityCurrent() {
         this.setState({
-            visibility: !this.state.visibility
+            visibilityCurrent: !this.state.visibilityCurrent
         });
     }
 
+    handleChangeVisibilityNew() {
+        this.setState({
+            visibilityNew: !this.state.visibilityNew
+        });
+    }
+
+    handleChangeVisibilityRepeat() {
+        this.setState({
+            visibilityRepeat: !this.state.visibilityRepeat
+        });
+    }
     render() {
         return _react2.default.createElement(_ProfilePassword2.default, {
             handleChangePassword1: this.handleChangePassword1,
             handleChangePassword2: this.handleChangePassword2,
             handleUpdatePassword: this.handleUpdatePassword,
-            handleChangeVisibility: this.handleChangeVisibility,
+            handleChangeVisibilityCurrent: this.handleChangeVisibilityCurrent,
+            handleChangeVisibilityRepeat: this.handleChangeVisibilityRepeat,
+            handleChangeVisibilityNew: this.handleChangeVisibilityNew,
             data: this.state.pwd,
-            visibility: this.state.visibility,
+            visibilityNew: this.state.visibilityNew,
+            visibilityCurrent: this.state.visibilityCurrent,
+            visibilityRepeat: this.state.visibilityRepeat,
             validPassword: this.state.validPassword,
             updated: this.state.updated,
             handleChangeCurrentPassword: this.handleChangeCurrentPassword
@@ -59799,7 +59846,7 @@ exports = module.exports = __webpack_require__(10)(undefined);
 
 
 // module
-exports.push([module.i, ".update-pwd {\n  margin-top: 100px;\n  padding: 10px;\n  display: flex;\n  flex-flow: column wrap; }\n", ""]);
+exports.push([module.i, ".update-pwd {\n  margin-top: 100px;\n  padding: 10px;\n  display: flex;\n  flex-flow: column wrap;\n  justify-content: center;\n  align-items: center; }\n  .update-pwd > div {\n    align-items: flex-end; }\n\n.btn-pwd {\n  width: 120px;\n  background-color: #ECF0F1;\n  border: none;\n  cursor: pointer;\n  height: 52px;\n  transition: 0.25s ease-in all; }\n  .btn-pwd:hover {\n    background-color: #cfd9db; }\n  .btn-pwd--update {\n    width: 427px;\n    margin-top: 20px;\n    background-color: #2ECC71; }\n    .btn-pwd--update:hover {\n      background-color: #25a25a; }\n\n.invalid > input {\n  border: 1px solid red; }\n\n.required-warning {\n  font-size: 0.7em;\n  color: #7F8C8D; }\n", ""]);
 
 // exports
 
