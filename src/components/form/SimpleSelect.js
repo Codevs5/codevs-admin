@@ -6,12 +6,13 @@ const SimpleSelect = ({title, options, handleChange, selected, enable}) => {
             {opt}
         </option>
     ));
+
     return (
         <div className="select-box">
             <label>
                 {title}
             </label>
-            <select disabled={!enable} onChange={handleChange} value={selected} className="select-ctrl">
+            <select disabled={(enable !== null && typeof enable !== 'undefined')?!enable:false} onChange={handleChange} value={selected} className="select-ctrl">
                 {listOptions}
             </select>
         </div>
