@@ -8,8 +8,8 @@ const SimpleToggle = ({check, controller}) => {
     return (
       <div className="toggle-box">
         <span>{check.uncheckMssg}</span>
-        <label className="switch" >
-            <input type="checkbox" onChange={controller} checked={check.isCheck}/>
+        <label htmlFor={check.checkMssg} className="switch" >
+            <input id={check.checkMssg} type="checkbox" onChange={controller} checked={check.isCheck}/>
             <div className="slider"></div>
               <i className={checkedIcon} />
             <i className={uncheckedIcon} />

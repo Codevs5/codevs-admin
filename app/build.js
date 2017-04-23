@@ -57613,8 +57613,8 @@ const SimpleToggle = ({ check, controller }) => {
         ),
         _react2.default.createElement(
             'label',
-            { className: 'switch' },
-            _react2.default.createElement('input', { type: 'checkbox', onChange: controller, checked: check.isCheck }),
+            { htmlFor: check.checkMssg, className: 'switch' },
+            _react2.default.createElement('input', { id: check.checkMssg, type: 'checkbox', onChange: controller, checked: check.isCheck }),
             _react2.default.createElement('div', { className: 'slider' }),
             _react2.default.createElement('i', { className: checkedIcon }),
             _react2.default.createElement('i', { className: uncheckedIcon })
@@ -59226,9 +59226,9 @@ class PublishedEntryContainer extends _react.Component {
   handleUpdateEntry() {}
 
   handleChangeVisibility() {
-    const tmpVisible = !this.state.entry.visibility;
+    const tmpVisible = !this.state.entry.visible;
+    this.setState({ entry: Object.assign({}, this.state.entry, { visible: tmpVisible }) });
     const dbRef = firebase.database().ref(`/entries/info/${this.props.match.params.id}/`);
-    this.setState({ entry: Object.assign({}, this.state.entry, { pinned: tmpVisible }) });
     dbRef.update({ visible: tmpVisible }).then(() => this.setState({ errorUpdating: false })).catch(e => this.setState({ errorUpdating: true, errorMessage: "Sorry, we couldn't update the entry" }));
   }
 
