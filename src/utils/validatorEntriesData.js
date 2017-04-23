@@ -18,11 +18,10 @@ export const getEntries = (key, pending = false, declined = false, accepted = fa
 * Amen, o lo que se diga cuando se confiesa uno.
 */
 export const postUpdateReview = (key, payload) => {
-  if(!payload || !payload.url || !payload.state) return Promise.reject('Invalid params');
-  axios.get(`${config.updateEntriesValidator}?key=${key}&id=${payload}`)
-    .then(res => {console.log(res);return res.data})
-    .then(data => (data.message)?console.log('Error, sin acceso!'):data)
-    .catch(err => console.log(err));
+  if(!payload || !payload.id || !payload.url || !payload.state) return Promise.reject('Invalid params');
+  return axios.get(`${config.updateEntriesValidator}?key=${key}&id=${payload.id}&url=${payload.url}&state=${payload.state}`)
+    .then(res => res.data)
+    .then(data => (data.error)?Promise.reject(data.error):data);
 }
 
 /*
@@ -40,3 +39,13 @@ export const postNewReviewer = (key, payload) =>
   axios.post(`${config.gasEntriesValidator}?key=${key}`, payload)
     .then(res => console.log(res))
     .catch(err => console.log(err));
+
+
+
+
+export const getIdFromURL = (url) => {
+  url = url.replace('https://docs.google.com/document/d/', '');
+  url = url.split('/')[0];
+  console.log(url);
+  return url
+}

@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 
-const SimpleSelect = ({title, options, handleChange, selected}) => {
+const SimpleSelect = ({title, options, handleChange, selected, enable}) => {
     const listOptions = options.map((opt, i) => (
         <option value={opt} key={i}>
             {opt}
@@ -11,7 +11,7 @@ const SimpleSelect = ({title, options, handleChange, selected}) => {
             <label>
                 {title}
             </label>
-            <select onChange={handleChange} value={selected}>
+            <select disabled={!enable} onChange={handleChange} value={selected} className="select-ctrl">
                 {listOptions}
             </select>
         </div>
@@ -22,7 +22,8 @@ SimpleSelect.propTypes = {
     title: PropTypes.string.isRequired,
     options: PropTypes.array.isRequired,
     handleChange: PropTypes.func.isRequired,
-    selected: PropTypes.string
+    selected: PropTypes.string,
+    enable: PropTypes.bool
 };
 
 export default SimpleSelect;

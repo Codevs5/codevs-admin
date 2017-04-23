@@ -4,9 +4,11 @@ const ValidatorEntryResume = ({entry, iconVisible, handleVisible}) => {
   const labelIcon = `validator-entry-resume--label ${entry.state}`;
   return (
     <div className="validator-entry-resume row">
-      <div className={labelIcon}>{entry.state} </div>
       <span className="validator-entry-resume--title">{entry.title} </span>
-      <i className={iconVisible} onClick={handleVisible}/>
+      <div className="row">
+        <div className={labelIcon}>{entry.state} </div>
+        <i className={iconVisible} onClick={handleVisible}/>
+      </div>
     </div>
   );
 };

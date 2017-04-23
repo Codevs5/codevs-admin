@@ -1,9 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import * as firebase from 'firebase';
+import { shell } from 'electron';
+
 
 import ValidatorEntry from '../components/entries/validator/ValidatorEntry.js';
 
-import {postNewReviewer, postUpdateReview} from '../utils/validatorEntriesData.js';
+import {postNewReviewer, postUpdateReview, getIdFromURL} from '../utils/validatorEntriesData.js';
 
 export default class ValidatorEntryContainer extends Component {
     constructor(props) {
@@ -30,22 +32,26 @@ export default class ValidatorEntryContainer extends Component {
         });
     }
 
-    handleReviewChange(e) {
+    handleReviewChange(e, reviewerId) {
         const user = firebase.auth().currentUser;
         const dbRef = firebase.database().ref(`/admins/${user.uid}`);
         this.setState({loading: true});
 
         const payload = {
-            url: entryResume.url,
-            id: user.uid,
+            url: getIdFromURL(this.state.entryResume.url),
+            id: reviewerId,
             state: e.target.value
-        }
+        };
 
-        dbRef.once('value').then(snap => snap.val()).then(data => postUpdateReview(data.key, payload)).then(res => res.data).then(data => {
-            const tmpEntry = this.props.entry;
-            const tmpReviewers = this.props.entry.reviewers
-            delete tmpEntry.reviewers;
-            this.setState({reviewers: tmpReviewers, entryResume: tmpEntry});
+        dbRef.once('value')
+          .then(snap => snap.val())
+          .then(data => postUpdateReview(data.key, payload))
+          .then(res => {
+            console.log(res);
+
+            const tmpReviewers = res.reviewers.slice()
+            delete res.reviewers;
+            this.setState({reviewers: tmpReviewers, entryResume: res});
         }).then(() => this.setState({loading: false})).catch((err) => console.log(err));
     }
 
@@ -57,11 +63,14 @@ export default class ValidatorEntryContainer extends Component {
         console.log('Add reviewer', this.state.entryResume.title);
     }
 
-    openInBrowser(url) {}
+    openInBrowser(url) {
+      if(this.state.entryResume.url)
+        shell.openExternal(this.state.entryResume.url);
+    }
 
     render() {
         const options = ['accepted', 'declined', 'reviewing', 'notreviewing'];
-        return (<ValidatorEntry visible={this.state.expanded} reviewers={this.state.reviewers} entryResume={this.state.entryResume} handleVisible={this.handleVisible} handlePublish={this.handlePublish} handleAddReviewer={this.handleAddReviewer} handleReviewChange={this.handleReviewChange} options={options} openInBrowser={this.openInBrowser} loading={this.state.loading}/>);
+        return (<ValidatorEntry uid={firebase.auth().currentUser.uid} visible={this.state.expanded} reviewers={this.state.reviewers} entryResume={this.state.entryResume} handleVisible={this.handleVisible} handlePublish={this.handlePublish} handleAddReviewer={this.handleAddReviewer} handleReviewChange={this.handleReviewChange} options={options} openInBrowser={this.openInBrowser} loading={this.state.loading}/>);
     }
 }
 

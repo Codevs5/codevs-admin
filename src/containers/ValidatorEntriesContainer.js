@@ -3,7 +3,7 @@ import * as firebase from 'firebase';
 
 import Header from '../components/layout/Header.js';
 import EntryValidateSelectBox from '../components/entries/validator/EntryValidateSelectBox.js';
-import ValidatorEntriesListContainer from './ValidatorEntriesListContainer.js';
+import ValidatorEntriesList from '../components/entries/validator/ValidatorEntriesList.js';
 
 import {getEntries} from '../utils/validatorEntriesData.js';
 import '../style/__validator.scss';
@@ -20,7 +20,7 @@ export default class ValidatorEntriesContainer extends Component {
         this.handleShowEntryType = this.handleShowEntryType.bind(this);
         this.fillStateWithEntries = this.fillStateWithEntries.bind(this);
         this.updateStateEntries = this.updateStateEntries.bind(this);
-        
+
     }
 
     handleShowEntryType(type) {
@@ -39,7 +39,11 @@ export default class ValidatorEntriesContainer extends Component {
         const user = firebase.auth().currentUser;
         const dbRef = firebase.database().ref(`/admins/${user.uid}`);
 
-        dbRef.once('value').then(snap => snap.val()).then(data => getEntries(data.key, this.state.pending, this.state.declined, this.state.accepted)).then(res => this.updateStateEntries(res)).catch(err => console.log(err)); //TODO: Gestionar bien el error con un modal o alguna hostia
+        dbRef.once('value')
+              .then(snap => snap.val())
+              .then(data => getEntries(data.key, this.state.pending, this.state.declined, this.state.accepted))
+              .then(res => this.updateStateEntries(res))
+              .catch(err => console.log(err)); //TODO: Gestionar bien el error con un modal o alguna hostia
     }
 
     updateStateEntries(data) {
@@ -54,6 +58,7 @@ export default class ValidatorEntriesContainer extends Component {
     }
 
     render() {
+
         const entryTypes = [
             {
                 type: 'accepted',
@@ -78,7 +83,7 @@ export default class ValidatorEntriesContainer extends Component {
                 <Header title="Validator entries"/>
                 <div className="validator-container">
                     <EntryValidateSelectBox handleToggle={this.handleShowEntryType} entryTypes={entryTypes}/>
-                    <ValidatorEntriesListContainer entries={this.state.entries} loading={this.state.loading}/>
+                    <ValidatorEntriesList entries={this.state.entries} loading={this.state.loading}/>
                 </div>
             </div>
         );

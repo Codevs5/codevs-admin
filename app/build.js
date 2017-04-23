@@ -29861,7 +29861,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SimpleSelect = ({ title, options, handleChange, selected }) => {
+const SimpleSelect = ({ title, options, handleChange, selected, enable }) => {
     const listOptions = options.map((opt, i) => _react2.default.createElement(
         "option",
         { value: opt, key: i },
@@ -29877,7 +29877,7 @@ const SimpleSelect = ({ title, options, handleChange, selected }) => {
         ),
         _react2.default.createElement(
             "select",
-            { onChange: handleChange, value: selected },
+            { disabled: !enable, onChange: handleChange, value: selected, className: "select-ctrl" },
             listOptions
         )
     );
@@ -29887,7 +29887,8 @@ SimpleSelect.propTypes = {
     title: _react.PropTypes.string.isRequired,
     options: _react.PropTypes.array.isRequired,
     handleChange: _react.PropTypes.func.isRequired,
-    selected: _react.PropTypes.string
+    selected: _react.PropTypes.string,
+    enable: _react.PropTypes.bool
 };
 
 exports.default = SimpleSelect;
@@ -29984,7 +29985,7 @@ const validateName = name => {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.postNewReviewer = exports.postUpdateReview = exports.getEntries = undefined;
+exports.getIdFromURL = exports.postNewReviewer = exports.postUpdateReview = exports.getEntries = undefined;
 
 var _axios = __webpack_require__(399);
 
@@ -30009,10 +30010,8 @@ const getEntries = exports.getEntries = (key, pending = false, declined = false,
 * Amen, o lo que se diga cuando se confiesa uno.
 */
 const postUpdateReview = exports.postUpdateReview = (key, payload) => {
-  if (!payload || !payload.url || !payload.state) return Promise.reject('Invalid params');
-  _axios2.default.get(`${_urls2.default.updateEntriesValidator}?key=${key}&id=${payload}`).then(res => {
-    console.log(res);return res.data;
-  }).then(data => data.message ? console.log('Error, sin acceso!') : data).catch(err => console.log(err));
+  if (!payload || !payload.id || !payload.url || !payload.state) return Promise.reject('Invalid params');
+  return _axios2.default.get(`${_urls2.default.updateEntriesValidator}?key=${key}&id=${payload.id}&url=${payload.url}&state=${payload.state}`).then(res => res.data).then(data => data.error ? Promise.reject(data.error) : data);
 };
 
 /*
@@ -30027,6 +30026,13 @@ const postUpdateReview = exports.postUpdateReview = (key, payload) => {
  * TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
  */
 const postNewReviewer = exports.postNewReviewer = (key, payload) => _axios2.default.post(`${_urls2.default.gasEntriesValidator}?key=${key}`, payload).then(res => console.log(res)).catch(err => console.log(err));
+
+const getIdFromURL = exports.getIdFromURL = url => {
+  url = url.replace('https://docs.google.com/document/d/', '');
+  url = url.split('/')[0];
+  console.log(url);
+  return url;
+};
 
 /***/ }),
 /* 170 */
@@ -57241,12 +57247,12 @@ const EntryValidateType = ({ handleToggle, type }) => {
     return _react2.default.createElement(
         "div",
         { className: classContainer },
-        _react2.default.createElement("input", { type: "checkbox", value: type.ype, checked: type.selected, onChange: function () {
+        _react2.default.createElement("input", { className: "styled-checkbox", id: type.type, type: "checkbox", value: type.type, checked: type.selected, onChange: function () {
                 handleToggle(type.type);
             } }),
         _react2.default.createElement(
             "label",
-            null,
+            { htmlFor: type.type },
             type.description
         ),
         _react2.default.createElement("i", { className: type.icon })
@@ -57268,7 +57274,7 @@ exports.default = EntryValidateType;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _react = __webpack_require__(1);
@@ -57279,16 +57285,22 @@ var _ValidatorEntryContainer = __webpack_require__(464);
 
 var _ValidatorEntryContainer2 = _interopRequireDefault(_ValidatorEntryContainer);
 
+var _LoadingList = __webpack_require__(96);
+
+var _LoadingList2 = _interopRequireDefault(_LoadingList);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ValidatorEntriesList = ({ entries }) => _react2.default.createElement(
-  'div',
-  { className: 'validator-list' },
-  entries.map((entry, i) => _react2.default.createElement(_ValidatorEntryContainer2.default, { entry: entry, key: i }))
-);
-
+const ValidatorEntriesList = ({ loading, entries }) => {
+    if (loading) return _react2.default.createElement(_LoadingList2.default, null);else return _react2.default.createElement(
+        'div',
+        { className: 'validator-list' },
+        entries.map((entry, i) => _react2.default.createElement(_ValidatorEntryContainer2.default, { entry: entry, key: i }))
+    );
+};
 ValidatorEntriesList.propTypes = {
-  entries: _react.PropTypes.array.isRequired
+    entries: _react.PropTypes.array.isRequired,
+    loading: _react.PropTypes.bool.isRequired
 };
 
 exports.default = ValidatorEntriesList;
@@ -57332,8 +57344,10 @@ const ValidatorEntry = ({
     handleAddReviewer,
     handleReviewChange,
     openInBrowser,
-    loading
+    loading,
+    uid
 }) => {
+
     const iconVisible = `fa fa-${visible ? 'caret-up' : 'caret-down'}`;
     if (loading) {
         return _react2.default.createElement(_LoadingEntryItem2.default, null);
@@ -57342,7 +57356,7 @@ const ValidatorEntry = ({
             'div',
             { className: 'validator-entry' },
             _react2.default.createElement(_ValidatorEntryResume2.default, { entry: entryResume, iconVisible: iconVisible, handleVisible: handleVisible }),
-            _react2.default.createElement(_ValidatorEntryExpanded2.default, { reviewers: reviewers, visible: visible, handleAddReviewer: handleAddReviewer, handlePublish: handlePublish, handleReviewChange: handleReviewChange, options: options, openInBrowser: openInBrowser })
+            _react2.default.createElement(_ValidatorEntryExpanded2.default, { uid: uid, reviewers: reviewers, visible: visible, handleAddReviewer: handleAddReviewer, handlePublish: handlePublish, handleReviewChange: handleReviewChange, options: options, openInBrowser: openInBrowser })
         );
     }
 };
@@ -57357,7 +57371,8 @@ ValidatorEntry.propTypes = {
     ['handleAddReviewer']: _react.PropTypes.func.isRequired,
     options: _react.PropTypes.array.isRequired,
     openInBrowser: _react.PropTypes.func.isRequired,
-    loading: _react.PropTypes.bool.isRequired
+    loading: _react.PropTypes.bool.isRequired,
+    uid: _react.PropTypes.string
 };
 
 exports.default = ValidatorEntry;
@@ -57383,24 +57398,24 @@ var _ValidatorEntryReviewer2 = _interopRequireDefault(_ValidatorEntryReviewer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ValidatorEntryExpanded = ({ visible, reviewers, handleReviewChange, handleAddReviewer, handlePublish, options, openInBrowser }) => {
+const ValidatorEntryExpanded = ({ visible, reviewers, handleReviewChange, handleAddReviewer, handlePublish, options, openInBrowser, uid }) => {
 
   //TODO: Gestionar si el array de reviewers viene vacio
 
   const container = visible ? 'validator-entry-expanded' : 'hidden';
-  const buttonValidator = reviewers.length === 2 ? '' : _react2.default.createElement(
-    'button',
-    { onClick: handleAddReviewer },
-    'Validate'
-  );
+
   return _react2.default.createElement(
     'div',
     { className: container },
-    reviewers.map((reviewer, i) => _react2.default.createElement(_ValidatorEntryReviewer2.default, { key: i, reviewer: reviewer, options: options, handleChange: handleReviewChange })),
+    reviewers.map((reviewer, i) => _react2.default.createElement(_ValidatorEntryReviewer2.default, { isUser: uid === reviewer.author.id, key: i, reviewer: reviewer, options: options, handleChange: handleReviewChange })),
     _react2.default.createElement(
       'div',
-      { className: 'validator-entry-expanded--buttons' },
-      buttonValidator,
+      { className: 'validator-entry-expanded--buttons row' },
+      reviewers.length < 2 && _react2.default.createElement(
+        'button',
+        { onClick: handleAddReviewer },
+        'Validate'
+      ),
       _react2.default.createElement(
         'button',
         { onClick: handlePublish },
@@ -57422,7 +57437,8 @@ ValidatorEntryExpanded.propTypes = {
   handleAddReviewer: _react.PropTypes.func.isRequired,
   handlePublish: _react.PropTypes.func.isRequired,
   options: _react.PropTypes.array.isRequired,
-  openInBrowser: _react.PropTypes.func.isRequired
+  openInBrowser: _react.PropTypes.func.isRequired,
+  uid: _react.PropTypes.string
 };
 
 exports.default = ValidatorEntryExpanded;
@@ -57450,18 +57466,22 @@ const ValidatorEntryResume = ({ entry, iconVisible, handleVisible }) => {
     "div",
     { className: "validator-entry-resume row" },
     _react2.default.createElement(
-      "div",
-      { className: labelIcon },
-      entry.state,
-      " "
-    ),
-    _react2.default.createElement(
       "span",
       { className: "validator-entry-resume--title" },
       entry.title,
       " "
     ),
-    _react2.default.createElement("i", { className: iconVisible, onClick: handleVisible })
+    _react2.default.createElement(
+      "div",
+      { className: "row" },
+      _react2.default.createElement(
+        "div",
+        { className: labelIcon },
+        entry.state,
+        " "
+      ),
+      _react2.default.createElement("i", { className: iconVisible, onClick: handleVisible })
+    )
   );
 };
 
@@ -57494,20 +57514,23 @@ var _SimpleSelect2 = _interopRequireDefault(_SimpleSelect);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ValidatorEntryReviewer = ({ reviewer, options, handleChange }) => {
+const ValidatorEntryReviewer = ({ reviewer, options, handleChange, isUser }) => {
 
   return _react2.default.createElement(
     'div',
-    { className: 'validator-entry-expanded--reviewer' },
+    { className: 'validator-entry-expanded--reviewer row' },
     reviewer.author.name,
-    _react2.default.createElement(_SimpleSelect2.default, { options: options, selected: reviewer.state, handleChange: handleChange, title: 'Review state' })
+    _react2.default.createElement(_SimpleSelect2.default, { enable: isUser, options: options, selected: reviewer.state, handleChange: function (e) {
+        handleChange(e, reviewer.author.id);
+      }, title: 'Review state' })
   );
 };
 
 ValidatorEntryReviewer.propTypes = {
   reviewer: _react.PropTypes.object.isRequired,
   options: _react.PropTypes.array.isRequired,
-  handleChange: _react.PropTypes.func.isRequired
+  handleChange: _react.PropTypes.func.isRequired,
+  isUser: _react.PropTypes.bool
 };
 
 exports.default = ValidatorEntryReviewer;
@@ -59385,9 +59408,9 @@ var _EntryValidateSelectBox = __webpack_require__(427);
 
 var _EntryValidateSelectBox2 = _interopRequireDefault(_EntryValidateSelectBox);
 
-var _ValidatorEntriesListContainer = __webpack_require__(463);
+var _ValidatorEntriesList = __webpack_require__(429);
 
-var _ValidatorEntriesListContainer2 = _interopRequireDefault(_ValidatorEntriesListContainer);
+var _ValidatorEntriesList2 = _interopRequireDefault(_ValidatorEntriesList);
 
 var _validatorEntriesData = __webpack_require__(169);
 
@@ -59439,6 +59462,7 @@ class ValidatorEntriesContainer extends _react.Component {
     }
 
     render() {
+
         const entryTypes = [{
             type: 'accepted',
             description: 'Accepted entries',
@@ -59464,7 +59488,7 @@ class ValidatorEntriesContainer extends _react.Component {
                 'div',
                 { className: 'validator-container' },
                 _react2.default.createElement(_EntryValidateSelectBox2.default, { handleToggle: this.handleShowEntryType, entryTypes: entryTypes }),
-                _react2.default.createElement(_ValidatorEntriesListContainer2.default, { entries: this.state.entries, loading: this.state.loading })
+                _react2.default.createElement(_ValidatorEntriesList2.default, { entries: this.state.entries, loading: this.state.loading })
             )
         );
     }
@@ -59472,50 +59496,7 @@ class ValidatorEntriesContainer extends _react.Component {
 exports.default = ValidatorEntriesContainer;
 
 /***/ }),
-/* 463 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _LoadingList = __webpack_require__(96);
-
-var _LoadingList2 = _interopRequireDefault(_LoadingList);
-
-var _ValidatorEntriesList = __webpack_require__(429);
-
-var _ValidatorEntriesList2 = _interopRequireDefault(_ValidatorEntriesList);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//Borrar
-class ValidatorEntriesListContainer extends _react.Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    if (this.props.loading) return _react2.default.createElement(_LoadingList2.default, null);else return _react2.default.createElement(_ValidatorEntriesList2.default, { entries: this.props.entries });
-  }
-
-}
-
-exports.default = ValidatorEntriesListContainer;
-ValidatorEntriesListContainer.propTypes = {
-  entries: _react.PropTypes.array.isRequired,
-  loading: _react.PropTypes.bool.isRequired
-};
-
-/***/ }),
+/* 463 */,
 /* 464 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -59533,6 +59514,8 @@ var _react2 = _interopRequireDefault(_react);
 var _firebase = __webpack_require__(28);
 
 var firebase = _interopRequireWildcard(_firebase);
+
+var _electron = __webpack_require__(754);
 
 var _ValidatorEntry = __webpack_require__(430);
 
@@ -59569,22 +59552,23 @@ class ValidatorEntryContainer extends _react.Component {
         });
     }
 
-    handleReviewChange(e) {
+    handleReviewChange(e, reviewerId) {
         const user = firebase.auth().currentUser;
         const dbRef = firebase.database().ref(`/admins/${user.uid}`);
         this.setState({ loading: true });
 
         const payload = {
-            url: entryResume.url,
-            id: user.uid,
+            url: (0, _validatorEntriesData.getIdFromURL)(this.state.entryResume.url),
+            id: reviewerId,
             state: e.target.value
         };
 
-        dbRef.once('value').then(snap => snap.val()).then(data => (0, _validatorEntriesData.postUpdateReview)(data.key, payload)).then(res => res.data).then(data => {
-            const tmpEntry = this.props.entry;
-            const tmpReviewers = this.props.entry.reviewers;
-            delete tmpEntry.reviewers;
-            this.setState({ reviewers: tmpReviewers, entryResume: tmpEntry });
+        dbRef.once('value').then(snap => snap.val()).then(data => (0, _validatorEntriesData.postUpdateReview)(data.key, payload)).then(res => {
+            console.log(res);
+
+            const tmpReviewers = res.reviewers.slice();
+            delete res.reviewers;
+            this.setState({ reviewers: tmpReviewers, entryResume: res });
         }).then(() => this.setState({ loading: false })).catch(err => console.log(err));
     }
 
@@ -59596,11 +59580,13 @@ class ValidatorEntryContainer extends _react.Component {
         console.log('Add reviewer', this.state.entryResume.title);
     }
 
-    openInBrowser(url) {}
+    openInBrowser(url) {
+        if (this.state.entryResume.url) _electron.shell.openExternal(this.state.entryResume.url);
+    }
 
     render() {
         const options = ['accepted', 'declined', 'reviewing', 'notreviewing'];
-        return _react2.default.createElement(_ValidatorEntry2.default, { visible: this.state.expanded, reviewers: this.state.reviewers, entryResume: this.state.entryResume, handleVisible: this.handleVisible, handlePublish: this.handlePublish, handleAddReviewer: this.handleAddReviewer, handleReviewChange: this.handleReviewChange, options: options, openInBrowser: this.openInBrowser, loading: this.state.loading });
+        return _react2.default.createElement(_ValidatorEntry2.default, { uid: firebase.auth().currentUser.uid, visible: this.state.expanded, reviewers: this.state.reviewers, entryResume: this.state.entryResume, handleVisible: this.handleVisible, handlePublish: this.handlePublish, handleAddReviewer: this.handleAddReviewer, handleReviewChange: this.handleReviewChange, options: options, openInBrowser: this.openInBrowser, loading: this.state.loading });
     }
 }
 
@@ -59702,7 +59688,7 @@ exports = module.exports = __webpack_require__(14)(undefined);
 
 
 // module
-exports.push([module.i, ".header {\n  width: 100%;\n  height: 64px;\n  position: fixed;\n  border-bottom: 1px solid #c0cdd1;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);\n  background-color: white;\n  line-height: 64px;\n  padding-left: 10px;\n  box-sizing: border-box; }\n", ""]);
+exports.push([module.i, ".header {\n  width: 100%;\n  height: 64px;\n  position: fixed;\n  border-bottom: 1px solid #c0cdd1;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);\n  background-color: white;\n  line-height: 64px;\n  padding-left: 10px;\n  box-sizing: border-box;\n  z-index: 99999999; }\n", ""]);
 
 // exports
 
@@ -59856,7 +59842,7 @@ exports = module.exports = __webpack_require__(14)(undefined);
 
 
 // module
-exports.push([module.i, ".validator-container {\n  margin-top: 64px; }\n\n.pending {\n  background-color: #fff790;\n  color: #c3b500;\n  font-weight: bold; }\n\n.declined {\n  background-color: #ed6464;\n  color: #770e0e;\n  font-weight: bold; }\n\n.accepted {\n  background-color: #52de86;\n  color: #105429;\n  font-weight: bold; }\n\n.validate-select--box {\n  padding: 10px 20px;\n  flex: 1; }\n", ""]);
+exports.push([module.i, ".validator-container {\n  margin-top: 64px; }\n\n.validate-select {\n  background-color: #F27668;\n  color: white; }\n  .validate-select > div:nth-child(even) {\n    border-left: 1px solid white;\n    border-right: 1px solid white; }\n  .validate-select--box {\n    padding: 10px 20px;\n    flex: 1; }\n    .validate-select--box > i {\n      margin-left: 10px; }\n\n.validator-list > div:nth-child(even) {\n  background-color: #F6F6F6; }\n\n.validator-list > div:nth-child(odd) {\n  background-color: #FFFFFF; }\n\n.validator-entry-resume {\n  height: 50px;\n  justify-content: space-between;\n  align-items: center;\n  padding: 5px 10px;\n  margin: 0; }\n  .validator-entry-resume > div {\n    margin: 0;\n    align-items: center; }\n  .validator-entry-resume--label {\n    font-size: 0.8em;\n    padding: 5px 10px;\n    color: white;\n    margin-right: 10px; }\n    .validator-entry-resume--label.Pendiente {\n      background-color: #F1C40F; }\n    .validator-entry-resume--label.Rechazada {\n      background-color: #bb373f; }\n    .validator-entry-resume--label.Aceptada {\n      background-color: #53e3a6; }\n\n.validator-entry-expanded {\n  background-color: #414141;\n  padding: 5px;\n  box-shadow: inset 0px 0px 41px -10px rgba(0, 0, 0, 0.75); }\n  .validator-entry-expanded--reviewer {\n    margin: 5px 10px;\n    border: 2px dashed #282828;\n    padding: 10px;\n    justify-content: space-between;\n    align-items: center;\n    color: white; }\n  .validator-entry-expanded--buttons {\n    justify-content: center;\n    align-items: center; }\n    .validator-entry-expanded--buttons > button {\n      cursor: pointer;\n      outline: none;\n      border: none;\n      font-size: 0.8em;\n      padding: 5px 20px;\n      border-radius: 0px;\n      background-color: #3498DB;\n      transition: 0.25s ease-in all;\n      margin: 0px 10px 10px 10px;\n      color: white; }\n      .validator-entry-expanded--buttons > button:hover {\n        background-color: #217dbb; }\n\n.select-box > label {\n  font-size: 0.75em;\n  margin-right: 10px; }\n\nselect.select-ctrl {\n  border: 1px solid #C0C0C0;\n  -webkit-appearance: none;\n  -webkit-border-radius: 0px;\n  background: url(\"data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 24 24'><path fill='#444' d='M7.406 7.828l4.594 4.594 4.594-4.594 1.406 1.406-6 6-6-6z'></path></svg>\");\n  background-position: 100% 50%;\n  background-repeat: no-repeat;\n  outline: 0;\n  display: inline-block;\n  padding: 5px 10px;\n  height: 30px;\n  background-color: #CCCCCC; }\n\n.styled-checkbox {\n  position: absolute;\n  opacity: 0; }\n  .styled-checkbox + label {\n    position: relative;\n    cursor: pointer;\n    padding: 0; }\n  .styled-checkbox + label:before {\n    content: '';\n    margin-right: 10px;\n    display: inline-block;\n    vertical-align: text-top;\n    width: 20px;\n    height: 20px;\n    background: white; }\n  .styled-checkbox:hover + label:before {\n    background: #f35429; }\n  .styled-checkbox:focus + label:before {\n    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12); }\n  .styled-checkbox:checked + label:before {\n    background: #f35429; }\n  .styled-checkbox:disabled + label {\n    color: #b8b8b8;\n    cursor: auto; }\n  .styled-checkbox:disabled + label:before {\n    box-shadow: none;\n    background: #ddd; }\n  .styled-checkbox:checked + label:after {\n    content: '';\n    position: absolute;\n    left: 5px;\n    top: 9px;\n    background: white;\n    width: 2px;\n    height: 2px;\n    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;\n    transform: rotate(45deg); }\n", ""]);
 
 // exports
 

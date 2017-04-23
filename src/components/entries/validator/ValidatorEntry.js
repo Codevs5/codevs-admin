@@ -14,8 +14,10 @@ const ValidatorEntry = ({
     handleAddReviewer,
     handleReviewChange,
     openInBrowser,
-    loading
+    loading,
+    uid
 }) => {
+
     const iconVisible = `fa fa-${ (visible)
         ? 'caret-up'
         : 'caret-down'}`;
@@ -24,7 +26,7 @@ const ValidatorEntry = ({
     return (
         <div className="validator-entry">
             <ValidatorEntryResume entry={entryResume} iconVisible={iconVisible} handleVisible={handleVisible}/>
-            <ValidatorEntryExpanded reviewers={reviewers} visible={visible} handleAddReviewer={handleAddReviewer} handlePublish={handlePublish} handleReviewChange={handleReviewChange} options={options} openInBrowser={openInBrowser}/>
+            <ValidatorEntryExpanded uid={uid} reviewers={reviewers} visible={visible} handleAddReviewer={handleAddReviewer} handlePublish={handlePublish} handleReviewChange={handleReviewChange} options={options} openInBrowser={openInBrowser}/>
         </div>
     );
 }
@@ -40,7 +42,8 @@ ValidatorEntry.propTypes = {
   handleAddReviewer: PropTypes.func.isRequired,
   options: PropTypes.array.isRequired,
   openInBrowser: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  uid: PropTypes.string
 };
 
 export default ValidatorEntry;

@@ -4,10 +4,10 @@ const EntryValidateType = ({handleToggle, type}) => {
     const classContainer = `validate-select--box ${type.type}`;
     return (
         <div className={classContainer}>
-            <input type="checkbox" value={type.ype} checked={type.selected} onChange={function() {
+            <input className="styled-checkbox" id={type.type} type="checkbox" value={type.type} checked={type.selected} onChange={function() {
                 handleToggle(type.type)
             }}/>
-            <label>
+          <label htmlFor={type.type}>
                 {type.description}
             </label>
             <i className={type.icon} />
