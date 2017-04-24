@@ -9,7 +9,7 @@
     &>.alert--inner{
       border: 2px dashed lighten($errorColour, 20%);
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       align-items: center;
       color: darken($errorColour, 40%);
     }

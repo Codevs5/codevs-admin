@@ -58288,6 +58288,14 @@ var _NewUserForm = __webpack_require__(449);
 
 var _NewUserForm2 = _interopRequireDefault(_NewUserForm);
 
+var _LoadingList = __webpack_require__(58);
+
+var _LoadingList2 = _interopRequireDefault(_LoadingList);
+
+var _ErrorComponent = __webpack_require__(73);
+
+var _ErrorComponent2 = _interopRequireDefault(_ErrorComponent);
+
 __webpack_require__(739);
 
 __webpack_require__(346);
@@ -58303,24 +58311,20 @@ const NewUser = ({
     handlePasswordChange,
     handlePasswordVisibility,
     roles,
-    values
-}) => _react2.default.createElement(
-    'div',
-    { className: 'container' },
-    _react2.default.createElement(_Header2.default, { title: 'Add new user' }),
-    _react2.default.createElement(_NewUserForm2.default, {
-        handleNewUser: handleNewUser,
-        handleNameChange: handleNameChange,
-        handleLastnameChange: handleLastnameChange,
-        handleRoleChange: handleRoleChange,
-        handleEmailChange: handleEmailChange,
-        handlePasswordChange: handlePasswordChange,
-        handlePasswordVisibility: handlePasswordVisibility,
-        roles: roles,
-        values: values
-    })
-);
+    values,
+    currentRole,
+    loading,
+    error,
+    updated
 
+}) => {
+    if (error) return _react2.default.createElement(_ErrorComponent2.default, null);else if (loading) return _react2.default.createElement(_LoadingList2.default, null);else return _react2.default.createElement(
+        'div',
+        { className: 'container' },
+        _react2.default.createElement(_Header2.default, { title: 'Add new user' }),
+        _react2.default.createElement(_NewUserForm2.default, { updated: updated, currentRole: currentRole, handleNewUser: handleNewUser, handleNameChange: handleNameChange, handleLastnameChange: handleLastnameChange, handleRoleChange: handleRoleChange, handleEmailChange: handleEmailChange, handlePasswordChange: handlePasswordChange, handlePasswordVisibility: handlePasswordVisibility, roles: roles, values: values })
+    );
+};
 NewUser.propTypes = {
     handleNewUser: _react.PropTypes.func.isRequired,
     handleNameChange: _react.PropTypes.func.isRequired,
@@ -58330,7 +58334,11 @@ NewUser.propTypes = {
     handlePasswordChange: _react.PropTypes.func.isRequired,
     handlePasswordVisibility: _react.PropTypes.func.isRequired,
     roles: _react.PropTypes.array.isRequired,
-    values: _react.PropTypes.object.isRequired
+    values: _react.PropTypes.object.isRequired,
+    currentRole: _react.PropTypes.string.isRequired,
+    loading: _react.PropTypes.bool.isRequired,
+    error: _react.PropTypes.bool.isRequired,
+    updated: _react.PropTypes.string.isRequired
 };
 
 exports.default = NewUser;
@@ -58343,7 +58351,7 @@ exports.default = NewUser;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _react = __webpack_require__(1);
@@ -58358,57 +58366,80 @@ var _SimpleSelect = __webpack_require__(167);
 
 var _SimpleSelect2 = _interopRequireDefault(_SimpleSelect);
 
+var _Alert = __webpack_require__(72);
+
+var _Alert2 = _interopRequireDefault(_Alert);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const NewUserForm = ({
-  handleNewUser,
-  handleNameChange,
-  handleLastnameChange,
-  handleRoleChange,
-  handleEmailChange,
-  handlePasswordChange,
-  handlePasswordVisibility,
-  roles,
-  values
-}) => _react2.default.createElement(
-  'div',
-  { className: 'new-user-container' },
-  _react2.default.createElement(
-    'h2',
-    { className: 'form-title' },
-    'Create new user: '
-  ),
-  _react2.default.createElement('div', { className: 'form-divider' }),
-  _react2.default.createElement(
-    'div',
-    { className: 'row' },
-    _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Name', content: values.name, controller: handleNameChange }),
-    _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Lastname', content: values.lastname, controller: handleLastnameChange })
-  ),
-  _react2.default.createElement(
-    'div',
-    { className: 'row' },
-    _react2.default.createElement(_SimpleInput2.default, { inputType: 'email', labeltitle: 'Email', content: values.email, controller: handleEmailChange }),
-    _react2.default.createElement(_SimpleInput2.default, { inputType: 'password', labeltitle: 'Password', content: values.password, controller: handlePasswordChange })
-  ),
-  _react2.default.createElement(_SimpleSelect2.default, { title: 'Role:', options: roles, handleChange: handleRoleChange, selected: roles[0] }),
-  _react2.default.createElement(
-    'button',
-    { onClick: handleNewUser },
-    ' Create user ! '
-  )
-);
+    handleNewUser,
+    handleNameChange,
+    handleLastnameChange,
+    handleRoleChange,
+    handleEmailChange,
+    handlePasswordChange,
+    handlePasswordVisibility,
+    roles,
+    values,
+    currentRole,
+    updated
+}) => {
+    let updateAlert;
+    if (updated === 'updated') updateAlert = _react2.default.createElement(_Alert2.default, { icon: 'fa fa-check-square-o', type: 'success', message: 'Yeeah, you just created a new user!' });else if (updated === 'fail') updateAlert = _react2.default.createElement(_Alert2.default, { icon: 'fa fa-exclamation', type: 'error', message: 'Booo! You\'re doing something wrong. Check the fields' });else updateAlert = _react2.default.createElement('div', { className: 'ghost-space' });
 
+    return _react2.default.createElement(
+        'div',
+        { className: 'new-user-container' },
+        _react2.default.createElement(
+            'h2',
+            { className: 'form-title' },
+            'Create new user:'
+        ),
+        _react2.default.createElement('div', { className: 'form-divider' }),
+        updateAlert,
+        _react2.default.createElement(
+            'div',
+            { className: 'row' },
+            _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Name', content: values.name, controller: handleNameChange }),
+            _react2.default.createElement(_SimpleInput2.default, { inputType: 'text', labeltitle: 'Lastname', content: values.lastname, controller: handleLastnameChange })
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'row' },
+            _react2.default.createElement(_SimpleInput2.default, { inputType: 'email', labeltitle: 'Email', content: values.email, controller: handleEmailChange }),
+            _react2.default.createElement(_SimpleInput2.default, { inputType: 'password', labeltitle: 'Password', content: values.password, controller: handlePasswordChange })
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'row create-row' },
+            _react2.default.createElement(_SimpleSelect2.default, { title: 'Role:', options: roles, handleChange: handleRoleChange, selected: currentRole }),
+            _react2.default.createElement(
+                'button',
+                { className: 'btn-createUser', onClick: handleNewUser },
+                'Create user !'
+            )
+        ),
+        _react2.default.createElement(
+            'p',
+            { className: 'required-warning' },
+            ' * Password must contain at least 6 characters * '
+        )
+    );
+};
 NewUserForm.propTypes = {
-  handleNewUser: _react.PropTypes.func.isRequired,
-  handleNameChange: _react.PropTypes.func.isRequired,
-  handleLastnameChange: _react.PropTypes.func.isRequired,
-  handleRoleChange: _react.PropTypes.func.isRequired,
-  handleEmailChange: _react.PropTypes.func.isRequired,
-  handlePasswordChange: _react.PropTypes.func.isRequired,
-  handlePasswordVisibility: _react.PropTypes.func.isRequired,
-  roles: _react.PropTypes.array.isRequired,
-  values: _react.PropTypes.object.isRequired
+    handleNewUser: _react.PropTypes.func.isRequired,
+    handleNameChange: _react.PropTypes.func.isRequired,
+    handleLastnameChange: _react.PropTypes.func.isRequired,
+    handleRoleChange: _react.PropTypes.func.isRequired,
+    handleEmailChange: _react.PropTypes.func.isRequired,
+    handlePasswordChange: _react.PropTypes.func.isRequired,
+    handlePasswordVisibility: _react.PropTypes.func.isRequired,
+    roles: _react.PropTypes.array.isRequired,
+    values: _react.PropTypes.object.isRequired,
+    currentRole: _react.PropTypes.string.isRequired,
+    updated: _react.PropTypes.string.isRequired
+
 };
 
 exports.default = NewUserForm;
@@ -58927,7 +58958,10 @@ class NewUserContainer extends _react.Component {
             role: this.roles[0],
             email: '',
             password: '',
-            pwdVisibility: false
+            pwdVisibility: false,
+            loading: false,
+            error: false,
+            updated: ''
         };
 
         this.handleNewUser = this.handleNewUser.bind(this);
@@ -58950,7 +58984,8 @@ class NewUserContainer extends _react.Component {
                 bio: '',
                 firstname: this.state.name,
                 lastname: this.state.lastname,
-                social: {}
+                social: {},
+                isAdmin: this.state.role === this.roles[0]
             }
         };
         return user.updateProfile({ photoURL: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg' }).then(() => dbRef.update(newUser)).then(res => this.setUserRole(user, this.state.role));
@@ -58979,15 +59014,19 @@ class NewUserContainer extends _react.Component {
             storageBucket: "codevs-test.appspot.com",
             messagingSenderId: "464619208597"
         };
+        this.setState({ loading: true });
         const secondaryAuth = firebase.initializeApp(config, "secondary");
         secondaryAuth.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(user => this.createUserProfile(user))
         //.then(() => secondaryAuth.auth().signOut())
         //.then(user => user.link(new firebase.auth.GoogleAuthProvider()))
-        .catch(err => console.log(err));
+        .then(() => this.setState({ error: false, loading: false, updated: 'updated' })).catch(err => {
+            console.log(err);
+            this.setState({ error: true, loading: false, updated: 'fail' });
+        });
     }
 
     handleNewUser() {
-        if ((0, _validateUserProfile.validateUser)(this.state)) this.createNewUser();else console.log('Error, lanzar un modal prox!');
+        if ((0, _validateUserProfile.validateUser)(this.state)) this.createNewUser();else this.setState({ updated: 'fail' });
     }
 
     handleNameChange(e) {
@@ -59028,7 +59067,11 @@ class NewUserContainer extends _react.Component {
             handlePasswordChange: this.handlePasswordChange,
             handlePasswordVisibility: this.handlePasswordVisibility,
             roles: this.roles,
-            values: this.state
+            values: this.state,
+            currentRole: this.state.role,
+            loading: this.state.loading,
+            error: this.state.error,
+            updated: this.state.updated
         });
     }
 }
@@ -59879,7 +59922,7 @@ exports = module.exports = __webpack_require__(10)(undefined);
 
 
 // module
-exports.push([module.i, ".alert {\n  margin: 10px 20px;\n  padding: 10px; }\n  .alert-error {\n    background-color: #bb373f; }\n    .alert-error > .alert--inner {\n      border: 2px dashed #d97f84;\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      color: #1d090a; }\n  .alert-success {\n    background-color: #53e3a6; }\n    .alert-success > .alert--inner {\n      border: 2px dashed #abf1d3;\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      color: #0f5b3b; }\n", ""]);
+exports.push([module.i, ".alert {\n  margin: 10px 20px;\n  padding: 10px; }\n  .alert-error {\n    background-color: #bb373f; }\n    .alert-error > .alert--inner {\n      border: 2px dashed #d97f84;\n      display: flex;\n      justify-content: space-around;\n      align-items: center;\n      color: #1d090a; }\n  .alert-success {\n    background-color: #53e3a6; }\n    .alert-success > .alert--inner {\n      border: 2px dashed #abf1d3;\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      color: #0f5b3b; }\n", ""]);
 
 // exports
 
@@ -60005,7 +60048,7 @@ exports = module.exports = __webpack_require__(10)(undefined);
 
 
 // module
-exports.push([module.i, ".new-user-container {\n  margin-top: 64px; }\n", ""]);
+exports.push([module.i, ".new-user-container {\n  margin-top: 64px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center; }\n  .new-user-container > .ghost-space {\n    margin-bottom: 60px; }\n  .new-user-container > .form-title {\n    margin-top: 20px; }\n\n.btn-createUser {\n  width: 50%;\n  background-color: #2980B9;\n  color: white;\n  transition: 0.25s ease-in all;\n  border: 0;\n  cursor: pointer;\n  width: 307px;\n  height: 50px;\n  font-size: 1em; }\n  .btn-createUser:hover {\n    background-color: #20638f; }\n\n.create-row {\n  justify-content: space-between;\n  padding: 16px; }\n  .create-row > div {\n    height: 50px;\n    display: flex;\n    flex-flow: column; }\n    .create-row > div > select {\n      width: 270px; }\n", ""]);
 
 // exports
 
@@ -60019,7 +60062,7 @@ exports = module.exports = __webpack_require__(10)(undefined);
 
 
 // module
-exports.push([module.i, ".update-pwd {\n  margin-top: 100px;\n  padding: 10px;\n  display: flex;\n  flex-flow: column wrap;\n  justify-content: center;\n  align-items: center; }\n  .update-pwd > div {\n    align-items: flex-end; }\n\n.btn-pwd {\n  width: 120px;\n  background-color: #ECF0F1;\n  border: none;\n  cursor: pointer;\n  height: 52px;\n  transition: 0.25s ease-in all; }\n  .btn-pwd:hover {\n    background-color: #cfd9db; }\n  .btn-pwd--update {\n    width: 427px;\n    margin-top: 20px;\n    background-color: #2ECC71; }\n    .btn-pwd--update:hover {\n      background-color: #25a25a; }\n\n.invalid > input {\n  border: 1px solid red; }\n\n.required-warning {\n  font-size: 0.7em;\n  color: #7F8C8D; }\n", ""]);
+exports.push([module.i, ".update-pwd {\n  margin-top: 100px;\n  padding: 10px;\n  display: flex;\n  flex-flow: column wrap;\n  justify-content: center;\n  align-items: center; }\n  .update-pwd > div {\n    align-items: flex-end; }\n\n.btn-pwd {\n  width: 120px;\n  background-color: #ECF0F1;\n  border: none;\n  cursor: pointer;\n  height: 52px;\n  transition: 0.25s ease-in all; }\n  .btn-pwd:hover {\n    background-color: #cfd9db; }\n  .btn-pwd--update {\n    width: 427px;\n    margin-top: 20px;\n    background-color: #2ECC71; }\n    .btn-pwd--update:hover {\n      background-color: #25a25a; }\n\n.invalid > input {\n  border: 1px solid red; }\n\n.required-warning {\n  font-size: 0.7em;\n  color: #7F8C8D;\n  align-self: center; }\n", ""]);
 
 // exports
 

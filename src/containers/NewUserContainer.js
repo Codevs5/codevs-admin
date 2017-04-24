@@ -17,7 +17,10 @@ export default class NewUserContainer extends Component {
             role: this.roles[0],
             email: '',
             password: '',
-            pwdVisibility: false
+            pwdVisibility: false,
+            loading: false,
+            error: false,
+            updated: ''
         }
 
         this.handleNewUser = this.handleNewUser.bind(this);
@@ -40,12 +43,14 @@ export default class NewUserContainer extends Component {
                 bio: '',
                 firstname: this.state.name,
                 lastname: this.state.lastname,
-                social: {}
+                social: {},
+                isAdmin: (this.state.role === this.roles[0])
             }
         };
         return user.updateProfile({photoURL: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'})
           .then(() => dbRef.update(newUser))
-          .then(res => this.setUserRole(user, this.state.role))
+          .then(res => this.setUserRole(user, this.state.role));
+
     }
 
     setUserRole(user) {
@@ -72,19 +77,24 @@ export default class NewUserContainer extends Component {
             storageBucket: "codevs-test.appspot.com",
             messagingSenderId: "464619208597"
         };
+        this.setState({loading: true});
         const secondaryAuth = firebase.initializeApp(config, "secondary");
         secondaryAuth.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
           .then(user => this.createUserProfile(user))
           //.then(() => secondaryAuth.auth().signOut())
           //.then(user => user.link(new firebase.auth.GoogleAuthProvider()))
-          .catch(err => console.log(err))
+          .then(() => this.setState({error: false, loading: false, updated: 'updated'}))
+          .catch(err => {
+            console.log(err);
+            this.setState({error: true, loading: false, updated: 'fail'});
+          });
     }
 
     handleNewUser() {
         if (validateUser(this.state))
             this.createNewUser();
         else
-            console.log('Error, lanzar un modal prox!');
+            this.setState({updated: 'fail'})
         }
 
     handleNameChange(e) {
@@ -126,6 +136,10 @@ export default class NewUserContainer extends Component {
             handlePasswordVisibility={this.handlePasswordVisibility}
             roles={this.roles}
             values={this.state}
+            currentRole={this.state.role}
+            loading={this.state.loading}
+            error={this.state.error}
+            updated={this.state.updated}
           />);
     }
 }

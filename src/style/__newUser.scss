@@ -2,4 +2,45 @@
 
 .new-user-container{
   margin-top: 64px;
+  display: flex;
+  flex-direction: column;
+  //align-items: center;
+
+  justify-content: center;
+  &>.ghost-space{
+    margin-bottom: 60px;
+  }
+
+  &>.form-title{
+    margin-top: 20px;
+  }
+}
+
+.btn-createUser{
+  width: 50%;
+  background-color: $c-belize-hole;
+  color: white;
+  transition: 0.25s ease-in all;
+  border: 0;
+  cursor: pointer;
+  width: 307px;
+  height: 50px;
+  font-size: 1em;
+  &:hover{
+    background-color: darken($c-belize-hole, 10%);
+  }
+}
+
+.create-row{
+  justify-content: space-between;
+  padding: 16px;
+  &> div {
+    height: 50px;
+    display: flex;
+    flex-flow: column;
+   & > select{
+    width: 270px;
+
+  }
+}
 }
