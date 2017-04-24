@@ -29,7 +29,7 @@ const AppRouter = ({handleLogout}) => (
         <Route exact path="/" component={Home} />
 
         <Route exact path="/profile" component={ProfileContainer} />
-        <Route exact path="/profile/basic" component={FormProfileContainer} />
+        <Route exact path="/profile/basic/:id" component={FormProfileContainer} />
         <Route exact path="/profile/password" component={ProfilePasswordContainer} />
         <Route exact path="/users" component={UsersContainer} />
         <Route exact path="/users/add" component={NewUserContainer} />

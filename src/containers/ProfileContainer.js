@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
+import * as firebase from 'firebase';
+
 import MenuCard from '../components/layout/MenuCard.js';
 
 export default class ProfileContainer extends Component {
   constructor(props){
     super(props);
-
   }
 
   render(){
+    const user = firebase.auth().currentUser;
     const pages = [
         {
-            linkPath: '/profile/basic',
+            linkPath: `/profile/basic/${user.uid}`,
             title: 'Basic profile',
             imagePath: 'basicProfile.png'
         }, {

@@ -1,0 +1,28 @@
+@import './__variables.scss';
+
+.user-list{
+  &>div:nth-child(odd){
+background-color: #F6F6F6;  }
+
+  &>div:nth-child(even){
+    background-color: #FFFFFF;
+  }
+
+  &-item{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+  }
+}
+
+.btn-profile{
+  background-color: $c-midnight-blue;
+  color: white;
+  padding: 5px 10px;
+  transition: 0.25s ease-in all;
+  &:hover{
+    background-color: darken($c-midnight-blue, 10%);
+  }
+}

@@ -6,14 +6,39 @@ import SimpleInput from '../form/SimpleInput.js';
 import SimpleTextarea from '../form/SimpleTextarea.js';
 import SocialInput from '../form/SocialInput.js';
 import Header from '../layout/Header.js';
+import ErrorComponent from '../layout/ErrorComponent.js';
+import LoadingList from '../layout/LoadingList.js';
+import Alert from '../layout/Alert.js';
 
-const FormProfile = ({handleFunctions, userData, socialNetworks}) => (
+const FormProfile = ({handleFunctions, userData, socialNetworks, error, loading, updated}) =>{
+  if(error) return (<ErrorComponent />);
+  else if(loading) return (<LoadingList />);
+  else return (<FormProfileView handleFunctions={handleFunctions} userData={userData} socialNetworks={socialNetworks} updated={updated}/>);
+};
+
+FormProfile.propTypes = {
+    handleFunctions: PropTypes.object.isRequired,
+    userData: PropTypes.object.isRequired,
+    socialNetworks: PropTypes.array.isRequired,
+    error: PropTypes.bool.isRequired,
+    loading: PropTypes.bool.isRequired,
+    updated: PropTypes.string.isRequired
+
+};
+
+const FormProfileView = ({handleFunctions, userData, socialNetworks, updated}) =>
+{
+  let alert;
+  if(updated === 'updated') alert = (<Alert message={'Success! Profile was succesfully updated'} type="success"/>);
+  else if(updated === 'fail') alert = alert = (<Alert message="Oops, we couldn't update the profile" type="error"/>)
+return (
     <div className="profile-container container">
         <Header title="Profile"/>
         <div className="form-container">
             <h2 className="form-title">Basic information
             </h2>
             <div className="form-divider"></div>
+            {alert}
             <div className="row">
                 <SimpleInput inputType={'text'} labeltitle={'Firstname'} content={userData.firstname} controller={handleFunctions.handleFirstNameChange}/>
                 <SimpleInput inputType={'text'} labeltitle={'Lasttname'} content={userData.lastname} controller={handleFunctions.handleLastnameChange}/>
@@ -42,11 +67,13 @@ const FormProfile = ({handleFunctions, userData, socialNetworks}) => (
         </div>
     </div>
 );
-
-FormProfile.propTypes = {
+}
+FormProfileView.propTypes = {
     handleFunctions: PropTypes.object.isRequired,
     userData: PropTypes.object.isRequired,
-    socialNetworks: PropTypes.array.isRequired
+    socialNetworks: PropTypes.array.isRequired,
+    updated: PropTypes.string.isRequired
+
 };
 
 export default FormProfile;

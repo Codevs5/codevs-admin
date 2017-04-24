@@ -49,21 +49,28 @@ const createUserDefaultData = (user) => {
             "lastmod": (new Date()).toISOString().split('T')[0],
             "role": 10
         }
+
     }
 }
 
-export default class FormContainer extends Component {
+export default class FormProfileContainer extends Component {
     constructor(props) {
         super(props);
         const userDefaultData = createUserDefaultData({}).metadata;
         this.state = {
-            bio: userDefaultData.bio,
-            social: userDefaultData.social,
-            city: userDefaultData.city,
-            firstname: userDefaultData.firstname,
-            lastname: userDefaultData.lastname,
-            avatar: userDefaultData.avatar,
-            birthdate: userDefaultData.birthdate
+            metadata: {
+              bio: userDefaultData.bio,
+              social: userDefaultData.social,
+              city: userDefaultData.city,
+              firstname: userDefaultData.firstname,
+              lastname: userDefaultData.lastname,
+              avatar: userDefaultData.avatar,
+              birthdate: userDefaultData.birthdate,
+              social: {},
+            },
+            loading: true,
+            error: false,
+            updated: ''
         };
 
         //function bindings
@@ -74,70 +81,83 @@ export default class FormContainer extends Component {
         this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
         this.handleSocialChange = this.handleSocialChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
+        this.errorOnRetreivingData = this.errorOnRetreivingData.bind(this);
+        this.fillUserData = this.fillUserData.bind(this);
     }
 
     componentDidMount() {
-        const user = firebase.auth().currentUser;
-        const dbRef = firebase.database().ref(`/users/${user.uid}`);
-        dbRef.on('value', (data) => {
-            let metadata;
-            if (!data.val()) { //No tiene perfil a�n en la DB
-                const defaultUserData = createUserDefaultData(user);
-                dbRef.set(defaultUserData);
-                metadata = defaultUserData.metadata;
-            } else {
-                metadata = data.val().metadata
-            }
-            this.setState({
-                bio: metadata.bio,
-                city: metadata.city,
-                firstname: metadata.firstname,
-                lastname: metadata.lastname,
-                avatar: metadata.avatar,
-                birthdate: metadata.birthdate,
-                social: metadata.social
-            });
-        })
+        //const user = firebase.auth().currentUser;
+        const id = this.props.match.params.id;
+
+        const dbRef = firebase.database().ref(`/users/${id}`);
+        dbRef.on('value', (data) => this.fillUserData(data), (err) => this.errorOnRetreivingData(err));
+    }
+
+    fillUserData(data){
+      let metadata;
+      if (!data.val()) { //No tiene perfil a�n en la DB
+          const defaultUserData = createUserDefaultData(user);
+          dbRef.set(defaultUserData);
+          metadata = defaultUserData.metadata;
+      } else {
+          metadata = data.val().metadata
+      }
+      this.setState({
+          metadata: {
+            bio: metadata.bio,
+            city: metadata.city || '',
+            firstname: metadata.firstname || '',
+            lastname: metadata.lastname || '',
+            avatar: metadata.avatar || '',
+            birthdate: metadata.birthdate || '',
+            social: metadata.social || {},
+          },
+          error: false,
+          loading: false
+      });
+    }
+
+    errorOnRetreivingData(err){
+      this.setState({error: true, loading: false});
     }
 
     //Handle inputs
     handleFirstNameChange(e) {
-        this.setState({firstname: e.target.value});
+      this.setState({metadata: Object.assign({}, this.state.metadata, {firstname: e.target.value})});
     }
     handleLastnameChange(e) {
-        this.setState({lastname: e.target.value});
+      this.setState({metadata: Object.assign({}, this.state.metadata, {lastname: e.target.value})});
     }
     handleBirthdateChange(e) {
-        this.setState({birthdate: e.target.value});
+      this.setState({metadata: Object.assign({}, this.state.metadata, {birthdate: e.target.value})});
     }
     handleCityChange(e) {
-        this.setState({city: e.target.value});
+      this.setState({metadata: Object.assign({}, this.state.metadata, {city: e.target.value})});
     }
     handleBioChange(e) {
-        this.setState({bio: e.target.value});
+      this.setState({metadata: Object.assign({}, this.state.metadata, {bio: e.target.value})});
     }
     handleSocialChange(e, newSocial) {
-        this.setState({social: Object.assign({}, this.state.social, newSocial)})
+      this.setState({metadata: Object.assign({}, this.state.metadata, {social: newSocial})});
     }
     //TODO: Avatar && social
 
     handleFormSubmit(e) {
         e.preventDefault();
-        const payload = {
-            metadata: this.state,
-            stats: {
-                'lastmod': (new Date()).toISOString().split('T')[0]
-            }
-        }
         const user = firebase.auth().currentUser;
         const dbRef = firebase.database().ref(`/users/${user.uid}`);
-        dbRef.child('/metadata').update(payload.metadata);
-        dbRef.child('/stats').update(payload.stats);
+
+        console.log(this.state);
+        dbRef.child('/metadata')
+          .update(this.state)
+          .then(() => this.setState({updated: 'updated'}))
+          .catch(() => this.setState({updated: 'fail'}));
+
     }
 
     render() {
 
-
+        console.log(this.state);
         const controllers = {
           handleLastnameChange : this.handleLastnameChange,
           handleFirstNameChange : this.handleFirstNameChange,
@@ -147,6 +167,14 @@ export default class FormContainer extends Component {
           handleCityChange : this.handleCityChange,
           handleBirthdateChange : this.handleBirthdateChange
         }
-        return (<FormProfile userData={this.state} handleFunctions={controllers}  socialNetworks={socialNetworks}/>);
+
+        return (<FormProfile
+          userData={this.state.metadata}
+          handleFunctions={controllers}
+          socialNetworks={socialNetworks}
+          loading={this.state.loading}
+          error={this.state.error}
+          updated={this.state.updated}
+          />);
     }
 }
