@@ -9,6 +9,7 @@ export default class PublishedEntryContainer extends Component {
         super(props);
         this.state = {
           entry : {
+            imgSrc: '',
             pinned: false,
             visible: false
           },
@@ -16,7 +17,8 @@ export default class PublishedEntryContainer extends Component {
           loading: true,
           titleEditable: false,
           errorUpdating: false,
-          errorMessage: ''
+          errorMessage: '',
+          loadingImage: false,
         };
 
         this.firstTitle = '';
@@ -29,6 +31,10 @@ export default class PublishedEntryContainer extends Component {
         this.handleChangeTitle = this.handleChangeTitle.bind(this);
         this.handleDeleteEntry = this.handleDeleteEntry.bind(this);
         this.handleToggleEditable = this.handleToggleEditable.bind(this);
+        this.handleAddMainImg = this.handleAddMainImg.bind(this);
+        this.uploadImage = this.uploadImage.bind(this);
+        this.uploadError = this.uploadError.bind(this);
+        this.uploadFinished = this.uploadFinished.bind(this);
     }
 
     componentDidMount() {
@@ -107,6 +113,58 @@ export default class PublishedEntryContainer extends Component {
       this.setState({titleEditable: !this.state.titleEditable})
     }
 
+    handleAddMainImg(e){
+      e.preventDefault();
+      this.setState({loadingImage: true});
+      let reader = new FileReader();
+      let file = e.target.files[0];
+      reader.onloadend = () => {
+          const mainImgUpload = {
+              file: file,
+              imagePreviewUrl: reader.result
+          };
+          this.uploadImage(mainImgUpload);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    uploadImage(mainImgUpload){
+      const id = this.props.match.params.id;
+      const stRef = firebase.storage().ref(`entries/${id}`);
+
+      const metadata = {
+          contentType: 'image/png'
+      };
+      const uploadTask = stRef.child('main.png').put(mainImgUpload.file, metadata);
+
+      uploadTask
+        .then(() => this.uploadFinished())
+        .catch((err) => this.uploadError(err));
+    }
+
+
+    uploadError(e) {
+        this.setState({error: false, loading: false, updated: 'fail', loadingAvatar: false});
+        console.log(e);
+    }
+
+    uploadFinished() {
+        const id = this.props.match.params.id;
+        const dbRef = firebase.database().ref(`/entries/info/${id}/`);
+        const stRef = firebase.storage().ref(`/entries/${id}/main.png`);
+        stRef.getDownloadURL()
+          .then((url) => dbRef.update({imgSrc: url})
+          .then(() => url))
+          .then((url) => {
+            console.log('end');
+            this.setState({error: false, loadingImage: false, loading: false, updated: ''});
+            this.setState({entry: Object.assign({}, this.state.entry, {imgSrc: url})});
+          }).catch((e) => {
+            this.setState({updated: 'fail'});
+            console.log(e);
+        });
+    }
+
     render() {
         const btns = [
           {
@@ -174,6 +232,8 @@ export default class PublishedEntryContainer extends Component {
               tags={this.state.tags}
               btns={btns}
               toggles={toggles}
+              loadingImage={this.state.loadingImage}
+              handleAddMainImg={this.handleAddMainImg}
               />
         );
     }

@@ -8,6 +8,7 @@ import PublishedButtons from './PublishedButtons.js';
 import PublishedToggles from './PublishedToggles.js';
 import TagInput from '../../form/TagInput.js';
 import Alert from '../../layout/Alert.js';
+import EntryMainImage from './EntryMainImage.js';
 
 import '../../../style/__entrypage.scss';
 
@@ -22,7 +23,9 @@ const PublishedEntryPage = ({
     btns,
     toggles,
     errorUpdating,
-    errorMessage
+    errorMessage,
+    handleAddMainImg,
+    loadingImage
 }) => {
     const titleElem = (titleEditable)
         ? (<SimpleInput controller={handleChangeTitle} labeltitle='' content={data.title} inputType="text" design="title-input"/>)
@@ -45,6 +48,7 @@ const PublishedEntryPage = ({
                     </div>
                 </div>
                 {errorUpdating && <Alert message={errorMessage} type="error"/>}
+                <EntryMainImage handleAddMainImg={handleAddMainImg} imgSrc={data.imgSrc} loadingImage={loadingImage} />
                 <PublishedEntryInfo data={data}/>
                 <EntryTagList handleRemove={handleRemoveTag} tags={data.tags || []} label="Tags list"/>
                 <TagInput title="Add new tag:" handleTagAdded={handleAddTag}/>
@@ -66,7 +70,9 @@ PublishedEntryPage.propTypes = {
     btns: PropTypes.array.isRequired,
     toggles: PropTypes.array.isRequired,
     errorUpdating: PropTypes.bool.isRequired,
-    errorMessage: PropTypes.string
+    errorMessage: PropTypes.string,
+    handleAddMainImg: PropTypes.func.isRequired,
+    loadingImage: PropTypes.bool.isRequired
 };
 
 export default PublishedEntryPage;

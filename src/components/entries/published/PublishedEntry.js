@@ -17,7 +17,9 @@ const PublishedEntry = ({
     btns,
     toggles,
     errorMessage,
-    errorUpdating
+    errorUpdating,
+    handleAddMainImg,
+    loadingImage
 }) => {
     if (error) {
         return (<ErrorComponent/>);
@@ -36,6 +38,8 @@ const PublishedEntry = ({
           toggles={toggles}
           errorUpdating={errorUpdating}
           errorMessage={errorMessage}
+          handleAddMainImg={handleAddMainImg}
+          loadingImage={loadingImage}
           />);
     }
 };
@@ -53,7 +57,9 @@ PublishedEntry.propTypes = {
     btns: PropTypes.array.isRequired,
     toggles: PropTypes.array.isRequired,
     errorUpdating: PropTypes.bool.isRequired,
-    errorMessage: PropTypes.string.isRequired
+    errorMessage: PropTypes.string.isRequired,
+    handleAddMainImg: PropTypes.func.isRequired,
+    loadingImage: PropTypes.bool.isRequired
 };
 
 export default PublishedEntry;

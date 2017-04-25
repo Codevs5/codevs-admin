@@ -1,0 +1,24 @@
+@import './__variables.scss';
+@import './assets/__loadingImage.scss';
+
+
+.entry-mainImg{
+  margin: 10px 0;
+  padding: 10px;
+  background-color: $c-clouds;
+  &>img{
+    margin: auto;
+    display: block;
+  }
+}
+
+.loadingImage>.model-1{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 600px;
+  height: 350px;
+  background-color: $c-clouds;
+  margin: 10px auto;
+}
