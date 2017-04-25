@@ -1,6 +1,8 @@
-module.exports = {
-  entry: './src/index.js',
-  target: "electron",
+const webpack = require('webpack');
+
+const options = {
+  entry: './src/index',
+//  target: "electron-renderer",
   output: {
     filename: 'build.js',
     path: __dirname + '/../app/'
@@ -24,5 +26,14 @@ module.exports = {
           loader: "style-loader!css-loader!sass-loader"
       }
     ]
-  }
-}
+  },
+  plugins: [
+    new webpack.ExternalsPlugin('commonjs', [
+        'electron'
+    ])
+]
+};
+
+
+
+module.exports = options;

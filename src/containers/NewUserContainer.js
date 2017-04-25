@@ -44,7 +44,8 @@ export default class NewUserContainer extends Component {
                 firstname: this.state.name,
                 lastname: this.state.lastname,
                 social: {},
-                isAdmin: (this.state.role === this.roles[0])
+                isAdmin: (this.state.role === this.roles[0]),
+                avatar: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'
             }
         };
         return user.updateProfile({photoURL: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'})
