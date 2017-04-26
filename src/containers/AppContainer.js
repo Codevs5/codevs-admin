@@ -9,7 +9,7 @@ export default class AppContainer extends Component {
         this.state = {
             email: '',
             password: '',
-            logged: false,
+            logged: 0,
             loading: false,
             fail: false
         }
@@ -25,8 +25,8 @@ export default class AppContainer extends Component {
         this.setState({loading: true});
         firebase.auth()
           .signInWithEmailAndPassword(this.state.email, this.state.password)
-          .then(user => this.setState({loading: false, logged: true, fail: false}))
-          .catch(err => this.setState({loading: false, fail: true, logged: false}));
+          .then(user => this.setState({loading: false, logged: 1, fail: false}))
+          .catch(err => this.setState({loading: false, fail: true, logged: -1}));
     }
 
     handleLogout() {
@@ -50,9 +50,9 @@ export default class AppContainer extends Component {
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.setState({logged: true})
+                this.setState({logged: 1})
             } else {
-                this.setState({logged: false})
+                this.setState({logged: -1})
             }
         });
     }

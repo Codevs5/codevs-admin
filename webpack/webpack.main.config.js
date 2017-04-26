@@ -18,7 +18,7 @@ const options = {
         loader: 'babel-loader',
         exclude: /(node_modules)/,
         query: {
-          presets: ['latest-minimal', 'react']
+          presets: ['latest-minimal', 'react',"es2015"]
         }
       },
       {

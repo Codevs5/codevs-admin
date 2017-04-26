@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import * as firebase from 'firebase';
+import {Provider} from 'react-redux';
+
+import store from './store.js';
 import './style/app.scss';
 
 import AppContainer from './containers/AppContainer.js';
@@ -15,6 +18,7 @@ const config = {
 };
 
 firebase.initializeApp(config);
-
 ReactDOM.render(
-    <AppContainer />, document.getElementById('app'));
+    <Provider store={store}>
+    <AppContainer/>
+</Provider>, document.getElementById('app'));

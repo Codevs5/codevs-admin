@@ -2,11 +2,11 @@ import React, { PropTypes } from 'react';
 
 import Login from './login/Login.js'
 import AppRouter from './AppRouter.js';
-import LoadingHome from './layout/LoadingHome.js';
+import LoadingHome from './layout/LoadingList.js';
 
 const App = ({handleLoginWithGoogle, handleLoginWithCredentials, handleLogout, handleEmailChange, handlePasswordChange, logged, loading, fail}) => {
-  if(logged) return (<AppRouter handleLogout={handleLogout} />);
-  else if (loading) return (<LoadingHome />);
+  if(logged === 1) return (<AppRouter handleLogout={handleLogout} />);
+  else if (logged === 0) return (<LoadingHome />);
   else return (<Login
       handleLoginWithCredentials={handleLoginWithCredentials}
       handleLoginWithGoogle={handleLoginWithGoogle}
@@ -17,7 +17,7 @@ const App = ({handleLoginWithGoogle, handleLoginWithCredentials, handleLogout, h
 }
 
 App.propTypes = {
-  logged: PropTypes.bool.isRequired,
+  logged: PropTypes.number.isRequired,
   loading: PropTypes.bool.isRequired,
   handleLogout: PropTypes.func.isRequired,
   handleLoginWithCredentials: PropTypes.func.isRequired,
