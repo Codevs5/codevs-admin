@@ -19,17 +19,18 @@ class PublishedEntriesContainer extends Component {
 
     render() {
         return (<PublishedEntries
-          entries={this.props.publishedEntries.entries}
+          entries={this.props.publishedEntries}
           changeVisibility={this.changeVisibility}
-          loading={this.props.publishedEntries.fetching}
-          error={this.props.publishedEntries.error}
+          loading={this.props.status.loading}
+          error={this.props.status.error}
           />);
     }
 }
 
 const mapStateToProps = (state, props) => {
     return {
-      publishedEntries: state.publishedEntries
+      publishedEntries: state.publishedEntries,
+      status: state.status
     };
 };
 

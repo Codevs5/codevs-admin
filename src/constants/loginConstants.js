@@ -1,0 +1,3 @@
+export const LOGIN_START = 'LOGIN_START';
+export const LOGIN_REJECTED = 'LOGIN_REJECTED';
+export const LOGIN_FINISHED = 'LOGIN_FINISHED';

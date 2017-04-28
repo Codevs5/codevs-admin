@@ -184,10 +184,10 @@ class PublishedEntryContainer extends Component {
 
 const mapStateToProps = (state, action) => {
     return {
-      entries: state.publishedEntries.entries,
-      loading: state.publishedEntries.fetching,
-      error: state.publishedEntries.error,
-      loadingImage: state.publishedEntries.loadingImage
+      entries: state.publishedEntries,
+      loading: state.status.loading,
+      error: state.status.error,
+      loadingImage: state.status.loadingImage
     }
 }
 

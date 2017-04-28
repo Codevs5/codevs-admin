@@ -17743,11 +17743,15 @@ var _firebase = __webpack_require__(17);
 
 var firebase = _interopRequireWildcard(_firebase);
 
+var _statusActions = __webpack_require__(553);
+
+var actions = _interopRequireWildcard(_statusActions);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function fetchEntries() {
     return function (dispatch) {
-        dispatch({ type: 'FETCH_P_ENTRIES' });
+        dispatch(actions.startLoading());
         var dbRef = firebase.database().ref('/entries/info');
         dbRef.orderByChild('date').once('value').then(function (data) {
             data = data.val();
@@ -17757,9 +17761,12 @@ function fetchEntries() {
                     id: key
                 }));
             }
+
             dispatch({ type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items });
+            dispatch(actions.fetchingSuccess());
         }).catch(function (err) {
-            return dispatch({ type: 'FETCH_P_ENTRIES_REJECTED', payload: err });
+            //dispatch({type: 'FETCH_P_ENTRIES_REJECTED', payload: err})
+            dispatch(actions.fetchEntriesRejected(err));
         });
     };
 };
@@ -17768,22 +17775,23 @@ function updateEntry(id, data) {
     return function (dispatch) {
         var dbRef = firebase.database().ref('/entries/info/' + id);
         dbRef.update(data).then(function () {
-            return dispatch({
+            dispatch({
                 type: 'UPDATE_ENTRY',
                 payload: {
                     id: id,
                     data: data
                 }
             });
+            dispatch(actions.updateSuccess());
         }).catch(function (err) {
-            return dispatch(type, payload);
+            return dispatch(actions.updateRejected(err));
         });
     };
 }
 
 function uploadImage(id, file) {
     return function (dispatch) {
-        dispatch({ type: 'UPLOAD_IMAGE' });
+        dispatch(actions.uploadImage());
         var reader = new FileReader();
 
         reader.onloadend = function () {
@@ -17807,7 +17815,7 @@ var startUpload = function startUpload(dispatch, mainImgUpload, id) {
     uploadTask.then(function () {
         return uploadFinished(id, dispatch);
     }).catch(function (err) {
-        return dispatch({ type: 'UPLOAD_IMAGE_REJECTED' });
+        return dispatch(actions.uploadImageRejected(err));
     });
 };
 
@@ -17819,7 +17827,7 @@ var uploadFinished = function uploadFinished(id, dispatch) {
             return url;
         });
     }).then(function (url) {
-        return dispatch({
+        dispatch({
             type: 'UPLOAD_IMAGE_FULLFILLED',
             payload: {
                 data: {
@@ -17827,8 +17835,9 @@ var uploadFinished = function uploadFinished(id, dispatch) {
                 }
             }
         });
-    }).catch(function (e) {
-        return dispatch({ type: 'UPLOAD_IMAGE_REJECTED' });
+        dispatch(actions.uploadImageSuccess());
+    }).catch(function (err) {
+        return dispatch(actions.uploadImageRejected(err));
     });
 };
 
@@ -30057,10 +30066,10 @@ var PublishedEntriesContainer = function (_Component) {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(_PublishedEntries2.default, {
-                entries: this.props.publishedEntries.entries,
+                entries: this.props.publishedEntries,
                 changeVisibility: this.changeVisibility,
-                loading: this.props.publishedEntries.fetching,
-                error: this.props.publishedEntries.error
+                loading: this.props.status.loading,
+                error: this.props.status.error
             });
         }
     }]);
@@ -30070,7 +30079,8 @@ var PublishedEntriesContainer = function (_Component) {
 
 var mapStateToProps = function mapStateToProps(state, props) {
     return {
-        publishedEntries: state.publishedEntries
+        publishedEntries: state.publishedEntries,
+        status: state.status
     };
 };
 
@@ -30315,10 +30325,10 @@ var PublishedEntryContainer = function (_Component) {
 
 var mapStateToProps = function mapStateToProps(state, action) {
     return {
-        entries: state.publishedEntries.entries,
-        loading: state.publishedEntries.fetching,
-        error: state.publishedEntries.error,
-        loadingImage: state.publishedEntries.loadingImage
+        entries: state.publishedEntries,
+        loading: state.status.loading,
+        error: state.status.error,
+        loadingImage: state.status.loadingImage
     };
 };
 
@@ -30885,10 +30895,15 @@ var _publishedEntriesReducer = __webpack_require__(275);
 
 var _publishedEntriesReducer2 = _interopRequireDefault(_publishedEntriesReducer);
 
+var _statusReducer = __webpack_require__(555);
+
+var _statusReducer2 = _interopRequireDefault(_statusReducer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var reducers = (0, _redux.combineReducers)({
-    publishedEntries: _publishedEntriesReducer2.default
+    publishedEntries: _publishedEntriesReducer2.default,
+    status: _statusReducer2.default
 });
 
 exports.default = reducers;
@@ -30904,37 +30919,23 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _publishedTypes = __webpack_require__(552);
+
+var c = _interopRequireWildcard(_publishedTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function publishedEntries() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-        entries: [],
-        fetching: false,
-        fetched: false,
-        error: false,
-        loadingImage: false,
-        alert: 0
-
-    };
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     var action = arguments[1];
 
     switch (action.type) {
-        case 'FETCH_P_ENTRIES':
-            return fetchEntries(state);
-        case 'FETCH_P_ENTRIES_REJECTED':
-            return fetchEntriesRejected(state, action);
-        case 'FETCH_P_ENTRIES_FULLFILLED':
+        case c.FETCH_P_ENTRIES_FULLFILLED:
             return fetchEntriesFullfilled(state, action);
-        case 'UPDATE_ENTRY':
+        case c.UPDATE_ENTRY:
             return updateEntry(state, action);
-        case 'UPDATE_ENTRY_REJECTED':
-            return updateEntryRejected(state, action);
-        case 'UPLOAD_IMAGE':
-            return uploadingImage(state, action);
-        case 'UPLOAD_IMAGE_FULLFILLED':
-            return uploadingImageFullfilled(state, action);
-        case 'UPLOAD_IMAGE_REJECTED':
-            return uploadingImageRejected(state, action);
+        case c.UPLOAD_IMAGE_FULLFILLED:
+            return updateEntry(state, action);
         default:
             return state;
     }
@@ -30943,38 +30944,14 @@ function publishedEntries() {
 //
 //  Reducers function to keep clean the switch
 //
-function fetchEntries(state) {
-    return _extends({}, state, {
-        fetching: true
-    });
-}
-
-function fetchEntriesRejected(state, action) {
-    return _extends({}, state, {
-        fetching: false,
-        error: action.payload
-    });
-}
 
 function fetchEntriesFullfilled(state, action) {
-    return _extends({}, state, {
-        fetching: false,
-        fetched: true,
-        entries: action.payload
-    });
+    return action.payload;
 }
 
 function updateEntry(state, action) {
-    return _extends({}, state, {
-        entries: state.entries.map(function (entry) {
-            return updateEntryState(entry, action);
-        })
-    });
-}
-
-function updateEntryRejected(state, action) {
-    return _extends({}, state, {
-        alert: -1
+    return state.map(function (entry) {
+        return updateEntryState(entry, action);
     });
 }
 
@@ -30983,29 +30960,6 @@ function updateEntryState(state, action) {
         return state;
     }
     return Object.assign({}, state, action.payload.data);
-}
-
-function uploadingImage(state, action) {
-    return _extends({}, state, {
-        loadingImage: true
-    });
-}
-
-function uploadingImageFullfilled(state, action) {
-    return _extends({}, state, {
-        loadingImage: false,
-        alert: 0,
-        entries: state.entries.map(function (entry) {
-            return updateEntryState(entry, action);
-        })
-    });
-}
-
-function uploadingImageRejected(state, action) {
-    return {
-        alert: -1,
-        loadingImage: false
-    };
 }
 
 exports.default = publishedEntries;
@@ -59427,6 +59381,226 @@ exports.createContext = Script.createContext = function (context) {
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 551 */,
+/* 552 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var FETCH_P_ENTRIES = exports.FETCH_P_ENTRIES = 'FETCH_P_ENTRIES';
+var FETCH_P_ENTRIES_FULLFILLED = exports.FETCH_P_ENTRIES_FULLFILLED = 'FETCH_P_ENTRIES_FULLFILLED';
+var FETCH_P_ENTRIES_REJECTED = exports.FETCH_P_ENTRIES_REJECTED = 'FETCH_P_ENTRIES_REJECTED';
+var UPDATE_ENTRY = exports.UPDATE_ENTRY = 'UPDATE_ENTRY';
+var UPDATE_ENTRY_REJECTED = exports.UPDATE_ENTRY_REJECTED = 'UPDATE_ENTRY_REJECTED';
+var UPLOAD_IMAGE = exports.UPLOAD_IMAGE = 'UPLOAD_IMAGE';
+var UPLOAD_IMAGE_FULLFILLED = exports.UPLOAD_IMAGE_FULLFILLED = 'UPLOAD_IMAGE_FULLFILLED';
+var UPLOAD_IMAGE_REJECTED = exports.UPLOAD_IMAGE_REJECTED = 'UPLOAD_IMAGE_REJECTED';
+
+/***/ }),
+/* 553 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.startLoading = startLoading;
+exports.fetchingRejected = fetchingRejected;
+exports.fetchingSuccess = fetchingSuccess;
+exports.updateStart = updateStart;
+exports.updateRejected = updateRejected;
+exports.updateSuccess = updateSuccess;
+exports.uploadImage = uploadImage;
+exports.uploadImageRejected = uploadImageRejected;
+exports.uploadImageSuccess = uploadImageSuccess;
+
+var _statusTypes = __webpack_require__(554);
+
+var c = _interopRequireWildcard(_statusTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function startLoading() {
+  return {
+    type: c.START_LOADING
+  };
+}
+
+function fetchingRejected(error) {
+  return {
+    type: c.FETCHING_REJECTED,
+    payload: error
+  };
+}
+
+function fetchingSuccess() {
+  return {
+    type: c.FETCHING_SUCCESS
+  };
+}
+
+function updateStart() {
+  return {
+    type: c.UPDATE_START
+  };
+}
+
+function updateRejected(error) {
+  return {
+    type: c.UPDATE_REJECTED,
+    payload: error
+  };
+}
+
+function updateSuccess() {
+  return {
+    type: c.UPDATE_SUCCESS
+  };
+}
+
+function uploadImage() {
+  return {
+    type: c.UPLOAD_IMAGE
+  };
+}
+
+function uploadImageRejected(error) {
+  return {
+    type: c.UPLOAD_IMAGE_REJECTED,
+    payload: error
+  };
+}
+
+function uploadImageSuccess() {
+  return {
+    type: c.UPLOAD_IMAGE_SUCCESS
+  };
+}
+
+/***/ }),
+/* 554 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var START_LOADING = exports.START_LOADING = 'START_LOADING';
+var FETCHING_REJECTED = exports.FETCHING_REJECTED = 'FETCHING_REJECTED';
+var FETCHING_SUCCESS = exports.FETCHING_SUCCESS = 'FETCHING_SUCCESS';
+var UPDATE_START = exports.UPDATE_START = 'UPDATE_START';
+var UPDATE_REJECTED = exports.UPDATE_REJECTED = 'UPDATE_REJECTED';
+var UPDATE_SUCCESS = exports.UPDATE_SUCCESS = 'UPDATE_SUCCESS';
+var UPLOAD_IMAGE = exports.UPLOAD_IMAGE = 'UPLOAD_IMAGE';
+var UPLOAD_IMAGE_SUCCESS = exports.UPLOAD_IMAGE_SUCCESS = 'UPLOAD_IMAGE_SUCCESS';
+var UPLOAD_IMAGE_REJECTED = exports.UPLOAD_IMAGE_REJECTED = 'UPLOAD_IMAGE_REJECTED';
+
+var UPDATE = exports.UPDATE = 1;
+var ERROR_UPDATED = exports.ERROR_UPDATED = -1;
+var NOT_UPDATING = exports.NOT_UPDATING = 0;
+
+var NOT_LOGGING = exports.NOT_LOGGING = 0;
+var LOGGED = exports.LOGGED = 1;
+var ERROR_LOGGING = exports.ERROR_LOGGING = -1;
+
+/***/ }),
+/* 555 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = statusReducer;
+
+var _statusTypes = __webpack_require__(554);
+
+var c = _interopRequireWildcard(_statusTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var defaultInitState = {
+    error: false,
+    loading: true,
+    updated: c.NOT_UPDATING,
+    errorMessage: '',
+    loadingImage: false,
+    logged: c.NOT_LOGGING
+};
+
+function statusReducer() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultInitState;
+    var action = arguments[1];
+
+    switch (action.type) {
+        case c.START_LOADING:
+            return _extends({}, state, {
+                loading: true
+            });
+        case c.FETCHING_REJECTED:
+            return _extends({}, state, {
+                loading: false,
+                error: true,
+                errorMessage: action.payload
+            });
+        case c.FETCHING_SUCCESS:
+            return _extends({}, state, {
+                loading: false,
+                error: false
+            });
+        case c.UPDATE_START:
+            return _extends({}, state, {
+                loading: true
+            });
+        case c.UPDATE_SUCCESS:
+            return _extends({}, state, {
+                error: false,
+                loading: false,
+                updated: c.UPDATED
+            });
+        case c.UPDATE_REJECTED:
+            return _extends({}, state, {
+                loading: false,
+                updated: c.UPDATE_ERROR,
+                error: true,
+                errorMessage: action.payload
+            });
+        case c.UPLOAD_IMAGE:
+            return _extends({}, state, {
+                loadingImage: true
+            });
+        case c.UPLOAD_IMAGE_SUCCESS:
+            return _extends({}, state, {
+                updated: c.UPDATED,
+                loadingImage: false
+            });
+        case c.UPLOAD_IMAGE_REJECTED:
+            return _extends({}, state, {
+                updated: c.ERROR_UPDATED,
+                loadingImage: false,
+                errorMessage: action.payload
+            });
+
+        default:
+            return state;
+
+    }
+}
 
 /***/ })
 /******/ ]);
