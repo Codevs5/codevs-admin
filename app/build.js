@@ -30605,6 +30605,10 @@ var _firebase = __webpack_require__(17);
 
 var firebase = _interopRequireWildcard(_firebase);
 
+var _reactRedux = __webpack_require__(69);
+
+var _userListActions = __webpack_require__(563);
+
 var _UsersList = __webpack_require__(260);
 
 var _UsersList2 = _interopRequireDefault(_UsersList);
@@ -30625,58 +30629,32 @@ var UserListContainer = function (_Component) {
   function UserListContainer(props) {
     _classCallCheck(this, UserListContainer);
 
-    var _this = _possibleConstructorReturn(this, (UserListContainer.__proto__ || Object.getPrototypeOf(UserListContainer)).call(this, props));
-
-    _this.state = {
-      users: [],
-      loading: true,
-      error: false
-    };
-    return _this;
+    return _possibleConstructorReturn(this, (UserListContainer.__proto__ || Object.getPrototypeOf(UserListContainer)).call(this, props));
   }
 
   _createClass(UserListContainer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
-
-      var dbRef = firebase.database().ref('/users/');
-
-      dbRef.once('value').then(function (res) {
-        return res.val();
-      }).then(function (data) {
-        var users = Object.keys(data).map(function (key) {
-          data[key].id = key;
-          return data[key];
-        });
-        users.sort(function (a, b) {
-          if (a.metadata.firstname.toLowerCase() > b.metadata.firstname.toLowerCase()) {
-            return 1;
-          }
-          if (a.metadata.firstname.toLowerCase() < b.metadata.firstname.toLowerCase()) {
-            return -1;
-          }
-          // a must be equal to b
-          return 0;
-        });
-        _this2.setState({ users: users });
-        _this2.setState({ loading: false, error: false });
-      }).catch(function (err) {
-
-        _this2.setState({ loading: false, error: true });
-      });
+      this.props.dispatch((0, _userListActions.fetchAllUsers)());
     }
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement(_UsersList2.default, { error: this.state.error, loading: this.state.loading, users: this.state.users });
+      return _react2.default.createElement(_UsersList2.default, { error: this.props.error, loading: this.props.loading, users: this.props.users });
     }
   }]);
 
   return UserListContainer;
 }(_react.Component);
 
-exports.default = UserListContainer;
+var mapStateToProps = function mapStateToProps(state, action) {
+  return {
+    users: state.userList,
+    error: state.status.error,
+    loading: state.status.loading
+  };
+};
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(UserListContainer);
 
 /***/ }),
 /* 274 */
@@ -31063,13 +31041,18 @@ var _userReducer = __webpack_require__(557);
 
 var _userReducer2 = _interopRequireDefault(_userReducer);
 
+var _userListReducer = __webpack_require__(562);
+
+var _userListReducer2 = _interopRequireDefault(_userListReducer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var reducers = (0, _redux.combineReducers)({
     publishedEntries: _publishedEntriesReducer2.default,
     validatorEntries: _validatorEntriesReducer2.default,
     status: _statusReducer2.default,
-    user: _userReducer2.default
+    user: _userReducer2.default,
+    userList: _userListReducer2.default
 });
 
 exports.default = reducers;
@@ -59878,6 +59861,107 @@ var changeReview = exports.changeReview = function changeReview(uid, payload) {
         });
     };
 };
+
+/***/ }),
+/* 561 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var FETCH_USERS_SUCCESS = exports.FETCH_USERS_SUCCESS = 'FETCH_USERS_SUCCESS';
+
+/***/ }),
+/* 562 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = userList;
+
+var _userListTypes = __webpack_require__(561);
+
+var c = _interopRequireWildcard(_userListTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function userList() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments[1];
+
+  switch (action.type) {
+    case c.FETCH_USERS_SUCCESS:
+      return action.payload;
+    default:
+      return state;
+  }
+}
+
+/***/ }),
+/* 563 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.fetchAllUsers = fetchAllUsers;
+
+var _firebase = __webpack_require__(17);
+
+var firebase = _interopRequireWildcard(_firebase);
+
+var _statusActions = __webpack_require__(224);
+
+var _userListTypes = __webpack_require__(561);
+
+var c = _interopRequireWildcard(_userListTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function fetchAllUsers() {
+  return function (dispatch) {
+    dispatch((0, _statusActions.startLoading)());
+    var dbRef = firebase.database().ref('/users/');
+
+    dbRef.once('value').then(function (res) {
+      return res.val();
+    }).then(function (data) {
+      var users = Object.keys(data).map(function (key) {
+        data[key].id = key;
+        return data[key];
+      });
+
+      users.sort(function (a, b) {
+        if (a.metadata.firstname.toLowerCase() > b.metadata.firstname.toLowerCase()) {
+          return 1;
+        }
+        if (a.metadata.firstname.toLowerCase() < b.metadata.firstname.toLowerCase()) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+
+      dispatch({
+        type: c.FETCH_USERS_SUCCESS,
+        payload: users
+      });
+      dispatch((0, _statusActions.fetchingSuccess)());
+    }).catch(function (err) {
+      dispatch((0, _statusActions.fetchingRejected)(err));
+    });
+  };
+}
 
 /***/ })
 /******/ ]);

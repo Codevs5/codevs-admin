@@ -1,51 +1,30 @@
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
+import {connect} from 'react-redux';
 
+import { fetchAllUsers } from '../actions/userListActions.js';
 import UsersList from '../components/users/UsersList.js';
 
-export default class UserListContainer extends Component{
+class UserListContainer extends Component{
   constructor(props){
     super(props);
-    this.state = {
-      users: [],
-      loading: true,
-      error: false
-    };
   }
 
   componentDidMount(){
-    const dbRef = firebase.database().ref('/users/');
-
-    dbRef.once('value')
-         .then(res => res.val())
-         .then(data => {
-          let users = Object.keys(data).map((key) => {
-            data[key].id = key;
-            return data[key];
-          });
-          users.sort((a, b) => {
-            if (a.metadata.firstname.toLowerCase() > b.metadata.firstname.toLowerCase()) {
-              return 1;
-            }
-            if (a.metadata.firstname.toLowerCase() < b.metadata.firstname.toLowerCase()) {
-              return -1;
-            }
-            // a must be equal to b
-            return 0;
-          });
-          this.setState({users});
-          this.setState({loading: false, error: false});
-         })
-         .catch(err => {
-
-           this.setState({loading: false, error: true});
-         })
+    this.props.dispatch(fetchAllUsers());
   }
 
 
   render(){
     return (
-      <UsersList error={this.state.error} loading={this.state.loading} users={this.state.users}/>
+      <UsersList error={this.props.error} loading={this.props.loading} users={this.props.users}/>
     );
   }
 }
+
+const mapStateToProps = (state, action) => ({
+  users: state.userList,
+  error: state.status.error,
+  loading: state.status.loading
+})
+export default connect(mapStateToProps)(UserListContainer);
