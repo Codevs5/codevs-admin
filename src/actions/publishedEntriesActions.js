@@ -18,7 +18,6 @@ export function fetchEntries() {
             dispatch({type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items});
             dispatch(actions.fetchingSuccess());
         }).catch(err => {
-            //dispatch({type: 'FETCH_P_ENTRIES_REJECTED', payload: err})
             dispatch(actions.fetchEntriesRejected(err))
         });
     }

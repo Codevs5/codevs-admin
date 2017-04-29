@@ -4,6 +4,7 @@ import {shell} from 'electron';
 import {connect} from 'react-redux';
 
 import {fetchEntries, updateEntry, uploadImage} from '../actions/publishedEntriesActions.js';
+import {ERROR_UPDATED} from '../constants/statusTypes.js';
 
 import PublishedEntry from '../components/entries/published/PublishedEntry.js'
 
@@ -25,9 +26,7 @@ class PublishedEntryContainer extends Component {
             entry: this.props.entries.filter((e) => e.id === props.match.params.id)[0] || defaultData,
             tags: [],
             titleEditable: false,
-            errorUpdating: false,
-            errorMessage: '',
-            loadingImage: false
+
         };
 
         this.firstTitle = '';
@@ -171,8 +170,8 @@ class PublishedEntryContainer extends Component {
           handleChangeTitle={this.handleChangeTitle}
           handleEditableChange={this.handleToggleEditable}
           data={this.state.entry}
-          errorUpdating={this.state.errorUpdating}
-          errorMessage={this.state.errorMessage}
+          errorUpdating={this.props.updated === ERROR_UPDATED}
+          errorMessage={this.props.errorMessage}
           handleRemoveTag={this.handleRemoveTag}
           handleAddTag={this.handleAddTag}
           btns={btns}
@@ -187,7 +186,9 @@ const mapStateToProps = (state, action) => {
       entries: state.publishedEntries,
       loading: state.status.loading,
       error: state.status.error,
-      loadingImage: state.status.loadingImage
+      loadingImage: state.status.loadingImage,
+      updated: state.status.updated,
+      errorMessage: state.status.errorMessage
     }
 }
 

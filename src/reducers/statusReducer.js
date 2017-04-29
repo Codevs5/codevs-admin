@@ -67,6 +67,18 @@ export default function statusReducer(state = defaultInitState, action) {
                 loadingImage: false,
                 errorMessage: action.payload
             };
+        case c.LOG_OUT:
+            return {
+                ...state,
+                logged: c.NOT_LOGGED,
+                loading: false
+            };
+        case c.LOG_IN:
+            return {
+                ...state,
+                logged: c.LOGGED,
+                loading: false
+            }
 
         default:
             return state;

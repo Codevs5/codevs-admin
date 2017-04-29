@@ -1,42 +1,31 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
+import { connect } from 'react-redux';
+
+import * as actions from '../actions/userActions.js';
 
 import App from '../components/App.js';
 
-export default class AppContainer extends Component {
+class AppContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
             email: '',
             password: '',
-            logged: 0,
-            loading: false,
-            fail: false
         }
-
-        this.handleLoginWithGoogle = this.handleLoginWithGoogle.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
         this.handleLoginWithCredentials = this.handleLoginWithCredentials.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        console.log(this.props);
     }
 
     handleLoginWithCredentials(e) {
-        this.setState({loading: true});
-        firebase.auth()
-          .signInWithEmailAndPassword(this.state.email, this.state.password)
-          .then(user => this.setState({loading: false, logged: 1, fail: false}))
-          .catch(err => this.setState({loading: false, fail: true, logged: -1}));
+      this.props.dispatch(actions.startLogging(this.state.email, this.state.password));
     }
 
     handleLogout() {
         firebase.auth().signOut();
-    }
-
-    handleLoginWithGoogle() {
-        // this.setState({loading: true});
-        // const provider = new firebase.auth.GoogleAuthProvider();
-        // firebase.auth().signInWithRedirect(provider).then(user => console.log(user)).catch(err => console.log(err));
     }
 
     handlePasswordChange(e) {
@@ -50,9 +39,9 @@ export default class AppContainer extends Component {
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.setState({logged: 1})
+                this.props.dispatch(actions.userLogged(user));
             } else {
-                this.setState({logged: -1})
+                this.props.dispatch(actions.userLogout());
             }
         });
     }
@@ -62,10 +51,18 @@ export default class AppContainer extends Component {
           handleLoginWithGoogle={this.handleLoginWithGoogle}
           handleLoginWithCredentials={this.handleLoginWithCredentials}
           handleLogout={this.handleLogout}
-          loading={this.state.loading}
-          logged={this.state.logged}
-          fail={this.state.fail}
+          loading={this.props.loading}
+          logged={this.props.logged}
+          fail={this.props.error}
           handlePasswordChange={this.handlePasswordChange}
           handleEmailChange={this.handleEmailChange}/>);
     }
 }
+
+const mapStateToProps = (state, actions) => ({
+  loading: state.status.loading,
+  logged: state.status.logged,
+  error: state.status.error,
+  user: state.user
+});
+export default connect(mapStateToProps)(AppContainer);
