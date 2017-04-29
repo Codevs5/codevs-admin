@@ -38,6 +38,12 @@ export function updateSuccess(){
   };
 }
 
+export function updateReset(){
+  return {
+    type: c.UPDATE_RESET
+  };
+}
+
 export function uploadImage(){
   return {
     type: c.UPLOAD_IMAGE

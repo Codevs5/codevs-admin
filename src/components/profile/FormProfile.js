@@ -35,15 +35,15 @@ FormProfile.propTypes = {
     socialNetworks: PropTypes.array.isRequired,
     error: PropTypes.bool.isRequired,
     loading: PropTypes.bool.isRequired,
-    updated: PropTypes.string.isRequired,
+    updated: PropTypes.number.isRequired,
     loadingAvatar: PropTypes.bool.isRequired
 };
 
 const FormProfileView = ({handleFunctions, userData, socialNetworks, updated, loadingAvatar}) => {
     let alert;
-    if (updated === 'updated')
+    if (updated === 1)
         alert = (<Alert message={'Success! Profile was succesfully updated'} type="success"/>);
-    else if (updated === 'fail')
+    else if (updated === -1)
         alert = alert = (<Alert message="Oops, we couldn't update the profile" type="error"/>)
     return (
         <div className="profile-container container">
@@ -90,7 +90,7 @@ FormProfileView.propTypes = {
     handleFunctions: PropTypes.object.isRequired,
     userData: PropTypes.object.isRequired,
     socialNetworks: PropTypes.array.isRequired,
-    updated: PropTypes.string.isRequired,
+    updated: PropTypes.number.isRequired,
     loadingAvatar: PropTypes.bool.isRequired
 
 };

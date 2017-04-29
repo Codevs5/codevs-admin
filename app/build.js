@@ -12504,13 +12504,14 @@ var FETCHING_SUCCESS = exports.FETCHING_SUCCESS = 'FETCHING_SUCCESS';
 var UPDATE_START = exports.UPDATE_START = 'UPDATE_START';
 var UPDATE_REJECTED = exports.UPDATE_REJECTED = 'UPDATE_REJECTED';
 var UPDATE_SUCCESS = exports.UPDATE_SUCCESS = 'UPDATE_SUCCESS';
+var UPDATE_RESET = exports.UPDATE_RESET = 'UPDATE_RESET';
 var UPLOAD_IMAGE = exports.UPLOAD_IMAGE = 'UPLOAD_IMAGE';
 var UPLOAD_IMAGE_SUCCESS = exports.UPLOAD_IMAGE_SUCCESS = 'UPLOAD_IMAGE_SUCCESS';
 var UPLOAD_IMAGE_REJECTED = exports.UPLOAD_IMAGE_REJECTED = 'UPLOAD_IMAGE_REJECTED';
 var LOG_OUT = exports.LOG_OUT = 'LOG_OUT';
 var LOG_IN = exports.LOG_IN = 'LOG_IN';
 
-var UPDATE = exports.UPDATE = 1;
+var UPDATED = exports.UPDATED = 1;
 var ERROR_UPDATED = exports.ERROR_UPDATED = -1;
 var NOT_UPDATING = exports.NOT_UPDATING = 0;
 
@@ -26705,6 +26706,7 @@ exports.fetchingSuccess = fetchingSuccess;
 exports.updateStart = updateStart;
 exports.updateRejected = updateRejected;
 exports.updateSuccess = updateSuccess;
+exports.updateReset = updateReset;
 exports.uploadImage = uploadImage;
 exports.uploadImageRejected = uploadImageRejected;
 exports.uploadImageSuccess = uploadImageSuccess;
@@ -26750,6 +26752,12 @@ function updateRejected(error) {
 function updateSuccess() {
   return {
     type: c.UPDATE_SUCCESS
+  };
+}
+
+function updateReset() {
+  return {
+    type: c.UPDATE_RESET
   };
 }
 
@@ -28626,7 +28634,7 @@ FormProfile.propTypes = {
     socialNetworks: _react.PropTypes.array.isRequired,
     error: _react.PropTypes.bool.isRequired,
     loading: _react.PropTypes.bool.isRequired,
-    updated: _react.PropTypes.string.isRequired,
+    updated: _react.PropTypes.number.isRequired,
     loadingAvatar: _react.PropTypes.bool.isRequired
 };
 
@@ -28638,7 +28646,7 @@ var FormProfileView = function FormProfileView(_ref2) {
         loadingAvatar = _ref2.loadingAvatar;
 
     var alert = void 0;
-    if (updated === 'updated') alert = _react2.default.createElement(_Alert2.default, { message: 'Success! Profile was succesfully updated', type: 'success' });else if (updated === 'fail') alert = alert = _react2.default.createElement(_Alert2.default, { message: 'Oops, we couldn\'t update the profile', type: 'error' });
+    if (updated === 1) alert = _react2.default.createElement(_Alert2.default, { message: 'Success! Profile was succesfully updated', type: 'success' });else if (updated === -1) alert = alert = _react2.default.createElement(_Alert2.default, { message: 'Oops, we couldn\'t update the profile', type: 'error' });
     return _react2.default.createElement(
         'div',
         { className: 'profile-container container' },
@@ -28698,7 +28706,7 @@ FormProfileView.propTypes = {
     handleFunctions: _react.PropTypes.object.isRequired,
     userData: _react.PropTypes.object.isRequired,
     socialNetworks: _react.PropTypes.array.isRequired,
-    updated: _react.PropTypes.string.isRequired,
+    updated: _react.PropTypes.number.isRequired,
     loadingAvatar: _react.PropTypes.bool.isRequired
 
 };
@@ -29297,6 +29305,12 @@ var _firebase = __webpack_require__(17);
 
 var firebase = _interopRequireWildcard(_firebase);
 
+var _reactRedux = __webpack_require__(69);
+
+var _userListActions = __webpack_require__(563);
+
+var _statusActions = __webpack_require__(224);
+
 var _FormProfile = __webpack_require__(255);
 
 var _FormProfile2 = _interopRequireDefault(_FormProfile);
@@ -29305,14 +29319,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-//import FireStorage from '../utils/storage.js';
 
 var socialNetworks = [{
     name: 'twitter',
@@ -29341,23 +29352,15 @@ var socialNetworks = [{
 }];
 
 //User default data
-var createUserDefaultData = function createUserDefaultData(user) {
+var createUserDefaultData = function createUserDefaultData() {
     return {
-        metadata: {
-            "bio": "Soy un soso y no tengo una bio",
-            "social": {},
-            "city": "Codevs city",
-            "firstname": user.displayName || "Anonimo",
-            "lastname": "",
-            "avatar": user.photoURL || '',
-            "birthdate": new Date().toISOString().split('T')[0]
-        },
-        "stats": {
-            "joined": new Date().toISOString().split('T')[0],
-            "lastmod": new Date().toISOString().split('T')[0],
-            "role": 10
-        }
-
+        "bio": "",
+        "social": {},
+        "city": "",
+        "firstname": "Anonimo",
+        "lastname": "",
+        "avatar": 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg',
+        "birthdate": new Date().toISOString().split('T')[0]
     };
 };
 
@@ -29365,28 +29368,13 @@ var FormProfileContainer = function (_Component) {
     _inherits(FormProfileContainer, _Component);
 
     function FormProfileContainer(props) {
-        var _metadata;
-
         _classCallCheck(this, FormProfileContainer);
 
         var _this = _possibleConstructorReturn(this, (FormProfileContainer.__proto__ || Object.getPrototypeOf(FormProfileContainer)).call(this, props));
 
-        var userDefaultData = createUserDefaultData({}).metadata;
         _this.state = {
-            metadata: (_metadata = {
-                bio: userDefaultData.bio,
-                social: userDefaultData.social,
-                city: userDefaultData.city,
-                firstname: userDefaultData.firstname,
-                lastname: userDefaultData.lastname,
-                birthdate: userDefaultData.birthdate
-            }, _defineProperty(_metadata, 'social', {}), _defineProperty(_metadata, 'avatar', 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'), _metadata),
-            loading: true,
-            error: false,
-            updated: '',
-            loadingAvatar: false
+            currentUser: {}
         };
-
         //function bindings
         _this.handleFirstNameChange = _this.handleFirstNameChange.bind(_this);
         _this.handleLastnameChange = _this.handleLastnameChange.bind(_this);
@@ -29395,102 +29383,79 @@ var FormProfileContainer = function (_Component) {
         _this.handleBirthdateChange = _this.handleBirthdateChange.bind(_this);
         _this.handleSocialChange = _this.handleSocialChange.bind(_this);
         _this.handleFormSubmit = _this.handleFormSubmit.bind(_this);
-        _this.errorOnRetreivingData = _this.errorOnRetreivingData.bind(_this);
-        _this.fillUserData = _this.fillUserData.bind(_this);
         _this.handleUserAvatar = _this.handleUserAvatar.bind(_this);
-        _this.uploadAvatar = _this.uploadAvatar.bind(_this);
-        _this.uploadError = _this.uploadError.bind(_this);
-        _this.uploadFinished = _this.uploadFinished.bind(_this);
 
         return _this;
     }
 
     _createClass(FormProfileContainer, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var _this2 = this;
+        key: 'componentWillMount',
+        value: function componentWillMount() {
+            this.props.dispatch((0, _statusActions.updateReset)());
+            if (this.props.users.length === 0) this.props.dispatch((0, _userListActions.fetchAllUsers)());
+            this.loadUserData(this.props.users || []);
+        }
+    }, {
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(props) {
 
-            //const user = firebase.auth().currentUser;
+            var listOfUsers = props.users;
+            this.loadUserData(listOfUsers || []);
+        }
+    }, {
+        key: 'loadUserData',
+        value: function loadUserData(listOfUsers) {
             var id = this.props.match.params.id;
-
-            var dbRef = firebase.database().ref('/users/' + id);
-            dbRef.on('value', function (data) {
-                return _this2.fillUserData(data);
-            }, function (err) {
-                return _this2.errorOnRetreivingData(err);
-            });
-        }
-    }, {
-        key: 'fillUserData',
-        value: function fillUserData(data) {
-            var metadata = void 0;
-            if (!data.val()) {
-                //No tiene perfil a�n en la DB
-                var defaultUserData = createUserDefaultData(user);
-                dbRef.set(defaultUserData);
-                metadata = defaultUserData.metadata;
-            } else {
-                metadata = data.val().metadata;
-            }
+            console.log(this.props.users, id);
+            var current = listOfUsers.filter(function (user) {
+                return user.id === id;
+            })[0] ? listOfUsers.filter(function (user) {
+                return user.id === id;
+            })[0].metadata : {};
             this.setState({
-                metadata: {
-                    bio: metadata.bio,
-                    city: metadata.city || '',
-                    firstname: metadata.firstname || '',
-                    lastname: metadata.lastname || '',
-                    birthdate: metadata.birthdate || '',
-                    social: metadata.social || {},
-                    avatar: metadata.avatar || this.state.metadata.avatar
-                },
-                error: false,
-                loading: false
+                currentUser: Object.assign({}, createUserDefaultData(), current)
             });
         }
-    }, {
-        key: 'errorOnRetreivingData',
-        value: function errorOnRetreivingData(err) {
-            this.setState({ error: true, loading: false });
-        }
-
         //Handle inputs
 
     }, {
         key: 'handleFirstNameChange',
         value: function handleFirstNameChange(e) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { firstname: e.target.value }) });
+
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { firstname: e.target.value }) });
         }
     }, {
         key: 'handleLastnameChange',
         value: function handleLastnameChange(e) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { lastname: e.target.value }) });
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { lastname: e.target.value }) });
         }
     }, {
         key: 'handleBirthdateChange',
         value: function handleBirthdateChange(e) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { birthdate: e.target.value }) });
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { birthdate: e.target.value }) });
         }
     }, {
         key: 'handleCityChange',
         value: function handleCityChange(e) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { city: e.target.value }) });
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { city: e.target.value }) });
         }
     }, {
         key: 'handleBioChange',
         value: function handleBioChange(e) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { bio: e.target.value }) });
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { bio: e.target.value }) });
         }
     }, {
         key: 'handleSocialChange',
         value: function handleSocialChange(e, newSocial) {
-            this.setState({ metadata: Object.assign({}, this.state.metadata, { social: newSocial }) });
+            this.setState({ currentUser: Object.assign({}, this.state.currentUser, { social: newSocial }) });
         }
     }, {
         key: 'handleUserAvatar',
         value: function handleUserAvatar(e) {
-            var _this3 = this;
+            var _this2 = this;
 
             e.preventDefault();
-            this.setState({ loadingAvatar: true });
+            var id = this.props.match.params.id;
             var reader = new FileReader();
             var file = e.target.files[0];
             reader.onloadend = function () {
@@ -29498,73 +29463,17 @@ var FormProfileContainer = function (_Component) {
                     file: file,
                     imagePreviewUrl: reader.result
                 };
-                _this3.uploadAvatar(avatarUpload);
+                _this2.props.dispatch((0, _userListActions.updateUserAvatar)(id, avatarUpload));
             };
 
             reader.readAsDataURL(file);
         }
     }, {
-        key: 'uploadAvatar',
-        value: function uploadAvatar(avatarUpload) {
-            var _this4 = this;
-
-            var id = this.props.match.params.id;
-            var stRef = firebase.storage().ref('users/' + id);
-
-            var metadata = {
-                contentType: 'image/png'
-            };
-            var uploadTask = stRef.child('avatar.png').put(avatarUpload.file, metadata);
-            //uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, this.uploadCallback, this.uploadError, this.uploadFinished(uploadTask));
-            uploadTask.then(function () {
-                return _this4.uploadFinished();
-            }).catch(function (err) {
-                return _this4.uploadError(err);
-            });
-        }
-    }, {
-        key: 'uploadCallback',
-        value: function uploadCallback(snap) {}
-    }, {
-        key: 'uploadError',
-        value: function uploadError(e) {
-            this.setState({ error: false, loading: false, updated: 'fail', loadingAvatar: false });
-        }
-    }, {
-        key: 'uploadFinished',
-        value: function uploadFinished() {
-            var _this5 = this;
-
-            var id = this.props.match.params.id;
-            var dbRef = firebase.database().ref('/users/' + id + '/metadata');
-            var stRef = firebase.storage().ref('/users/' + id + '/avatar.png');
-            stRef.getDownloadURL().then(function (url) {
-                return dbRef.update({ avatar: url }).then(function () {
-                    return url;
-                });
-            }).then(function (url) {
-                _this5.setState({ error: false, loadingAvatar: false, loading: false, updated: '' });
-                _this5.setState({ metadata: Object.assign({}, _this5.state.metadata, { avatar: url }) });
-            }).catch(function (e) {
-                _this5.setState({ updated: 'fail' });
-            });
-        }
-    }, {
         key: 'handleFormSubmit',
         value: function handleFormSubmit(e) {
-            var _this6 = this;
-
             e.preventDefault();
             var id = this.props.match.params.id;
-            var dbRef = firebase.database().ref('/users/' + id);
-
-            dbRef.child('/metadata').update(this.state.metadata)
-            //.then(() => this.uploadAvatar())
-            .then(function () {
-                return _this6.setState({ updated: 'updated' });
-            }).catch(function (e) {
-                _this6.setState({ updated: 'fail' });
-            });
+            this.props.dispatch((0, _userListActions.updateUser)(id, this.state.currentUser));
         }
     }, {
         key: 'render',
@@ -29582,13 +29491,13 @@ var FormProfileContainer = function (_Component) {
             };
 
             return _react2.default.createElement(_FormProfile2.default, {
-                userData: this.state.metadata,
+                userData: this.state.currentUser,
                 handleFunctions: controllers,
                 socialNetworks: socialNetworks,
-                loading: this.state.loading,
-                error: this.state.error,
-                updated: this.state.updated,
-                loadingAvatar: this.state.loadingAvatar
+                loading: this.props.loading,
+                error: this.props.error,
+                updated: this.props.updated,
+                loadingAvatar: this.props.loadingImage
             });
         }
     }]);
@@ -29596,7 +29505,16 @@ var FormProfileContainer = function (_Component) {
     return FormProfileContainer;
 }(_react.Component);
 
-exports.default = FormProfileContainer;
+var mapStateToProps = function mapStateToProps(state, action) {
+    return {
+        users: state.userList,
+        loading: state.status.loading,
+        error: state.status.error,
+        loadingImage: state.status.loadingImage,
+        updated: state.status.updated
+    };
+};
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(FormProfileContainer);
 
 /***/ }),
 /* 265 */
@@ -31205,7 +31123,10 @@ function statusReducer() {
                 logged: c.LOGGED,
                 loading: false
             });
-
+        case c.UPDATE_RESET:
+            return _extends({}, state, {
+                updated: c.NOT_UPDATING
+            });
         default:
             return state;
 
@@ -59873,6 +59794,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var FETCH_USERS_SUCCESS = exports.FETCH_USERS_SUCCESS = 'FETCH_USERS_SUCCESS';
+var UPDATE_USER_SUCCESS = exports.UPDATE_USER_SUCCESS = 'UPDATE_USER_SUCCESS';
+var UPLOAD_USER_AVATAR_SUCCESS = exports.UPLOAD_USER_AVATAR_SUCCESS = 'UPLOAD_USER_AVATAR_SUCCESS';
 
 /***/ }),
 /* 562 */
@@ -59884,6 +59807,9 @@ var FETCH_USERS_SUCCESS = exports.FETCH_USERS_SUCCESS = 'FETCH_USERS_SUCCESS';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports.default = userList;
 
 var _userListTypes = __webpack_require__(561);
@@ -59899,10 +59825,38 @@ function userList() {
   switch (action.type) {
     case c.FETCH_USERS_SUCCESS:
       return action.payload;
+    case c.UPDATE_USER_SUCCESS:
+      return updateUser(action.payload.id, action.payload.currentUser, state);
+    case c.UPLOAD_USER_AVATAR_SUCCESS:
+      return updateUserAvatar(action.payload.id, action.payload.url, state);
     default:
       return state;
   }
 }
+
+var updateUser = function updateUser(id, current, state) {
+  return state.map(function (user) {
+    if (user.id !== id) return user;
+    return {
+      id: id,
+      metadata: current
+    };
+  });
+};
+
+var updateUserAvatar = function updateUserAvatar(id, url, state) {
+  return state.map(function (user) {
+    if (user.id !== id) return user;
+    console.log(_extends({}, user, {
+      avatar: url
+    }));
+    return _extends({}, user, {
+      metadata: _extends({}, user.metadata, {
+        avatar: url
+      })
+    });
+  });
+};
 
 /***/ }),
 /* 563 */
@@ -59915,6 +59869,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.fetchAllUsers = fetchAllUsers;
+exports.updateUser = updateUser;
+exports.updateUserAvatar = updateUserAvatar;
 
 var _firebase = __webpack_require__(17);
 
@@ -59962,6 +59918,63 @@ function fetchAllUsers() {
     });
   };
 }
+
+function updateUser(id, currentUser) {
+  return function (dispatch) {
+    dispatch((0, _statusActions.startLoading)());
+    var dbRef = firebase.database().ref('/users/' + id);
+    dbRef.child('/metadata').update(currentUser).then(function () {
+      console.log(currentUser);
+      dispatch((0, _statusActions.updateSuccess)());
+      dispatch({
+        type: c.UPDATE_USER_SUCCESS,
+        payload: {
+          id: id,
+          currentUser: currentUser
+        }
+      });
+    }).catch(function (e) {
+      return dispatch((0, _statusActions.updateRejected)(e));
+    });
+  };
+}
+
+function updateUserAvatar(id, avatarUpload) {
+  return function (dispatch) {
+    dispatch((0, _statusActions.uploadImage)());
+    var stRef = firebase.storage().ref('users/' + id);
+    var metadata = {
+      contentType: 'image/png'
+    };
+    var uploadTask = stRef.child('avatar.png').put(avatarUpload.file, metadata);
+    uploadTask.then(function () {
+      return uploadFinished(dispatch, id);
+    }).catch(function (err) {
+      return dispatch((0, _statusActions.uploadImageRejected)(err));
+    });
+  };
+}
+
+var uploadFinished = function uploadFinished(dispatch, id) {
+  var dbRef = firebase.database().ref('/users/' + id + '/metadata');
+  var stRef = firebase.storage().ref('/users/' + id + '/avatar.png');
+  stRef.getDownloadURL().then(function (url) {
+    return dbRef.update({ avatar: url }).then(function () {
+      return url;
+    });
+  }).then(function (url) {
+    dispatch({
+      type: c.UPLOAD_USER_AVATAR_SUCCESS,
+      payload: {
+        id: id,
+        url: url
+      }
+    });
+    dispatch((0, _statusActions.uploadImageSuccess)());
+  }).catch(function (e) {
+    undefined.setState({ updated: 'fail' });
+  });
+};
 
 /***/ })
 /******/ ]);

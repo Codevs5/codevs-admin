@@ -79,7 +79,11 @@ export default function statusReducer(state = defaultInitState, action) {
                 logged: c.LOGGED,
                 loading: false
             }
-
+        case c.UPDATE_RESET:
+            return {
+                ...state,
+                updated: c.NOT_UPDATING
+            };
         default:
             return state;
 

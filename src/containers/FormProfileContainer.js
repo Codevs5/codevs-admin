@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
-//import FireStorage from '../utils/storage.js';
+import { connect } from 'react-redux';
+
+import { fetchAllUsers, updateUser, updateUserAvatar } from '../actions/userListActions.js';
+import { updateReset } from '../actions/statusActions.js';
 
 import FormProfile from '../components/profile/FormProfile.js';
 
@@ -33,47 +36,25 @@ const socialNetworks = [
 ];
 
 //User default data
-const createUserDefaultData = (user) => {
+const createUserDefaultData = () => {
     return {
-        metadata: {
-            "bio": "Soy un soso y no tengo una bio",
+            "bio": "",
             "social": {},
-            "city": "Codevs city",
-            "firstname": user.displayName || "Anonimo",
+            "city": "",
+            "firstname": "Anonimo",
             "lastname": "",
-            "avatar": user.photoURL || '',
+            "avatar":  'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg',
             "birthdate": (new Date()).toISOString().split('T')[0]
-        },
-        "stats": {
-            "joined": (new Date()).toISOString().split('T')[0],
-            "lastmod": (new Date()).toISOString().split('T')[0],
-            "role": 10
-        }
-
-    }
+        };
 }
 
-export default class FormProfileContainer extends Component {
+class FormProfileContainer extends Component {
     constructor(props) {
         super(props);
-        const userDefaultData = createUserDefaultData({}).metadata;
-        this.state = {
-            metadata: {
-                bio: userDefaultData.bio,
-                social: userDefaultData.social,
-                city: userDefaultData.city,
-                firstname: userDefaultData.firstname,
-                lastname: userDefaultData.lastname,
-                birthdate: userDefaultData.birthdate,
-                social: {},
-                avatar: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg'
-            },
-            loading: true,
-            error: false,
-            updated: '',
-            loadingAvatar: false
-        };
 
+        this.state = {
+          currentUser: {}
+        }
         //function bindings
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
         this.handleLastnameChange = this.handleLastnameChange.bind(this);
@@ -82,75 +63,54 @@ export default class FormProfileContainer extends Component {
         this.handleBirthdateChange = this.handleBirthdateChange.bind(this);
         this.handleSocialChange = this.handleSocialChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
-        this.errorOnRetreivingData = this.errorOnRetreivingData.bind(this);
-        this.fillUserData = this.fillUserData.bind(this);
         this.handleUserAvatar = this.handleUserAvatar.bind(this);
-        this.uploadAvatar = this.uploadAvatar.bind(this);
-        this.uploadError = this.uploadError.bind(this);
-        this.uploadFinished = this.uploadFinished.bind(this);
 
     }
 
-    componentDidMount() {
-        //const user = firebase.auth().currentUser;
-        const id = this.props.match.params.id;
-
-        const dbRef = firebase.database().ref(`/users/${id}`);
-        dbRef.on('value', (data) => this.fillUserData(data), (err) => this.errorOnRetreivingData(err));
-
+    componentWillMount() {
+      this.props.dispatch(updateReset());
+      if(this.props.users.length === 0) this.props.dispatch(fetchAllUsers());
+      this.loadUserData(this.props.users || []);
     }
 
-    fillUserData(data) {
-        let metadata;
-        if (!data.val()) { //No tiene perfil a�n en la DB
-            const defaultUserData = createUserDefaultData(user);
-            dbRef.set(defaultUserData);
-            metadata = defaultUserData.metadata;
-        } else {
-            metadata = data.val().metadata
-        }
-        this.setState({
-            metadata: {
-                bio: metadata.bio,
-                city: metadata.city || '',
-                firstname: metadata.firstname || '',
-                lastname: metadata.lastname || '',
-                birthdate: metadata.birthdate || '',
-                social: metadata.social || {},
-                avatar: metadata.avatar || this.state.metadata.avatar
-            },
-            error: false,
-            loading: false
-        });
+    componentWillReceiveProps(props){
+
+      const listOfUsers = props.users;
+      this.loadUserData(listOfUsers || [])
     }
 
-    errorOnRetreivingData(err) {
-        this.setState({error: true, loading: false});
+    loadUserData(listOfUsers){
+      const id = this.props.match.params.id;
+      console.log(this.props.users, id);
+      const current = (listOfUsers.filter((user) => user.id === id)[0])?listOfUsers.filter((user) => user.id === id)[0].metadata:{};
+      this.setState({
+        currentUser : Object.assign({},createUserDefaultData(), current)
+      });
     }
-
     //Handle inputs
     handleFirstNameChange(e) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {firstname: e.target.value})});
+
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {firstname: e.target.value})});
     }
     handleLastnameChange(e) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {lastname: e.target.value})});
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {lastname: e.target.value})});
     }
     handleBirthdateChange(e) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {birthdate: e.target.value})});
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {birthdate: e.target.value})});
     }
     handleCityChange(e) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {city: e.target.value})});
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {city: e.target.value})});
     }
     handleBioChange(e) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {bio: e.target.value})});
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {bio: e.target.value})});
     }
     handleSocialChange(e, newSocial) {
-        this.setState({metadata: Object.assign({}, this.state.metadata, {social: newSocial})});
+        this.setState({currentUser: Object.assign({}, this.state.currentUser, {social: newSocial})});
     }
 
     handleUserAvatar(e) {
         e.preventDefault();
-        this.setState({loadingAvatar: true});
+        const id = this.props.match.params.id;
         let reader = new FileReader();
         let file = e.target.files[0];
         reader.onloadend = () => {
@@ -158,58 +118,18 @@ export default class FormProfileContainer extends Component {
                 file: file,
                 imagePreviewUrl: reader.result
             };
-            this.uploadAvatar(avatarUpload);
+            this.props.dispatch(updateUserAvatar(id, avatarUpload));
         }
 
         reader.readAsDataURL(file)
 
     }
 
-    uploadAvatar(avatarUpload) {
-        const id = this.props.match.params.id;
-        const stRef = firebase.storage().ref(`users/${id}`);
-
-        const metadata = {
-            contentType: 'image/png'
-        };
-        const uploadTask = stRef.child('avatar.png').put(avatarUpload.file, metadata);
-        //uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, this.uploadCallback, this.uploadError, this.uploadFinished(uploadTask));
-        uploadTask
-          .then(() => this.uploadFinished())
-          .catch((err) => this.uploadError(err));
-    }
-
-    uploadCallback(snap) {}
-
-    uploadError(e) {
-        this.setState({error: false, loading: false, updated: 'fail', loadingAvatar: false});
-    }
-    uploadFinished() {
-        const id = this.props.match.params.id;
-        const dbRef = firebase.database().ref(`/users/${id}/metadata`);
-        const stRef = firebase.storage().ref(`/users/${id}/avatar.png`);
-        stRef.getDownloadURL().then((url) => dbRef.update({avatar: url}).then(() => url)).then((url) => {
-            this.setState({error: false, loadingAvatar: false, loading: false, updated: ''});
-            this.setState({metadata: Object.assign({}, this.state.metadata, {avatar: url})});
-        }).catch((e) => {
-            this.setState({updated: 'fail'});
-
-        });
-    }
 
     handleFormSubmit(e) {
         e.preventDefault();
         const id = this.props.match.params.id;
-        const dbRef = firebase.database().ref(`/users/${id}`);
-
-
-        dbRef.child('/metadata').update(this.state.metadata)
-        //.then(() => this.uploadAvatar())
-            .then(() => this.setState({updated: 'updated'})).catch((e) => {
-            this.setState({updated: 'fail'});
-
-        });
-
+        this.props.dispatch(updateUser(id, this.state.currentUser));
     }
 
     render() {
@@ -226,13 +146,23 @@ export default class FormProfileContainer extends Component {
         }
 
         return (<FormProfile
-          userData={this.state.metadata}
+          userData={this.state.currentUser}
           handleFunctions={controllers}
           socialNetworks={socialNetworks}
-          loading={this.state.loading}
-          error={this.state.error}
-          updated={this.state.updated}
-          loadingAvatar={this.state.loadingAvatar}
+          loading={this.props.loading}
+          error={this.props.error}
+          updated={this.props.updated}
+          loadingAvatar={this.props.loadingImage}
           />);
     }
 }
+
+
+const mapStateToProps = (state, action) => ({
+  users : state.userList,
+  loading: state.status.loading,
+  error: state.status.error,
+  loadingImage: state.status.loadingImage,
+  updated: state.status.updated
+});
+export default connect(mapStateToProps)(FormProfileContainer);
