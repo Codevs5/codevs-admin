@@ -86,7 +86,7 @@ export default class NewUserContainer extends Component {
           //.then(user => user.link(new firebase.auth.GoogleAuthProvider()))
           .then(() => this.setState({error: false, loading: false, updated: 'updated'}))
           .catch(err => {
-            console.log(err);
+
             this.setState({error: true, loading: false, updated: 'fail'});
           });
     }
@@ -107,7 +107,7 @@ export default class NewUserContainer extends Component {
     }
 
     handleRoleChange(e) {
-      console.log(e.target.value);
+
         this.setState({role: e.target.value});
     }
 

@@ -13,7 +13,6 @@ export function userLogout() {
 
 export function userLogged(user) {
     return (dispatch) => {
-        console.log('ss');
         dispatch({type: sc.LOG_IN});
         dispatch({type: uc.USER_LOGIN, payload: user})
     }

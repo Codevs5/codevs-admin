@@ -17931,6 +17931,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
@@ -17942,13 +17944,14 @@ var SimpleSelect = function SimpleSelect(_ref) {
         options = _ref.options,
         handleChange = _ref.handleChange,
         selected = _ref.selected,
-        enable = _ref.enable;
+        enable = _ref.enable,
+        label = _ref.label;
 
     var listOptions = options.map(function (opt, i) {
         return _react2.default.createElement(
             'option',
-            { value: opt, key: i },
-            opt
+            { value: (typeof opt === 'undefined' ? 'undefined' : _typeof(opt)) === _typeof({}) ? opt.opt : opt, key: i },
+            (typeof opt === 'undefined' ? 'undefined' : _typeof(opt)) === _typeof({}) ? opt.label : opt
         );
     });
 
@@ -17973,7 +17976,8 @@ SimpleSelect.propTypes = {
     options: _react.PropTypes.array.isRequired,
     handleChange: _react.PropTypes.func.isRequired,
     selected: _react.PropTypes.string,
-    enable: _react.PropTypes.bool
+    enable: _react.PropTypes.bool,
+    label: _react.PropTypes.string
 };
 
 exports.default = SimpleSelect;
@@ -18038,15 +18042,16 @@ var getEntries = exports.getEntries = function getEntries(key) {
   var pending = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   var declined = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var accepted = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+
   return _axios2.default.get(_urls2.default.gasEntriesValidator + '?key=' + key + '&pending=' + pending + '&declined=' + declined + '&accepted=' + accepted).then(function (res) {
     return res.data;
   }).then(function (data) {
-    return data.message ? console.log('Error, sin acceso!') : data;
+    return data.message ? Promise.reject(data.message) : data;
   }).catch(function (err) {
     return console.log(err);
   });
 };
-
 /*
 * Perdoname señor por utilizar un GET en vez de un POST
 * es mi último recurso, no quería hacerlo pero me veo obligado.
@@ -24722,7 +24727,7 @@ var AppContainer = function (_Component) {
         _this.handleLoginWithCredentials = _this.handleLoginWithCredentials.bind(_this);
         _this.handleEmailChange = _this.handleEmailChange.bind(_this);
         _this.handlePasswordChange = _this.handlePasswordChange.bind(_this);
-        console.log(_this.props);
+
         return _this;
     }
 
@@ -27925,7 +27930,8 @@ var ValidatorEntryResume = function ValidatorEntryResume(_ref) {
       iconVisible = _ref.iconVisible,
       handleVisible = _ref.handleVisible;
 
-  var labelIcon = "validator-entry-resume--label " + entry.state;
+  var labelIcon = "validator-entry-resume--label " + parseState(entry.state);
+
   return _react2.default.createElement(
     "div",
     { className: "validator-entry-resume row" },
@@ -27941,7 +27947,7 @@ var ValidatorEntryResume = function ValidatorEntryResume(_ref) {
       _react2.default.createElement(
         "div",
         { className: labelIcon },
-        entry.state,
+        parseState(entry.state),
         " "
       ),
       _react2.default.createElement("i", { className: iconVisible, onClick: handleVisible })
@@ -27956,6 +27962,19 @@ ValidatorEntryResume.propTypes = {
 };
 
 exports.default = ValidatorEntryResume;
+
+
+function parseState(state) {
+  switch (state) {
+    case 'pending':
+      return 'Pendiente';
+    case 'accepted':
+      return 'Aceptada';
+    case 'declined':
+      return 'Rechazada';
+
+  }
+}
 
 /***/ }),
 /* 243 */
@@ -28732,7 +28751,7 @@ var ProfilePassword = function ProfilePassword(_ref) {
         updated = _ref.updated,
         handleChangeCurrentPassword = _ref.handleChangeCurrentPassword;
 
-    console.log(validPassword);
+
     var design = validPassword ? 'valid' : 'invalid';
     var alert = '';
     if (updated === 'error') alert = _react2.default.createElement(_Alert2.default, { type: 'error', message: 'Error: Can\'t update the password, you\'re doing something wrong', icon: 'fa fa-exclamation-triangle' });else if (updated === 'updated') alert = _react2.default.createElement(_Alert2.default, { type: 'success', message: 'Cool! You updated the password succesfully', icon: 'fa fa-check' });
@@ -29510,7 +29529,6 @@ var FormProfileContainer = function (_Component) {
         key: 'uploadError',
         value: function uploadError(e) {
             this.setState({ error: false, loading: false, updated: 'fail', loadingAvatar: false });
-            console.log(e);
         }
     }, {
         key: 'uploadFinished',
@@ -29529,7 +29547,6 @@ var FormProfileContainer = function (_Component) {
                 _this5.setState({ metadata: Object.assign({}, _this5.state.metadata, { avatar: url }) });
             }).catch(function (e) {
                 _this5.setState({ updated: 'fail' });
-                console.log(e);
             });
         }
     }, {
@@ -29541,14 +29558,12 @@ var FormProfileContainer = function (_Component) {
             var id = this.props.match.params.id;
             var dbRef = firebase.database().ref('/users/' + id);
 
-            console.log(this.state);
             dbRef.child('/metadata').update(this.state.metadata)
             //.then(() => this.uploadAvatar())
             .then(function () {
                 return _this6.setState({ updated: 'updated' });
             }).catch(function (e) {
                 _this6.setState({ updated: 'fail' });
-                console.log(e);
             });
         }
     }, {
@@ -29829,7 +29844,7 @@ var NewUserContainer = function (_Component) {
             .then(function () {
                 return _this3.setState({ error: false, loading: false, updated: 'updated' });
             }).catch(function (err) {
-                console.log(err);
+
                 _this3.setState({ error: true, loading: false, updated: 'fail' });
             });
         }
@@ -29851,7 +29866,7 @@ var NewUserContainer = function (_Component) {
     }, {
         key: 'handleRoleChange',
         value: function handleRoleChange(e) {
-            console.log(e.target.value);
+
             this.setState({ role: e.target.value });
         }
     }, {
@@ -30045,7 +30060,7 @@ var ProfilePasswordContainer = function (_Component) {
     }, {
         key: 'handleChangePassword2',
         value: function handleChangePassword2(e) {
-            console.log(this.state);
+
             this.setState({ pwd: Object.assign({}, this.state.pwd, { password2: e.target.value }) });
             this.setState({ validPassword: e.target.value === this.state.pwd.password });
         }
@@ -30072,7 +30087,6 @@ var ProfilePasswordContainer = function (_Component) {
                     return _this2.setState({ updated: 'updated' });
                 }).catch(function (e) {
                     _this2.setState({ updated: 'error' });
-                    console.log(e);
                 });
             }
         }
@@ -30269,7 +30283,6 @@ var PublishedEntryContainer = function (_Component) {
 
         var _this = _possibleConstructorReturn(this, (PublishedEntryContainer.__proto__ || Object.getPrototypeOf(PublishedEntryContainer)).call(this, props));
 
-        console.log(_this.props);
         _this.state = {
             entry: _this.props.entries.filter(function (e) {
                 return e.id === props.match.params.id;
@@ -30422,7 +30435,7 @@ var PublishedEntryContainer = function (_Component) {
                     isCheck: this.state.entry.visible
                 }
             }];
-            console.log(this.props);
+
             return _react2.default.createElement(_PublishedEntry2.default, {
                 previous: this.props.history.goBack,
                 loading: this.props.loading,
@@ -30649,7 +30662,7 @@ var UserListContainer = function (_Component) {
         _this2.setState({ users: users });
         _this2.setState({ loading: false, error: false });
       }).catch(function (err) {
-        console.log(err);
+
         _this2.setState({ loading: false, error: true });
       });
     }
@@ -30686,6 +30699,8 @@ var _firebase = __webpack_require__(17);
 
 var firebase = _interopRequireWildcard(_firebase);
 
+var _reactRedux = __webpack_require__(69);
+
 var _Header = __webpack_require__(25);
 
 var _Header2 = _interopRequireDefault(_Header);
@@ -30698,15 +30713,13 @@ var _ValidatorEntriesList = __webpack_require__(239);
 
 var _ValidatorEntriesList2 = _interopRequireDefault(_ValidatorEntriesList);
 
-var _validatorEntriesData = __webpack_require__(125);
+var _validatorEntriesActions = __webpack_require__(560);
 
 __webpack_require__(544);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -30723,15 +30736,11 @@ var ValidatorEntriesContainer = function (_Component) {
         var _this = _possibleConstructorReturn(this, (ValidatorEntriesContainer.__proto__ || Object.getPrototypeOf(ValidatorEntriesContainer)).call(this, props));
 
         _this.state = {
-            entries: [],
             accepted: false,
             declined: true,
-            pending: true,
-            loading: true
+            pending: true
         };
         _this.handleShowEntryType = _this.handleShowEntryType.bind(_this);
-        _this.fillStateWithEntries = _this.fillStateWithEntries.bind(_this);
-        _this.updateStateEntries = _this.updateStateEntries.bind(_this);
 
         return _this;
     }
@@ -30741,39 +30750,23 @@ var ValidatorEntriesContainer = function (_Component) {
         value: function handleShowEntryType(type) {
             var toggledValue = {};
             toggledValue[type] = !this.state[type];
-            toggledValue['loading'] = true;
+            //toggledValue['loading'] = true;
             this.setState(Object.assign({}, this.state, toggledValue));
-            this.fillStateWithEntries();
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            this.fillStateWithEntries();
+            var uid = firebase.auth().currentUser.uid;
+
+            this.props.dispatch((0, _validatorEntriesActions.getValidatorEntries)(uid));
         }
     }, {
-        key: 'fillStateWithEntries',
-        value: function fillStateWithEntries() {
+        key: 'filterEntries',
+        value: function filterEntries() {
             var _this2 = this;
 
-            var user = firebase.auth().currentUser;
-            var dbRef = firebase.database().ref('/admins/' + user.uid);
-
-            dbRef.once('value').then(function (snap) {
-                return snap.val();
-            }).then(function (data) {
-                return (0, _validatorEntriesData.getEntries)(data.key, _this2.state.pending, _this2.state.declined, _this2.state.accepted);
-            }).then(function (res) {
-                return _this2.updateStateEntries(res);
-            }).catch(function (err) {
-                return console.log(err);
-            }); //TODO: Gestionar bien el error con un modal o alguna hostia
-        }
-    }, {
-        key: 'updateStateEntries',
-        value: function updateStateEntries(data) {
-            this.setState({
-                entries: [].concat(_toConsumableArray(data.pending || []), _toConsumableArray(data.accepted || []), _toConsumableArray(data.declined || [])),
-                loading: false
+            return this.props.entries.filter(function (entry, i) {
+                return entry.state === 'pending' && _this2.state.pending || entry.state === 'declined' && _this2.state.declined || entry.state === 'accepted' && _this2.state.accepted || !_this2.state.accepted && !_this2.state.declined && !_this2.state.pending;
             });
         }
     }, {
@@ -30805,7 +30798,7 @@ var ValidatorEntriesContainer = function (_Component) {
                     'div',
                     { className: 'validator-container' },
                     _react2.default.createElement(_EntryValidateSelectBox2.default, { handleToggle: this.handleShowEntryType, entryTypes: entryTypes }),
-                    _react2.default.createElement(_ValidatorEntriesList2.default, { entries: this.state.entries, loading: this.state.loading })
+                    _react2.default.createElement(_ValidatorEntriesList2.default, { entries: this.filterEntries(), loading: this.props.loading })
                 )
             );
         }
@@ -30814,7 +30807,16 @@ var ValidatorEntriesContainer = function (_Component) {
     return ValidatorEntriesContainer;
 }(_react.Component);
 
-exports.default = ValidatorEntriesContainer;
+var mapStateToProps = function mapStateToProps(state, action) {
+    return {
+        entries: state.validatorEntries,
+        loading: state.status.loading,
+        error: state.status.error,
+        user: state.user
+    };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(ValidatorEntriesContainer);
 
 /***/ }),
 /* 275 */
@@ -30826,6 +30828,8 @@ exports.default = ValidatorEntriesContainer;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -30839,9 +30843,13 @@ var firebase = _interopRequireWildcard(_firebase);
 
 var _electron = __webpack_require__(193);
 
+var _reactRedux = __webpack_require__(69);
+
 var _ValidatorEntry = __webpack_require__(240);
 
 var _ValidatorEntry2 = _interopRequireDefault(_ValidatorEntry);
+
+var _validatorEntriesActions = __webpack_require__(560);
 
 var _validatorEntriesData = __webpack_require__(125);
 
@@ -30877,10 +30885,23 @@ var ValidatorEntryContainer = function (_Component) {
         _this.handleAddReviewer = _this.handleAddReviewer.bind(_this);
         _this.handlePublish = _this.handlePublish.bind(_this);
         _this.openInBrowser = _this.openInBrowser.bind(_this);
+
         return _this;
     }
 
     _createClass(ValidatorEntryContainer, [{
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(props) {
+            var tmpEntry = props.entry;
+            var tmpReviewers = props.entry.reviewers;
+            delete tmpEntry.reviewers;
+            this.setState(_extends({}, this.state, {
+                expanded: false,
+                reviewers: tmpReviewers,
+                entryResume: tmpEntry
+            }));
+        }
+    }, {
         key: 'handleVisible',
         value: function handleVisible() {
             this.setState({
@@ -30890,33 +30911,14 @@ var ValidatorEntryContainer = function (_Component) {
     }, {
         key: 'handleReviewChange',
         value: function handleReviewChange(e, reviewerId) {
-            var _this2 = this;
-
-            var user = firebase.auth().currentUser;
-            var dbRef = firebase.database().ref('/admins/' + user.uid);
-            this.setState({ loading: true });
-
+            var uid = firebase.auth().currentUser.uid;
             var payload = {
                 url: (0, _validatorEntriesData.getIdFromURL)(this.state.entryResume.url),
                 id: reviewerId,
                 state: e.target.value
             };
-
-            dbRef.once('value').then(function (snap) {
-                return snap.val();
-            }).then(function (data) {
-                return (0, _validatorEntriesData.postUpdateReview)(data.key, payload);
-            }).then(function (res) {
-                console.log(res);
-
-                var tmpReviewers = res.reviewers.slice();
-                delete res.reviewers;
-                _this2.setState({ reviewers: tmpReviewers, entryResume: res });
-            }).then(function () {
-                return _this2.setState({ loading: false });
-            }).catch(function (err) {
-                return console.log(err);
-            });
+            console.log('ue');
+            this.props.dispatch((0, _validatorEntriesActions.changeReview)(uid, payload));
         }
     }, {
         key: 'handlePublish',
@@ -30936,20 +30938,50 @@ var ValidatorEntryContainer = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var options = ['accepted', 'declined', 'reviewing', 'notreviewing'];
-            return _react2.default.createElement(_ValidatorEntry2.default, { uid: firebase.auth().currentUser.uid, visible: this.state.expanded, reviewers: this.state.reviewers, entryResume: this.state.entryResume, handleVisible: this.handleVisible, handlePublish: this.handlePublish, handleAddReviewer: this.handleAddReviewer, handleReviewChange: this.handleReviewChange, options: options, openInBrowser: this.openInBrowser, loading: this.state.loading });
+            var options = [{
+                opt: 'accepted',
+                label: 'Aceptada'
+            }, {
+                opt: 'declined',
+                label: 'Rechazada'
+            }, {
+                opt: 'reviewing',
+                label: 'Pendiente'
+            }, {
+                opt: 'notreviewing',
+                'label': 'Sin revisar'
+            }];
+            return _react2.default.createElement(_ValidatorEntry2.default, {
+                uid: firebase.auth().currentUser.uid,
+                visible: this.state.expanded,
+                reviewers: this.state.reviewers || [],
+                entryResume: this.state.entryResume,
+                handleVisible: this.handleVisible,
+                handlePublish: this.handlePublish,
+                handleAddReviewer: this.handleAddReviewer,
+                handleReviewChange: this.handleReviewChange,
+                options: options,
+                openInBrowser: this.openInBrowser,
+                loading: this.props.loading });
         }
     }]);
 
     return ValidatorEntryContainer;
 }(_react.Component);
 
-exports.default = ValidatorEntryContainer;
-
-
 ValidatorEntryContainer.propTypes = {
     entry: _react.PropTypes.object.isRequired
 };
+
+var mapStateToProps = function mapStateToProps(state, action) {
+    return {
+        entries: state.validatorEntries,
+        loading: state.status.loading,
+        error: state.status.error
+    };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(ValidatorEntryContainer);
 
 /***/ }),
 /* 276 */
@@ -31019,6 +31051,10 @@ var _publishedEntriesReducer = __webpack_require__(278);
 
 var _publishedEntriesReducer2 = _interopRequireDefault(_publishedEntriesReducer);
 
+var _validatorEntriesReducer = __webpack_require__(559);
+
+var _validatorEntriesReducer2 = _interopRequireDefault(_validatorEntriesReducer);
+
 var _statusReducer = __webpack_require__(279);
 
 var _statusReducer2 = _interopRequireDefault(_statusReducer);
@@ -31031,6 +31067,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var reducers = (0, _redux.combineReducers)({
     publishedEntries: _publishedEntriesReducer2.default,
+    validatorEntries: _validatorEntriesReducer2.default,
     status: _statusReducer2.default,
     user: _userReducer2.default
 });
@@ -59649,7 +59686,6 @@ function userLogout() {
 
 function userLogged(user) {
     return function (dispatch) {
-        console.log('ss');
         dispatch({ type: sc.LOG_IN });
         dispatch({ type: uc.USER_LOGIN, payload: user });
     };
@@ -59705,12 +59741,142 @@ function userReducer() {
 
     switch (action.type) {
         case c.USER_LOGIN:
-            return action.payload;
+            return action.payload.uid;
         case c.USER_LOGOUT:
             return null;
         default:
             return state;
     }
+};
+
+/***/ }),
+/* 558 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var FETCHED_VALIDATOR_COMPLETED = exports.FETCHED_VALIDATOR_COMPLETED = 'FETCHED_VALIDATOR_COMPLETED';
+var UPDATE_REVIEWER_SUCCESS = exports.UPDATE_REVIEWER_SUCCESS = 'UPDATE_REVIEWER_SUCCESS';
+
+/***/ }),
+/* 559 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = validatorEntries;
+
+var _validatorEntriesTypes = __webpack_require__(558);
+
+var c = _interopRequireWildcard(_validatorEntriesTypes);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function validatorEntries() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments[1];
+
+
+  switch (action.type) {
+    case c.FETCHED_VALIDATOR_COMPLETED:
+      return action.payload;
+    case c.UPDATE_REVIEWER_SUCCESS:
+      return state.map(function (entry) {
+        return updateValidatorEntry(entry, action.payload);
+      });
+    default:
+      return state;
+  }
+}
+
+var updateValidatorEntry = function updateValidatorEntry(entry, payload) {
+  if (entry.url !== payload.url) {
+    return entry;
+  }
+  return payload;
+};
+
+/***/ }),
+/* 560 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.changeReview = exports.getValidatorEntries = undefined;
+
+var _firebase = __webpack_require__(17);
+
+var firebase = _interopRequireWildcard(_firebase);
+
+var _validatorEntriesTypes = __webpack_require__(558);
+
+var c = _interopRequireWildcard(_validatorEntriesTypes);
+
+var _statusActions = __webpack_require__(224);
+
+var _validatorEntriesData = __webpack_require__(125);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var getValidatorEntries = exports.getValidatorEntries = function getValidatorEntries(uid) {
+    return function (dispatch) {
+
+        var dbRef = firebase.database().ref('/admins/' + uid);
+        dispatch((0, _statusActions.startLoading)());
+        dbRef.once('value').then(function (snap) {
+            return snap.val();
+        }).then(function (data) {
+            return (0, _validatorEntriesData.getEntries)(data.key, true, true, true);
+        }).then(function (res) {
+            return updateStateEntries(res, dispatch);
+        }).catch(function (err) {
+            return (0, _statusActions.fetchingRejected)(err);
+        });
+    };
+};
+
+var updateStateEntries = function updateStateEntries(data, dispatch) {
+    dispatch((0, _statusActions.fetchingSuccess)());
+    dispatch({
+        type: c.FETCHED_VALIDATOR_COMPLETED,
+        payload: [].concat(_toConsumableArray(data.pending || []), _toConsumableArray(data.accepted || []), _toConsumableArray(data.declined || []))
+    });
+};
+
+var changeReview = exports.changeReview = function changeReview(uid, payload) {
+    return function (dispatch) {
+        var dbRef = firebase.database().ref('/admins/' + uid);
+        dispatch((0, _statusActions.startLoading)());
+
+        dbRef.once('value').then(function (snap) {
+            return snap.val();
+        }).then(function (data) {
+            return (0, _validatorEntriesData.postUpdateReview)(data.key, payload);
+        }).then(function (res) {
+            console.log('res', res);
+            dispatch((0, _statusActions.updateSuccess)());
+            dispatch({
+                type: c.UPDATE_REVIEWER_SUCCESS,
+                payload: res
+            });
+        }).catch(function (err) {
+            return (0, _statusActions.updateRejected)(err);
+        });
+    };
 };
 
 /***/ })

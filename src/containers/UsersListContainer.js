@@ -37,7 +37,7 @@ export default class UserListContainer extends Component{
           this.setState({loading: false, error: false});
          })
          .catch(err => {
-           console.log(err);
+
            this.setState({loading: false, error: true});
          })
   }

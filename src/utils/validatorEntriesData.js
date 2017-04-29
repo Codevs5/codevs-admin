@@ -1,12 +1,13 @@
 import axios from 'axios';
 import config from './config/urls.json';
 
-export const getEntries = (key, pending = false, declined = false, accepted = false) =>
-  axios.get(`${config.gasEntriesValidator}?key=${key}&pending=${pending}&declined=${declined}&accepted=${accepted}`)
-    .then((res) => res.data)
-    .then((data) => (data.message)?console.log('Error, sin acceso!'):data)
-    .catch(err => console.log(err));
+export const getEntries = (key, pending = false, declined = false, accepted = false) =>{
 
+  return axios.get(`${config.gasEntriesValidator}?key=${key}&pending=${pending}&declined=${declined}&accepted=${accepted}`)
+    .then((res) => res.data)
+    .then((data) => (data.message)?Promise.reject(data.message):data)
+    .catch(err => console.log(err));
+}
 /*
 * Perdoname señor por utilizar un GET en vez de un POST
 * es mi último recurso, no quería hacerlo pero me veo obligado.

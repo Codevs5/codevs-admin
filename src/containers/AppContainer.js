@@ -17,7 +17,7 @@ class AppContainer extends Component {
         this.handleLoginWithCredentials = this.handleLoginWithCredentials.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-        console.log(this.props);
+
     }
 
     handleLoginWithCredentials(e) {

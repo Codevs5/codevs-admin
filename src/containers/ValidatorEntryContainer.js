@@ -1,13 +1,14 @@
 import React, {Component, PropTypes} from 'react';
 import * as firebase from 'firebase';
 import { shell } from 'electron';
-
+import { connect } from 'react-redux';
 
 import ValidatorEntry from '../components/entries/validator/ValidatorEntry.js';
 
+import { changeReview } from '../actions/validatorEntriesActions.js';
 import {postNewReviewer, postUpdateReview, getIdFromURL} from '../utils/validatorEntriesData.js';
 
-export default class ValidatorEntryContainer extends Component {
+class ValidatorEntryContainer extends Component {
     constructor(props) {
         super(props);
         const tmpEntry = this.props.entry;
@@ -24,7 +25,22 @@ export default class ValidatorEntryContainer extends Component {
         this.handleAddReviewer = this.handleAddReviewer.bind(this);
         this.handlePublish = this.handlePublish.bind(this);
         this.openInBrowser = this.openInBrowser.bind(this);
+
+
     }
+
+    componentWillReceiveProps(props){
+      const tmpEntry = props.entry;
+      const tmpReviewers = props.entry.reviewers
+      delete tmpEntry.reviewers;
+      this.setState({
+          ...this.state,
+          expanded: false,
+          reviewers: tmpReviewers,
+          entryResume: tmpEntry
+      });
+    }
+
 
     handleVisible() {
         this.setState({
@@ -33,26 +49,14 @@ export default class ValidatorEntryContainer extends Component {
     }
 
     handleReviewChange(e, reviewerId) {
-        const user = firebase.auth().currentUser;
-        const dbRef = firebase.database().ref(`/admins/${user.uid}`);
-        this.setState({loading: true});
-
+        const uid = firebase.auth().currentUser.uid;
         const payload = {
             url: getIdFromURL(this.state.entryResume.url),
             id: reviewerId,
             state: e.target.value
         };
-
-        dbRef.once('value')
-          .then(snap => snap.val())
-          .then(data => postUpdateReview(data.key, payload))
-          .then(res => {
-            console.log(res);
-
-            const tmpReviewers = res.reviewers.slice()
-            delete res.reviewers;
-            this.setState({reviewers: tmpReviewers, entryResume: res});
-        }).then(() => this.setState({loading: false})).catch((err) => console.log(err));
+        console.log('ue');
+        this.props.dispatch(changeReview(uid, payload));
     }
 
     handlePublish() {
@@ -69,11 +73,44 @@ export default class ValidatorEntryContainer extends Component {
     }
 
     render() {
-        const options = ['accepted', 'declined', 'reviewing', 'notreviewing'];
-        return (<ValidatorEntry uid={firebase.auth().currentUser.uid} visible={this.state.expanded} reviewers={this.state.reviewers} entryResume={this.state.entryResume} handleVisible={this.handleVisible} handlePublish={this.handlePublish} handleAddReviewer={this.handleAddReviewer} handleReviewChange={this.handleReviewChange} options={options} openInBrowser={this.openInBrowser} loading={this.state.loading}/>);
+      const options = [
+          {
+              opt: 'accepted',
+              label: 'Aceptada'
+          }, {
+              opt: 'declined',
+              label: 'Rechazada'
+          }, {
+              opt: 'reviewing',
+              label: 'Pendiente'
+          }, {
+              opt: 'notreviewing',
+              'label': 'Sin revisar'
+          }
+      ];
+        return (<ValidatorEntry
+          uid={firebase.auth().currentUser.uid}
+          visible={this.state.expanded}
+          reviewers={this.state.reviewers || []}
+          entryResume={this.state.entryResume}
+          handleVisible={this.handleVisible}
+          handlePublish={this.handlePublish}
+          handleAddReviewer={this.handleAddReviewer}
+          handleReviewChange={this.handleReviewChange}
+          options={options}
+          openInBrowser={this.openInBrowser}
+          loading={this.props.loading}/>);
     }
 }
 
 ValidatorEntryContainer.propTypes = {
     entry: PropTypes.object.isRequired
 }
+
+const mapStateToProps = (state, action) => ({
+    entries: state.validatorEntries,
+    loading: state.status.loading,
+    error: state.status.error
+});
+
+export default connect(mapStateToProps)(ValidatorEntryContainer);

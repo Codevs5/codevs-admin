@@ -8,7 +8,8 @@ const ValidatorEntriesList = ({loading, entries}) => {
     else
         return (
             <div className="validator-list">
-                {entries.map((entry, i) => <ValidatorEntryContainer entry={entry} key={i}/>)}
+
+                {entries.map((entry, i) => (<ValidatorEntryContainer entry={entry} key={i}/>))}
             </div>
         );
     }

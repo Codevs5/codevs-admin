@@ -35,7 +35,7 @@ export default class ProfilePasswordContainer extends Component {
     }
 
     handleChangePassword2(e) {
-        console.log(this.state);
+
         this.setState({pwd: Object.assign({}, this.state.pwd, {password2: e.target.value})});
         this.setState({validPassword: (e.target.value === this.state.pwd.password)});
 
@@ -59,7 +59,7 @@ export default class ProfilePasswordContainer extends Component {
                 .then(() => this.setState({updated: 'updated'}))
                 .catch((e) => {
                   this.setState({updated: 'error'})
-                  console.log(e);
+
                 }
                 );
         }

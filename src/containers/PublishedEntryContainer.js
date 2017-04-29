@@ -21,7 +21,7 @@ const defaultData = {
 class PublishedEntryContainer extends Component {
     constructor(props) {
         super(props);
-        console.log(this.props);
+
         this.state = {
             entry: this.props.entries.filter((e) => e.id === props.match.params.id)[0] || defaultData,
             tags: [],
@@ -161,7 +161,7 @@ class PublishedEntryContainer extends Component {
                 }
             }
         ];
-        console.log(this.props);
+
         return (<PublishedEntry
           previous={this.props.history.goBack}
           loading={this.props.loading}

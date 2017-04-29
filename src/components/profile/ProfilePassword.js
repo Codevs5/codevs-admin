@@ -21,7 +21,7 @@ const ProfilePassword = ({
     updated,
     handleChangeCurrentPassword
 }) => {
-    console.log(validPassword);
+
     const design = (validPassword)
         ? 'valid'
         : 'invalid';

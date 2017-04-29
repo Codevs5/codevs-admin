@@ -183,7 +183,6 @@ export default class FormProfileContainer extends Component {
 
     uploadError(e) {
         this.setState({error: false, loading: false, updated: 'fail', loadingAvatar: false});
-        console.log(e);
     }
     uploadFinished() {
         const id = this.props.match.params.id;
@@ -194,7 +193,7 @@ export default class FormProfileContainer extends Component {
             this.setState({metadata: Object.assign({}, this.state.metadata, {avatar: url})});
         }).catch((e) => {
             this.setState({updated: 'fail'});
-            console.log(e);
+
         });
     }
 
@@ -203,12 +202,12 @@ export default class FormProfileContainer extends Component {
         const id = this.props.match.params.id;
         const dbRef = firebase.database().ref(`/users/${id}`);
 
-        console.log(this.state);
+
         dbRef.child('/metadata').update(this.state.metadata)
         //.then(() => this.uploadAvatar())
             .then(() => this.setState({updated: 'updated'})).catch((e) => {
             this.setState({updated: 'fail'});
-            console.log(e);
+
         });
 
     }

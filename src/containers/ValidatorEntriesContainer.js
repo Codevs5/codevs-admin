@@ -1,61 +1,50 @@
 import React, {Component, PropTypes} from 'react';
 import * as firebase from 'firebase';
+import { connect } from 'react-redux';
 
 import Header from '../components/layout/Header.js';
 import EntryValidateSelectBox from '../components/entries/validator/EntryValidateSelectBox.js';
 import ValidatorEntriesList from '../components/entries/validator/ValidatorEntriesList.js';
 
-import {getEntries} from '../utils/validatorEntriesData.js';
+
+import { getValidatorEntries } from '../actions/validatorEntriesActions.js';
+
 import '../style/__validator.scss';
-export default class ValidatorEntriesContainer extends Component {
+
+class ValidatorEntriesContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            entries: [],
             accepted: false,
             declined: true,
             pending: true,
-            loading: true
         }
         this.handleShowEntryType = this.handleShowEntryType.bind(this);
-        this.fillStateWithEntries = this.fillStateWithEntries.bind(this);
-        this.updateStateEntries = this.updateStateEntries.bind(this);
+
 
     }
 
     handleShowEntryType(type) {
         let toggledValue = {};
         toggledValue[type] = !this.state[type];
-        toggledValue['loading'] = true;
+        //toggledValue['loading'] = true;
         this.setState(Object.assign({}, this.state, toggledValue));
-        this.fillStateWithEntries();
     }
 
     componentDidMount() {
-        this.fillStateWithEntries();
-    }
+      const uid = firebase.auth().currentUser.uid;
 
-    fillStateWithEntries() {
-        const user = firebase.auth().currentUser;
-        const dbRef = firebase.database().ref(`/admins/${user.uid}`);
+          this.props.dispatch(getValidatorEntries(uid))
 
-        dbRef.once('value')
-              .then(snap => snap.val())
-              .then(data => getEntries(data.key, this.state.pending, this.state.declined, this.state.accepted))
-              .then(res => this.updateStateEntries(res))
-              .catch(err => console.log(err)); //TODO: Gestionar bien el error con un modal o alguna hostia
     }
-
-    updateStateEntries(data) {
-        this.setState({
-            entries: [
-                ...data.pending || [],
-                ...data.accepted || [],
-                ...data.declined || []
-            ],
-            loading: false
-        });
-    }
+filterEntries() {
+    return this.props.entries.filter((entry, i) =>
+    (entry.state === 'pending' && this.state.pending)
+    || (entry.state === 'declined' && this.state.declined)
+    || (entry.state === 'accepted' && this.state.accepted)
+    || (!this.state.accepted && !this.state.declined && !this.state.pending)
+  )
+}
 
     render() {
 
@@ -83,9 +72,20 @@ export default class ValidatorEntriesContainer extends Component {
                 <Header title="Validator entries"/>
                 <div className="validator-container">
                     <EntryValidateSelectBox handleToggle={this.handleShowEntryType} entryTypes={entryTypes}/>
-                    <ValidatorEntriesList entries={this.state.entries} loading={this.state.loading}/>
+                    <ValidatorEntriesList entries={this.filterEntries()} loading={this.props.loading}/>
                 </div>
             </div>
         );
     }
 }
+
+const mapStateToProps = (state, action) => {
+  return {
+    entries: state.validatorEntries,
+    loading: state.status.loading,
+    error: state.status.error,
+    user: state.user
+  }
+};
+
+export default connect(mapStateToProps)(ValidatorEntriesContainer);
