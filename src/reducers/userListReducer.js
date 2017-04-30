@@ -8,6 +8,11 @@ export default function userList(state = [], action){
       return updateUser(action.payload.id, action.payload.currentUser, state);
     case c.UPLOAD_USER_AVATAR_SUCCESS:
       return updateUserAvatar(action.payload.id, action.payload.url, state);
+    case c.CREATE_USER:
+      return [
+        ...state,
+        action.payload
+      ];
     default:
       return state;
   }

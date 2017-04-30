@@ -45,8 +45,7 @@ export default function statusReducer(state = defaultInitState, action) {
             return {
                 ...state,
                 loading: false,
-                updated: c.UPDATE_ERROR,
-                error: true,
+                updated: c.ERROR_UPDATED,
                 errorMessage: action.payload
             };
         case c.UPLOAD_IMAGE:

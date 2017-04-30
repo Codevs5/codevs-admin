@@ -18,9 +18,9 @@ const NewUserForm = ({
     updated
 }) => {
     let updateAlert;
-    if (updated === 'updated')
+    if (updated === 1)
         updateAlert = (<Alert icon="fa fa-check-square-o" type='success' message='Yeeah, you just created a new user!'/>);
-    else if (updated === 'fail')
+    else if (updated === -1)
         updateAlert = (<Alert icon="fa fa-exclamation" type='error' message="Booo! You're doing something wrong. Check the fields"/>);
     else
         updateAlert = (<div className="ghost-space" />)
@@ -62,7 +62,7 @@ NewUserForm.propTypes = {
     roles: PropTypes.array.isRequired,
     values: PropTypes.object.isRequired,
     currentRole: PropTypes.string.isRequired,
-    updated: PropTypes.string.isRequired
+    updated: PropTypes.number.isRequired
 
 };
 

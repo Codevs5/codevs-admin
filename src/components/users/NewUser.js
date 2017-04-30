@@ -49,7 +49,7 @@ NewUser.propTypes = {
     currentRole: PropTypes.string.isRequired,
     loading: PropTypes.bool.isRequired,
     error: PropTypes.bool.isRequired,
-    updated: PropTypes.string.isRequired,
+    updated: PropTypes.number.isRequired,
 };
 
 export default NewUser;

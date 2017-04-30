@@ -17,8 +17,12 @@ const config = {
     messagingSenderId: "464619208597"
 };
 
+
 firebase.initializeApp(config);
+
 ReactDOM.render(
     <Provider store={store}>
     <AppContainer/>
 </Provider>, document.getElementById('app'));
+
+export const secondaryAuth = firebase.initializeApp(config, "secondary");;
