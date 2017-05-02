@@ -62,3 +62,9 @@ export function uploadImageSuccess(){
     type: c.UPLOAD_IMAGE_SUCCESS
   };
 }
+
+export function removeSuccess(){
+  return {
+    type: c.FETCHING_SUCCESS
+  };
+}

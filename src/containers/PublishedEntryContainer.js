@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
-import {shell} from 'electron';
+import {shell, remote} from 'electron';
 import {connect} from 'react-redux';
 
-import {fetchEntries, updateEntry, uploadImage} from '../actions/publishedEntriesActions.js';
+import {fetchEntries, updateEntry, uploadImage, deleteEntry} from '../actions/publishedEntriesActions.js';
 import {ERROR_UPDATED} from '../constants/statusTypes.js';
 
 import PublishedEntry from '../components/entries/published/PublishedEntry.js'
@@ -17,6 +17,8 @@ const defaultData = {
     "title": "No title",
     "visible": false
 };
+const YES = 0;
+const NO = 1;
 
 class PublishedEntryContainer extends Component {
     constructor(props) {
@@ -73,7 +75,21 @@ class PublishedEntryContainer extends Component {
         }));
     }
 
-    handleDeleteEntry() {}
+handleDeleteEntry() {
+
+    const res = remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+        type: 'question',
+        buttons: [
+            'Yes', 'No'
+        ],
+        title: 'Delete?',
+        message: 'Are you sure you want to delete this entry?'
+    });
+    console.log(this);
+    if(res === YES){
+      this.props.dispatch(deleteEntry(this.state.entry.id, this.props.history));
+    }
+}
 
     handleChangePinned() {
         this.props.dispatch(updateEntry(this.state.entry.id, {

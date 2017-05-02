@@ -9564,6 +9564,7 @@ exports.updateReset = updateReset;
 exports.uploadImage = uploadImage;
 exports.uploadImageRejected = uploadImageRejected;
 exports.uploadImageSuccess = uploadImageSuccess;
+exports.removeSuccess = removeSuccess;
 
 var _statusTypes = __webpack_require__(59);
 
@@ -9631,6 +9632,12 @@ function uploadImageRejected(error) {
 function uploadImageSuccess() {
   return {
     type: c.UPLOAD_IMAGE_SUCCESS
+  };
+}
+
+function removeSuccess() {
+  return {
+    type: c.FETCHING_SUCCESS
   };
 }
 
@@ -18049,6 +18056,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.fetchEntries = fetchEntries;
 exports.updateEntry = updateEntry;
 exports.uploadImage = uploadImage;
+exports.deleteEntry = deleteEntry;
 
 var _firebase = __webpack_require__(13);
 
@@ -18057,6 +18065,10 @@ var firebase = _interopRequireWildcard(_firebase);
 var _statusActions = __webpack_require__(44);
 
 var actions = _interopRequireWildcard(_statusActions);
+
+var _publishedTypes = __webpack_require__(268);
+
+var c = _interopRequireWildcard(_publishedTypes);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -18150,6 +18162,28 @@ var uploadFinished = function uploadFinished(id, dispatch) {
         return dispatch(actions.uploadImageRejected(err));
     });
 };
+
+function deleteEntry(id, history) {
+    return function (dispatch) {
+        actions.startLoading();
+        var dbRefInfo = firebase.database().ref('/entries/info/' + id + '/');
+        var dbRefContent = firebase.database().ref('/entries/content/' + id + '/');
+
+        dbRefInfo.remove().then(function () {
+            return dbRefContent.remove();
+        }).then(function () {
+            dispatch({
+                type: c.ENTRY_REMOVE,
+                payload: id
+            });
+            dispatch(actions.removeSuccess());
+            //Redirect!!!
+            history.goBack();
+        }).catch(function (e) {
+            return dispatch(actions.updateRejected(e));
+        });
+    };
+}
 
 /***/ }),
 /* 124 */
@@ -29592,6 +29626,7 @@ var UPDATE_ENTRY_REJECTED = exports.UPDATE_ENTRY_REJECTED = 'UPDATE_ENTRY_REJECT
 var UPLOAD_IMAGE = exports.UPLOAD_IMAGE = 'UPLOAD_IMAGE';
 var UPLOAD_IMAGE_FULLFILLED = exports.UPLOAD_IMAGE_FULLFILLED = 'UPLOAD_IMAGE_FULLFILLED';
 var UPLOAD_IMAGE_REJECTED = exports.UPLOAD_IMAGE_REJECTED = 'UPLOAD_IMAGE_REJECTED';
+var ENTRY_REMOVE = exports.ENTRY_REMOVE = 'ENTRY_REMOVE';
 
 /***/ }),
 /* 269 */
@@ -30547,6 +30582,8 @@ var defaultData = {
     "title": "No title",
     "visible": false
 };
+var YES = 0;
+var NO = 1;
 
 var PublishedEntryContainer = function (_Component) {
     _inherits(PublishedEntryContainer, _Component);
@@ -30618,7 +30655,19 @@ var PublishedEntryContainer = function (_Component) {
         }
     }, {
         key: 'handleDeleteEntry',
-        value: function handleDeleteEntry() {}
+        value: function handleDeleteEntry() {
+
+            var res = _electron.remote.dialog.showMessageBox(_electron.remote.getCurrentWindow(), {
+                type: 'question',
+                buttons: ['Yes', 'No'],
+                title: 'Delete?',
+                message: 'Are you sure you want to delete this entry?'
+            });
+            console.log(this);
+            if (res === YES) {
+                this.props.dispatch((0, _publishedEntriesActions.deleteEntry)(this.state.entry.id, this.props.history));
+            }
+        }
     }, {
         key: 'handleChangePinned',
         value: function handleChangePinned() {
@@ -31307,6 +31356,9 @@ function publishedEntries() {
             return updateEntry(state, action);
         case c.UPLOAD_IMAGE_FULLFILLED:
             return updateEntry(state, action);
+        case c.ENTRY_REMOVE:
+            return removeEntry(state, action.payload);
+
         default:
             return state;
     }
@@ -31315,7 +31367,11 @@ function publishedEntries() {
 //
 //  Reducers function to keep clean the switch
 //
-
+function removeEntry(state, id) {
+    return state.filter(function (entry) {
+        return entry.id !== id;
+    });
+}
 function fetchEntriesFullfilled(state, action) {
     return action.payload;
 }

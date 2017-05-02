@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import * as actions from './statusActions.js';
+import * as c from '../constants/publishedTypes.js';
 
 export function fetchEntries() {
     return (dispatch) => {
@@ -80,3 +81,24 @@ const uploadFinished = (id, dispatch) => {
         dispatch(actions.uploadImageSuccess());
     }).catch((err) => dispatch(actions.uploadImageRejected(err)));
 };
+
+export function deleteEntry(id, history){
+  return (dispatch) => {
+    actions.startLoading();
+    const dbRefInfo = firebase.database().ref(`/entries/info/${id}/`);
+    const dbRefContent = firebase.database().ref(`/entries/content/${id}/`);
+
+    dbRefInfo.remove()
+    .then(() => dbRefContent.remove())
+    .then(() => {dispatch({
+      type: c.ENTRY_REMOVE,
+      payload: id
+    });
+    dispatch(actions.removeSuccess());
+    //Redirect!!!
+    history.goBack();
+
+
+  }).catch(e => dispatch(actions.updateRejected(e)))
+  }
+}

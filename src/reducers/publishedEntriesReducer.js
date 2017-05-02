@@ -8,6 +8,9 @@ function publishedEntries(state = [], action) {
             return updateEntry(state, action);
         case c.UPLOAD_IMAGE_FULLFILLED:
             return updateEntry(state, action);
+        case c.ENTRY_REMOVE:
+            return removeEntry(state, action.payload);
+            
         default:
             return state;
     }
@@ -16,7 +19,9 @@ function publishedEntries(state = [], action) {
 //
 //  Reducers function to keep clean the switch
 //
-
+function removeEntry(state, id){
+  return state.filter(entry => entry.id !== id);
+}
 function fetchEntriesFullfilled(state, action) {
     return action.payload
 }
