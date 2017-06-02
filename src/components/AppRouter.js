@@ -15,7 +15,6 @@ import  MenuContainer  from '../containers/MenuContainer.js';
 
 import  EntriesContainer  from '../containers/EntriesContainer.js';
 import  PublishedEntriesContainer  from '../containers/PublishedEntriesContainer.js';
-import  ValidatorEntriesContainer  from '../containers/ValidatorEntriesContainer.js';
 import PublishedEntryContainer from '../containers/PublishedEntryContainer.js';
 
 import CalendarContainer from '../containers/CalendarContainer.js';
@@ -38,7 +37,6 @@ const AppRouter = ({handleLogout}) => (
         <Route exact path="/entries" component={EntriesContainer} />
         <Route exact path="/entries/published" component={PublishedEntriesContainer} />
         <Route path="/entries/published/:id" component={PublishedEntryContainer} />
-        <Route exact path="/entries/validator" component={ValidatorEntriesContainer} />
 
         <Route exact path="/stats" component={StatsContainer} />
         <Route exact path="/calendar" component={CalendarContainer} />

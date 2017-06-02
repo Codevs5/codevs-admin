@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import SimpleToggle from '../../form/SimpleToggle.js';
+import SimpleToggle from '../form/SimpleToggle.js';
 
 const PublishedToggles = ({toggles}) => (
   <div className="entry-toggles row">

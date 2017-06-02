@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 
-import SimpleFile from '../../form/SimpleFile.js';
+import SimpleFile from '../form/SimpleFile.js';
 
-import '../../../style/__mainImage.scss';
-import '../../../style/__mainImage.scss';
+import '../../style/__mainImage.scss';
+import '../../style/__mainImage.scss';
 
 const EntryMainImage = ({imgSrc, handleAddMainImg, loadingImage}) => {
   if(loadingImage) return (<LoadingImage />);

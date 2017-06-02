@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import * as firebase from 'firebase';
 import {connect} from 'react-redux';
 
-import PublishedEntries from '../components/entries/published/PublishedEntries.js';
+import PublishedEntries from '../components/entries/PublishedEntries.js';
 import {fetchEntries, updateEntry} from '../actions/publishedEntriesActions.js';
 
 class PublishedEntriesContainer extends Component {

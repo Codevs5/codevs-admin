@@ -1,16 +1,16 @@
 import React, {PropTypes} from 'react';
 
-import Header from '../../layout/Header.js';
-import SimpleInput from '../../form/SimpleInput.js';
+import Header from '../layout/Header.js';
+import SimpleInput from '../form/SimpleInput.js';
 import PublishedEntryInfo from './PublishedEntryInfo.js';
 import EntryTagList from './EntryTagList.js';
 import PublishedButtons from './PublishedButtons.js';
 import PublishedToggles from './PublishedToggles.js';
-import TagInput from '../../form/TagInput.js';
-import Alert from '../../layout/Alert.js';
+import TagInput from '../form/TagInput.js';
+import Alert from '../layout/Alert.js';
 import EntryMainImage from './EntryMainImage.js';
 
-import '../../../style/__entrypage.scss';
+import '../../style/__entrypage.scss';
 
 const PublishedEntryPage = ({
     previous,

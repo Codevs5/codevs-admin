@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react';
 
 import PublishedEntryPage from './PublishedEntryPage.js';
-import ErrorComponent from '../../layout/ErrorComponent.js';
-import LoadingList from '../../layout/LoadingList.js';
+import ErrorComponent from '../layout/ErrorComponent.js';
+import LoadingList from '../layout/LoadingList.js';
 
 const PublishedEntry = ({
     previous,

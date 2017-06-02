@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
-import {shell, remote} from 'electron';
+import {shell, remote, ipcRenderer} from 'electron';
 import {connect} from 'react-redux';
 
 import {fetchEntries, updateEntry, uploadImage, deleteEntry} from '../actions/publishedEntriesActions.js';
 import {ERROR_UPDATED} from '../constants/statusTypes.js';
 
-import PublishedEntry from '../components/entries/published/PublishedEntry.js'
+import PublishedEntry from '../components/entries/PublishedEntry.js'
 
 const defaultData = {
     "author": "Anonimo",
@@ -63,8 +63,7 @@ class PublishedEntryContainer extends Component {
         }
 
     handleOpenURL() {
-        if (this.state.entry.url)
-            shell.openExternal(this.state.entry.url);
+            ipcRenderer.send('loadNewWin');
         }
 
     handleUpdateEntry() {}

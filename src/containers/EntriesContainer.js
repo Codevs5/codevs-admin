@@ -14,10 +14,6 @@ export default class EntriesContainer extends Component{
             title: 'Published entries',
             imagePath: 'publishedEntries.png'
         }, {
-            linkPath: '/entries/validator',
-            title: 'Validate entries',
-            imagePath: 'entryValidator.png'
-        }, {
           linkPath: '/entries/add',
           title: 'Create new entry',
           imagePath: 'addEntry.png'
