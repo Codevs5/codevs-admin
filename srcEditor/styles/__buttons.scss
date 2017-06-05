@@ -1,0 +1,16 @@
+.styling{
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.style-btn{
+  padding: 10px;
+  &.active{
+    background-color: #dbdbdb;
+  }
+}
