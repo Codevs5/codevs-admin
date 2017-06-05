@@ -3,16 +3,17 @@ import {Editor} from 'draft-js';
 
 import '../styles/__textarea.scss';
 
-const TextareaUI = ({editorState, editorOnChange, styleMap, blockStyle, onTab, handleKeyCommand}) => (
+const TextareaUI = ({editorState,handleReturn, plugins, editorOnChange, styleMap, blockStyle, onTab, handleKeyCommand}) => (
   <div className="textarea">
-    <Editor customStyleMap={styleMap} handleKeyCommand={handleKeyCommand} editorState={editorState} onTab={onTab} onChange={editorOnChange} blockStyleFn={blockStyle}/>
+    <Editor handleReturn={handleReturn} customStyleMap={styleMap} handleKeyCommand={handleKeyCommand} editorState={editorState} onTab={onTab} onChange={editorOnChange} blockStyleFn={blockStyle} blockRendererFn={blockStyle}/>
   </div>
 );
 
 TextareaUI.propTypes = {
   editorState: PropTypes.object.isRequired,
   editorOnChange: PropTypes.func.isRequired,
-  onTab: PropTypes.func.isRequired
+  onTab: PropTypes.func.isRequired,
+  handleReturn: PropTypes.func.isRequired
 };
 
 export default TextareaUI;

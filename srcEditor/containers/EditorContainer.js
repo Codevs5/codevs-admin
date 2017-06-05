@@ -1,12 +1,8 @@
-import React, { Component } from 'react';
-import {EditorState, RichUtils, CompositeDecorator} from 'draft-js';
-
-import EditorUI from '../components/EditorUI';
-import Tag from '../components/Tag';
-
-import styleMap from '../styles/EditorStyleMap';
-
-class EditorContainer extends Component{
+import React, { Component } from 'react'; import {Entity, EditorState, RichUtils,
+CompositeDecorator, AtomicBlockUtils, convertToRaw} from 'draft-js'; import { Map }
+from 'immutable'; import EditorUI from '../components/EditorUI'; import Tag from
+'../components/Tag'; import Media from '../components/Media'; import styleMap from
+'../styles/EditorStyleMap'; class EditorContainer extends Component{
   constructor(props){
     super(props);
     const compositeDecorator = new CompositeDecorator([
@@ -15,43 +11,50 @@ class EditorContainer extends Component{
         component: Tag
       }
     ]);
-
     this.state = {
       editorState : EditorState.createEmpty(compositeDecorator),
+      showPrompt: false,
+      urlType: '',
+      urlValue: ''
     }
-
-
-
+    //Function bindings
     this.editorOnChange = this.editorOnChange.bind(this);
     this._onInlineClick = this._onInlineClick.bind(this);
     this._promptForLink = this._promptForLink.bind(this);
     this._toggleBlockType = this._toggleBlockType.bind(this);
     this._onTab = this._onTab.bind(this);
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
+    this.addAudio = this._addAudio.bind(this);
+    this.addImage = this._addImage.bind(this);
+    this.addVideo = this._addVideo.bind(this);
+    this.confirmMedia = this._confirmMedia.bind(this);
+    this.onURLInputKeyDown = this._onURLInputKeyDown.bind(this);
+    this.onURLChange = (e) => this.setState({urlValue: e.target.value});
+    this.logState = () => {
+      const content = this.state.editorState.getCurrentContent();
+      console.log(convertToRaw(content));
+    };
+    this.handleReturn = this._handleReturn.bind(this);
   }
-
   _onInlineClick(style) {
-    this.editorOnChange(RichUtils.toggleInlineStyle(this.state.editorState, style.toUpperCase()));
+    this.editorOnChange(RichUtils.toggleInlineStyle(this.state.editorState,
+style.toUpperCase()));
   }
-
   _onTab(e) {
       console.log('tab');
        const maxDepth = 4;
        this.editorOnChange(RichUtils.onTab(e, this.state.editorState, maxDepth));
   }
-
   _promptForLink(e){
     e.preventDefault();
     const {editorState} = this.state;
     const selection = editorState.getSelection();
-
     if(!selection.isCollapsed()){
       const contentState = editorState.getCurrentContent();
       const startKey = editorState.getSelection().getStartKey();
       const startOffset = editorState.getSelection().getStartOffset();
       const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
       const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
-
       let url = '';
       if (linkKey) {
        const linkInstance = contentState.getEntity(linkKey);
@@ -60,7 +63,6 @@ class EditorContainer extends Component{
      console.log(startKey, startOffset, linkKey, url);
     }
   }
-
   _toggleBlockType(blockType) {
     this.editorOnChange(
       RichUtils.toggleBlockType(
@@ -69,17 +71,73 @@ class EditorContainer extends Component{
       )
     );
   }
-
   _handleKeyCommand(command) {
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      this.onChange(newState);
+      this.editorOnChange(newState);
       return true;
     }
     return false;
   }
-
+  _handleReturn(e) {
+    const {editorState} = this.state
+    if (!e.altKey && !e.metaKey && !e.ctrlKey) {
+      const currentBlock = getCurrentBlock(editorState)
+      const blockType = currentBlock.getType()
+      if (blockType.indexOf('atomic') === 0) {
+        const selectionState = editorState.getSelection()
+        if (selectionState.isCollapsed()) {
+          console.log(selectionState.getAnchorOffset(),
+window.getSelection().anchorOffset)
+        }
+        this.onChange(addNewBlockAt(editorState, currentBlock.getKey()))
+        return true
+      }
+      return false
+    }
+    return false
+  }
+  //Media handler
+  _confirmMedia(e) {
+    e.preventDefault();
+    const {editorState, urlValue, urlType} = this.state;
+    const entityKey = Entity.create(urlType, 'IMMUTABLE', {src: urlValue})
+    this.setState({
+      editorState: AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' '),
+      showPrompt: false,
+      urlValue: ''
+    }, () => {
+      //setTimeout(() => this.focus(), 0);
+    });
+  }
+  _onURLInputKeyDown(e) {
+    console.log(e.which);
+    if (e.which === 13) {
+      this._confirmMedia(e);
+    }
+  }
+  _promptForMedia(type) {
+    const {editorState} = this.state;
+    this.setState({
+      showPrompt: true,
+      urlValue: '',
+      urlType: type,
+      }, () => {
+    //setTimeout(() => this.refs.url.focus(), 0);
+    });
+  }
+  _addAudio() {
+    this._promptForMedia('audio');
+  }
+  _addImage() {
+    console.log('image');
+    this._promptForMedia('image');
+  }
+  _addVideo() {
+    this._promptForMedia('video');
+  }
+  //Main function to handle any change on the editor
   editorOnChange(editorState){
     this.setState({editorState});
   }
@@ -94,8 +152,28 @@ class EditorContainer extends Component{
         controller: this._onInlineClick
       }
     };
-
+    let urlInput;
+   if (this.state.showPrompt) {
+     urlInput =
+       <div style={styleMap.urlInputContainer}>
+         <input
+           onChange={this.onURLChange}
+           ref="url"
+           type="text"
+           value={this.state.urlValue}
+           onKeyDown={this.onURLInputKeyDown}
+         />
+         <button onMouseDown={this.confirmMedia}>
+           Confirm
+         </button>
+       </div>;
+   }
     return(
+      <div>
+      {urlInput}
+      <button onMouseDown={this.addImage} style={{marginRight: 10}}>
+                  Add Image
+                </button>
       <EditorUI
         buttons={buttons}
         editorState={this.state.editorState}
@@ -104,18 +182,16 @@ class EditorContainer extends Component{
         blockStyle={getBlockStyle}
         onTab={this._onTab}
         handleKeyCommand={this.handleKeyCommand}
+        handleReturn={this.handleReturn}
         />
+        </div>
     );
   }
 }
-
-export default EditorContainer;
-
-const TAG_REGEX = /\#[\w]+/g;
-function tagHandle(contentBlock, callback) {
+export default EditorContainer; const TAG_REGEX = /\#[\w]+/g; function
+tagHandle(contentBlock, callback) {
   findWithRegex(TAG_REGEX, contentBlock, callback);
 }
-
 function findWithRegex(regex, contentBlock, callback) {
   const text = contentBlock.getText();
   let matchArr,
@@ -125,16 +201,59 @@ function findWithRegex(regex, contentBlock, callback) {
     callback(start, start + matchArr[0].length);
   }
 }
-
 function getBlockStyle(block) {
   switch (block.getType()) {
     case 'blockquote':
       return 'blockquote';
+    case 'atomic':
+      return {
+        component: Media,
+        editable: false,
+      };
     default:
       return null;
   }
 }
+const addNewBlockAt = (editorState, pivotBlockKey, newBlockType = 'unstyled',
+initialData = {}) => {
+  const content = editorState.getCurrentContent()
+  const blockMap = content.getBlockMap()
+  const block = blockMap.get(pivotBlockKey)
+  const blocksBefore = blockMap.toSeq().takeUntil((v) => (v === block))
+  const blocksAfter = blockMap.toSeq().skipUntil((v) => (v === block)).rest()
+  const newBlockKey = genKey()
+  const newBlock = new ContentBlock({
+    key: newBlockKey,
+    type: newBlockType,
+    text: '',
+    characterList: block.getCharacterList().slice(0, 0),
+    depth: 0,
+    data: Map(initialData)
+  })
+  const newBlockMap = blocksBefore.concat([
+    [
+      pivotBlockKey, block
+    ],
+    [newBlockKey, newBlock]
+  ], blocksAfter).toOrderedMap()
+  const selection = editorState.getSelection()
+  const newContent = content.merge({
+    blockMap: newBlockMap,
+    selectionBefore: selection,
+    selectionAfter: selection.merge({anchorKey: newBlockKey, anchorOffset: 0,
+focusKey: newBlockKey, focusOffset: 0, isBackward: false})
+  })
+  return EditorState.push(editorState, newContent, 'split-block')
+}
+const getCurrentBlock = (editorState) => {
+  const selectionState = editorState.getSelection();
+  const contentState = editorState.getCurrentContent();
+  const block = contentState.getBlockForKey(selectionState.getStartKey());
+  return block;
+};
 
+
+//Buttons types
 const BLOCK_TYPES = [
   {label: 'H1', style: 'header-one', icon: 'style-btn fa fa-header'},
   {label: 'H2', style: 'header-two', icon: 'style-btn fa fa-header'},

@@ -48,6 +48,7 @@
     "firebase": "^3.7.5",
     "fs": "0.0.1-security",
     "google-cloud": "^0.53.0",
+    "immutable": "^3.8.1",
     "node-sass": "^4.5.2",
     "node-uuid": "^1.4.8",
     "path": "^0.12.7",
