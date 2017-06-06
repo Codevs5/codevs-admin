@@ -36,7 +36,7 @@ class EditorContainer extends Component {
       }
     ]);
     this.state = {
-      editorState: EditorState.createEmpty(compositeDecorator),
+      editorState: this.props.editorState,
       showPrompt: false,
       urlType: '',
       urlValue: ''

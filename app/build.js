@@ -28517,7 +28517,7 @@ var PublishedEntryContainer = function (_Component) {
     }, {
         key: 'handleOpenURL',
         value: function handleOpenURL() {
-            _electron.ipcRenderer.send('loadNewWin');
+            _electron.ipcRenderer.send('loadNewWin', { id: this.state.entry.id });
         }
     }, {
         key: 'handleUpdateEntry',

@@ -45,11 +45,11 @@ exports.removeStorage = () => {
     mainWindow.webContents.session.clearStorageData()
 }
 
-ipcMain.on('loadNewWin', (event) => {
+ipcMain.on('loadNewWin', (event, data) => {
 
   var currentWin = new BrowserWindow({ width: 800, height: 600 });
-    //win.loadURL('file:///editor.html');
+  currentWin.postId = data.id;
   currentWin.loadURL('file://' + __dirname + '/app/editor.html');
-  currentWin.webContents.openDevTools()
+  currentWin.webContents.openDevTools();
 
 });

@@ -20389,6 +20389,14 @@ var _react = __webpack_require__(9);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _draftJs = __webpack_require__(90);
+
+var _electron = __webpack_require__(353);
+
+var _firebase = __webpack_require__(144);
+
+var firebase = _interopRequireWildcard(_firebase);
+
 var _HeaderContainer = __webpack_require__(148);
 
 var _HeaderContainer2 = _interopRequireDefault(_HeaderContainer);
@@ -20398,6 +20406,8 @@ var _EditorContainer = __webpack_require__(147);
 var _EditorContainer2 = _interopRequireDefault(_EditorContainer);
 
 __webpack_require__(351);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20413,17 +20423,27 @@ var AppContainer = function (_Component) {
   function AppContainer(props) {
     _classCallCheck(this, AppContainer);
 
-    return _possibleConstructorReturn(this, (AppContainer.__proto__ || Object.getPrototypeOf(AppContainer)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (AppContainer.__proto__ || Object.getPrototypeOf(AppContainer)).call(this, props));
+
+    var currentWin = _electron.remote.getCurrentWindow();
+    _this.state = {
+      id: currentWin.postId,
+      editorState: _draftJs.EditorState.createEmpty()
+    };
+    return _this;
   }
 
   _createClass(AppContainer, [{
+    key: '_fillState',
+    value: function _fillState() {}
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement(_HeaderContainer2.default, null),
-        _react2.default.createElement(_EditorContainer2.default, null)
+        _react2.default.createElement(_HeaderContainer2.default, { id: this.state.id }),
+        _react2.default.createElement(_EditorContainer2.default, { editorState: this.state.editorState })
       );
     }
   }]);
@@ -20526,7 +20546,7 @@ var EditorContainer = function (_Component) {
       component: _Tag2.default
     }]);
     _this.state = {
-      editorState: _draftJs.EditorState.createEmpty(compositeDecorator),
+      editorState: _this.props.editorState,
       showPrompt: false,
       urlType: '',
       urlValue: ''
@@ -49497,6 +49517,12 @@ HeaderUI.propTypes = {
 };
 
 exports.default = HeaderUI;
+
+/***/ }),
+/* 353 */
+/***/ (function(module, exports) {
+
+module.exports = require("electron");
 
 /***/ })
 /******/ ]);

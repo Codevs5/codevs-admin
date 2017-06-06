@@ -63,7 +63,7 @@ class PublishedEntryContainer extends Component {
         }
 
     handleOpenURL() {
-            ipcRenderer.send('loadNewWin');
+            ipcRenderer.send('loadNewWin', {id: this.state.entry.id});
         }
 
     handleUpdateEntry() {}
