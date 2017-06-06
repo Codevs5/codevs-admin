@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import * as actions from './statusActions.js';
 import * as c from '../constants/publishedTypes.js';
+import {ipcRenderer} from 'electron';
 
 export function fetchEntries() {
     return (dispatch) => {
@@ -8,18 +9,31 @@ export function fetchEntries() {
         const dbRef = firebase.database().ref('/entries/info');
         dbRef.orderByChild('date').once('value').then(data => {
             data = data.val();
-            let items = []
+            let items = [];
+            console.log('aa', data);
             for (let key in data) {
+                let copy = Object.assign(data[key], {});
+                let author = 'Anónimo';
+                if(data[key].author && data[key].author.name) {
+                  author = data[key].author.name;
+                  console.log('A', author);
+                }
+                else if(data[key].author && !typeof data[key].author === 'object') {
+                  author = data[key].author;
+                  console.log('B', author);
+                }
+                delete copy.author;
                 items.push({
-                    ...data[key],
-                    id: key
+                    ...copy,
+                    author: author,
+                    id: key,
                 });
             }
-
+            console.log('eee', items);
             dispatch({type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items});
             dispatch(actions.fetchingSuccess());
         }).catch(err => {
-            dispatch(actions.fetchEntriesRejected(err))
+            dispatch(actions.fetchingRejected(err))
         });
     }
 };
@@ -84,7 +98,7 @@ const uploadFinished = (id, dispatch) => {
 
 export function deleteEntry(id, history){
   return (dispatch) => {
-    actions.startLoading();
+    dispatch(actions.startLoading());
     const dbRefInfo = firebase.database().ref(`/entries/info/${id}/`);
     const dbRefContent = firebase.database().ref(`/entries/content/${id}/`);
 
@@ -100,5 +114,33 @@ export function deleteEntry(id, history){
 
 
   }).catch(e => dispatch(actions.updateRejected(e)))
+  }
+}
+
+export function createEntry(){
+  return(dispatch) => {
+    dispatch(actions.startLoading());
+    const user = firebase.auth().currentUser.uid;
+
+    const dbRefInfo = firebase.database().ref('entries/info');
+    firebase.database()
+      .ref('users')
+      .child(user)
+      .once('value')
+      .then((snap) => snap.val())
+      .then((data) => {
+        const entryInfo = {
+          author: {
+            name: data.metadata.firstname,
+            id: user
+          },
+          pinned: false,
+          visible: false,
+          date: new Date()
+        };
+        const key = dbRefInfo.push(entryInfo).key;
+        ipcRenderer.send('loadNewWin', {id: key});
+        return key;
+      });
   }
 }
