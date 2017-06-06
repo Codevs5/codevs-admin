@@ -22,7 +22,7 @@ const Media = (props) => {
 export default Media;
 
 const Audio = (props) => (<audio controls src={props.src} style={styles.media} />);
-const Image = (props) => (<img src={props.src} style={styles.media} />);
+const Image = (props) => (<img src={props.src} style={styles.media}/>);
 const Video = (props) => (<video controls src={props.src} style={styles.media} />);
 
 //TODO: Esto lo pongo en su sitio, ya si eso mañana
@@ -53,7 +53,5 @@ const styles = {
     marginTop: 10,
     textAlign: 'center',
   },
-  media: {
-    width: '100%',
-  },
+
 };
