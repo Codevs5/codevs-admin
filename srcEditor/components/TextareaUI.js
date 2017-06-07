@@ -14,7 +14,7 @@ const TextareaUI = ({editorState,handleReturn, editorOnChange, styleMap, blockSt
       onChange={editorOnChange}
       blockStyleFn={blockStyle}
       blockRendererFn={blockStyle}
-      placeholder={"Empieza la entrada por aquí..."}
+      
       />
   </div>
 );

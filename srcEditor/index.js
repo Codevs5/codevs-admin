@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import * as firebase from 'firebase';
+import {Provider} from 'react-redux';
+
+import store from './store.js';
 
 import AppContainer from './containers/AppContainer.js';
 
@@ -17,7 +20,9 @@ const config = {
 firebase.initializeApp(config);
 
 ReactDOM.render(
+  <Provider store={store}>
     <AppContainer/>
+  </Provider>
 , document.getElementById('app'));
 
 export const secondaryAuth = firebase.initializeApp(config, "secondary");;

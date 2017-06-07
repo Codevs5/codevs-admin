@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { EditorState } from 'draft-js';
+import { EditorState, ContentState, convertFromHTML } from 'draft-js';
 import { remote } from 'electron';
-
+import { connect } from 'react-redux';
 import * as firebase from 'firebase';
+
+import { startEntry, saveEntry } from '../actions/entryActions';
 
 import HeaderContainer from './HeaderContainer';
 import EditorContainer from './EditorContainer';
@@ -10,27 +12,25 @@ import EditorContainer from './EditorContainer';
 import '../styles/__main.scss';
 
 class AppContainer extends Component{
+
   constructor(props){
     super(props);
-    const currentWin = remote.getCurrentWindow();
-    this.state = {
-      id: currentWin.postId,
-      editorState : EditorState.createEmpty(),
-    }
   }
 
-  _fillState(){
-
+  componentDidMount(){
+    const currentWin = remote.getCurrentWindow();
+    this.props.dispatch(startEntry(currentWin.postId));
+    setInterval(() => this.props.dispatch(saveEntry()), 30000);
   }
 
   render(){
     return (
       <div>
-        <HeaderContainer id={this.state.id}/>
-        <EditorContainer editorState={this.state.editorState}/>
+        <HeaderContainer />
+        <EditorContainer />
       </div>
     );
   }
 }
 
-export default AppContainer;
+export default connect()(AppContainer);

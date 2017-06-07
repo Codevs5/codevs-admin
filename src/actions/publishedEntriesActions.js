@@ -10,17 +10,14 @@ export function fetchEntries() {
         dbRef.orderByChild('date').once('value').then(data => {
             data = data.val();
             let items = [];
-            console.log('aa', data);
             for (let key in data) {
                 let copy = Object.assign(data[key], {});
                 let author = 'Anónimo';
                 if(data[key].author && data[key].author.name) {
                   author = data[key].author.name;
-                  console.log('A', author);
                 }
                 else if(data[key].author && !typeof data[key].author === 'object') {
                   author = data[key].author;
-                  console.log('B', author);
                 }
                 delete copy.author;
                 items.push({
@@ -29,7 +26,6 @@ export function fetchEntries() {
                     id: key,
                 });
             }
-            console.log('eee', items);
             dispatch({type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items});
             dispatch(actions.fetchingSuccess());
         }).catch(err => {
@@ -141,6 +137,7 @@ export function createEntry(){
         const key = dbRefInfo.push(entryInfo).key;
         ipcRenderer.send('loadNewWin', {id: key});
         return key;
-      });
+      })
+      .then(() => dispatch(actions.endLoading()));
   }
 }

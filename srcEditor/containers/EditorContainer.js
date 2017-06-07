@@ -5,26 +5,16 @@ import {
   RichUtils,
   CompositeDecorator,
   AtomicBlockUtils,
-  convertToRaw
+  convertToRaw,
+  ContentState
 } from 'draft-js';
 import {Map} from 'immutable';
 import EditorUI from '../components/EditorUI';
 import Tag from '../components/Tag';
 import Media from '../components/Media';
+import { connect } from 'react-redux';
+
 import styleMap from '../styles/EditorStyleMap';
-// import { composeDecorators } from 'draft-js-plugins-editor';
-// import createResizeablePlugin from 'draft-js-resizeable-plugin';
-// import createFocusPlugin from 'draft-js-focus-plugin';
-//
-// const resizeablePlugin = createResizeablePlugin();
-// const focusPlugin = createFocusPlugin();
-//
-// const decorator = composeDecorators(
-//   resizeablePlugin.decorator,
-//   focusPlugin.decorator,
-// );
-//
-// const plugins = [focusPlugin, resizeablePlugin];
 
 class EditorContainer extends Component {
   constructor(props) {
@@ -36,7 +26,7 @@ class EditorContainer extends Component {
       }
     ]);
     this.state = {
-      editorState: this.props.editorState,
+      editorState: this.props.editor,
       showPrompt: false,
       urlType: '',
       urlValue: ''
@@ -60,6 +50,10 @@ class EditorContainer extends Component {
     };
     this.handleReturn = this._handleReturn.bind(this);
   }
+
+
+
+
 
   _onInlineClick(style) {
     this.editorOnChange(RichUtils.toggleInlineStyle(this.state.editorState, style.toUpperCase()));
@@ -195,10 +189,14 @@ class EditorContainer extends Component {
       handleReturn={this.handleReturn}
       showPrompt={this.state.showPrompt}
       />);
-  }
+  } 
 }
 
-export default EditorContainer;
+const mapStateToProps = (state, action) => ({
+  editor: state.entry.editorState
+});
+
+export default connect(mapStateToProps)(EditorContainer);
 
 const TAG_REGEX = /\#[\w]+/g;
 function tagHandle(contentBlock, callback) {
@@ -267,10 +265,6 @@ const getCurrentBlock = (editorState) => {
 const BLOCK_TYPES = [
   {label: 'H1', style: 'header-one', icon: 'style-btn fa fa-header', labeled: true},
   {label: 'H2', style: 'header-two', icon: 'style-btn fa fa-header', labeled: true},
-  // {label: 'H3', style: 'header-three', icon: 'style-btn fa fa-header'},
-  // {label: 'H4', style: 'header-four', icon: 'style-btn fa fa-header'},
-  // {label: 'H5', style: 'header-five', icon: 'style-btn fa fa-header'},
-  // {label: 'H6', style: 'header-six', icon: 'style-btn fa fa-header'},
   {label: 'Blockquote', style: 'blockquote', icon: 'style-btn fa fa-quote-right'},
   {label: 'UL', style: 'unordered-list-item', icon: 'style-btn fa fa-list-ul'},
   {label: 'OL', style: 'ordered-list-item', icon: 'style-btn fa fa-list-ol'},
