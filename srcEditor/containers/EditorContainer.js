@@ -13,7 +13,7 @@ import EditorUI from '../components/EditorUI';
 import Tag from '../components/Tag';
 import Media from '../components/Media';
 import { connect } from 'react-redux';
-
+import { onChangeEditor } from '../actions/entryActions';
 import styleMap from '../styles/EditorStyleMap';
 
 class EditorContainer extends Component {
@@ -46,20 +46,21 @@ class EditorContainer extends Component {
     this.onURLChange = (e) => this.setState({urlValue: e.target.value});
     this.logState = () => {
       const content = this.state.editorState.getCurrentContent();
-      console.log(convertToRaw(content));
+
     };
     this.handleReturn = this._handleReturn.bind(this);
   }
 
 
-
+  componentWillReceiveProps(newProps){
+    this.setState({editorState: newProps.editor})
+  }
 
 
   _onInlineClick(style) {
     this.editorOnChange(RichUtils.toggleInlineStyle(this.state.editorState, style.toUpperCase()));
   }
   _onTab(e) {
-    console.log('tab');
     const maxDepth = 4;
     this.editorOnChange(RichUtils.onTab(e, this.state.editorState, maxDepth));
   }
@@ -78,7 +79,7 @@ class EditorContainer extends Component {
         const linkInstance = contentState.getEntity(linkKey);
         url = linkInstance.getData().url;
       }
-      console.log(startKey, startOffset, linkKey, url);
+
     }
   }
 
@@ -104,7 +105,7 @@ class EditorContainer extends Component {
       if (blockType.indexOf('atomic') === 0) {
         const selectionState = editorState.getSelection();
         if (selectionState.isCollapsed()) {
-          console.log(selectionState.getAnchorOffset(), window.getSelection().anchorOffset)
+
         }
         this.onChange(addNewBlockAt(editorState, currentBlock.getKey()))
         return true
@@ -116,7 +117,6 @@ class EditorContainer extends Component {
   //Media handler
   _confirmMedia(e) {
     e.preventDefault();
-    console.log('click');
     const {editorState, urlValue, urlType} = this.state;
     const entityKey = Entity.create(urlType, 'IMMUTABLE', {src: urlValue})
     this.setState({
@@ -128,7 +128,6 @@ class EditorContainer extends Component {
     });
   }
   _onURLInputKeyDown(e) {
-    console.log(e.which);
     if (e.which === 13) {
       this._confirmMedia(e);
     }
@@ -147,7 +146,6 @@ class EditorContainer extends Component {
     this._promptForMedia('audio');
   }
   _addImage() {
-    console.log('image');
     this._promptForMedia('image');
   }
   _addVideo() {
@@ -155,7 +153,7 @@ class EditorContainer extends Component {
   }
   //Main function to handle any change on the editor
   editorOnChange(editorState) {
-    this.setState({editorState});
+    this.props.dispatch(onChangeEditor(editorState));
   }
   render() {
     const buttons = {
@@ -180,7 +178,7 @@ class EditorContainer extends Component {
 
     return (<EditorUI
       buttons={buttons}
-      editorState={this.state.editorState}
+      editorState={this.props.editor}
       editorOnChange={this.editorOnChange}
       styleMap={styleMap}
       blockStyle={getBlockStyle}
@@ -189,7 +187,7 @@ class EditorContainer extends Component {
       handleReturn={this.handleReturn}
       showPrompt={this.state.showPrompt}
       />);
-  } 
+  }
 }
 
 const mapStateToProps = (state, action) => ({
@@ -199,10 +197,10 @@ const mapStateToProps = (state, action) => ({
 export default connect(mapStateToProps)(EditorContainer);
 
 const TAG_REGEX = /\#[\w]+/g;
-function tagHandle(contentBlock, callback) {
+const tagHandle = (contentBlock, callback) => {
   findWithRegex(TAG_REGEX, contentBlock, callback);
 }
-function findWithRegex(regex, contentBlock, callback) {
+const findWithRegex = (regex, contentBlock, callback) => {
   const text = contentBlock.getText();
   let matchArr,
     start;
@@ -211,7 +209,7 @@ function findWithRegex(regex, contentBlock, callback) {
     callback(start, start + matchArr[0].length);
   }
 }
-function getBlockStyle(block) {
+const getBlockStyle = (block) => {
   switch (block.getType()) {
     case 'blockquote':
       return 'blockquote';
@@ -248,8 +246,6 @@ const addNewBlockAt = (editorState, pivotBlockKey, newBlockType = 'unstyled', in
     selectionBefore: selection,
     selectionAfter: selection.merge({anchorKey: newBlockKey, anchorOffset: 0, focusKey: newBlockKey, focusOffset: 0, isBackward: false})
   });
-  console.log(newContent);
-  console.log('aaa');
   return EditorState.push(editorState, newContent, 'split-block');
 };
 

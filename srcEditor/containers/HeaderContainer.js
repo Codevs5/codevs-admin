@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
 import { connect } from 'react-redux';
-
+import store from '../store';
 import { saveTitle, saveEntry } from '../actions/entryActions';
 import HeaderUI from '../components/HeaderUI';
 
@@ -14,7 +14,13 @@ class HeaderContainer extends Component{
     };
     this.handleToggleEditable = () => this._handleToggleEditable();
     this.handleChangeTitle = (e) => this._handleChangeTitle(e);
-    this.save = () => this.props.dispatch(saveEntry());
+    this.save = () => this.props.dispatch(saveEntry(store.getState().entry.editorState));
+  }
+
+  componentWillReceiveProps(newProps){
+      if(newProps.title !== this.state.title && typeof newProps.title === 'string'){
+        this.setState({title: newProps.title})
+      }
   }
 
   _handleChangeTitle(e) {

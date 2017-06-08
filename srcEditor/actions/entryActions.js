@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
+import {stateToHTML} from 'draft-js-export-html';
 
 import * as c from '../constants/entryTypes';
 import { startLoading, endLoading, errorFetching, successFetching } from './statusActions';
@@ -48,19 +49,15 @@ export const fetchTitle = (title) => ({
   payload: title,
 });
 
-export const updateEditor = (content) => {
-  //Esta mierda no funciona!
+export const updateEditor = (content) => (dispatch) => {
   const blocksFromHTML = convertFromHTML(content);
   const contentState = ContentState.createFromBlockArray(
           blocksFromHTML.contentBlocks,
           blocksFromHTML.entityMap,
         );
   const editorState = EditorState.createWithContent(contentState);
-  
-  return {
-    type: c.FETCH_CONTENT,
-    payload: editorState
-  };
+
+  return dispatch(onChangeEditor(editorState));
 };
 
 export const saveTitle = (id, title) => (dispatch) => {
@@ -73,8 +70,24 @@ export const saveTitle = (id, title) => (dispatch) => {
     .then(() => dispatch(endLoading()));
 };
 
-export const saveEntry = () => (dispatch) => {
+export const saveEntry = (currentState) => (dispatch) => {
   dispatch(startLoading());
-  console.log('Guardando...');
-  dispatch(endLoading());
+  //TODO: Gestionar error al guardar
+  const entry = store.getState().entry;
+  const editor = currentState.getCurrentContent();
+  const id = entry.id;
+
+  const dbRef = firebase.database().ref('entries').child('content');
+  let data = {};
+  data[id] = {content: stateToHTML(editor)};
+  dbRef
+    .update(data)
+    .then(() => dispatch(endLoading()))
+  console.log(data);
+
 };
+
+export const onChangeEditor = (editor) => ({
+  type: c.FETCH_CONTENT,
+  payload: editor
+});
