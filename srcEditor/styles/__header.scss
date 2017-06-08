@@ -1,0 +1,77 @@
+.header{
+  position: fixed;
+  top: 0;
+  background-color: lighten(#C7D4D5, 15%);
+  width: 100%;
+  height: 82px;
+  border-bottom: 2px solid #95A5A6;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-title{
+  display: flex;
+}
+.saving{
+   animation: spinner 2s linear infinite;
+}
+
+.row{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-btn{
+  background-color: #95A5A6;
+  border: 1px solid darken(#95A5A6, 5%);
+  height: 48px;
+  width: 48px;
+  cursor: pointer;
+  font-size: 1em;
+  color: white;
+  &:hover{
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+}
+
+.title-input{
+  &>input{
+  box-sizing: border-box;
+  font-size: 16px;
+  padding: 6px;
+  border: none;
+}
+}
+
+.edit-btn{
+  height: 30px;
+  width: 30px;
+  background-color: #95A5A6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  line-height: 30px;
+  &:hover{
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+}
+
+.title{
+  padding: 10px;
+}
+
+.hidden{
+  display: none;
+}
+@keyframes spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

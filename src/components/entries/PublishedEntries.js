@@ -1,11 +1,11 @@
 import React, {PropTypes} from 'react';
 
 import PublishedEntryItem from './PublishedEntryItem.js';
-import Header from '../../layout/Header.js';
-import LoadingList from '../../layout/LoadingList.js';
-import ErrorComponent from '../../layout/ErrorComponent.js';
+import Header from '../layout/Header.js';
+import LoadingList from '../layout/LoadingList.js';
+import ErrorComponent from '../layout/ErrorComponent.js';
 
-import '../../../style/__published.scss';
+import '../../style/__published.scss';
 
 const PublishedEntries = ({changeVisibility, entries, loading, error}) => {
 

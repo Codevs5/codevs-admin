@@ -6,6 +6,8 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
+const ipcMain = electron.ipcMain;
+
 //require('./server');
 require('electron-reload')(__dirname);
 let mainWindow
@@ -42,3 +44,12 @@ app.on('activate', function() {
 exports.removeStorage = () => {
     mainWindow.webContents.session.clearStorageData()
 }
+
+ipcMain.on('loadNewWin', (event, data) => {
+
+  var currentWin = new BrowserWindow({ width: 800, height: 600 });
+  currentWin.postId = data.id;
+  currentWin.loadURL('file://' + __dirname + '/app/editor.html');
+  currentWin.webContents.openDevTools();
+
+});

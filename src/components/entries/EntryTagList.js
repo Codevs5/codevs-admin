@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import EntryTag from './EntryTag.js';
-import '../../../style/__tags.scss';
+import '../../style/__tags.scss';
 
 const parseTags = (tags) => Array.isArray(tags)?tags:Object.keys(tags);
 
