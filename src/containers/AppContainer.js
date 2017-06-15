@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import * as firebase from 'firebase';
 import { connect } from 'react-redux';
 
-import * as actions from '../actions/userActions.js';
+import { userLogged, startLogging, userLogout } from '../actions/userActions.js';
 
 import App from '../components/App.js';
 
@@ -13,42 +13,41 @@ class AppContainer extends Component {
             email: '',
             password: '',
         }
-        this.handleLogout = this.handleLogout.bind(this);
-        this.handleLoginWithCredentials = this.handleLoginWithCredentials.bind(this);
-        this.handleEmailChange = this.handleEmailChange.bind(this);
-        this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handleLogout = () => this._handleLogout();
+        this.handleLoginWithCredentials = (e) => this._handleLoginWithCredentials(e);
+        this.handleEmailChange = (e) => this._handleEmailChange(e);
+        this.handlePasswordChange = (e) => this._handlePasswordChange(e);
 
     }
 
-    handleLoginWithCredentials(e) {
-      this.props.dispatch(actions.startLogging(this.state.email, this.state.password));
+    _handleLoginWithCredentials(e) {
+      this.props.dispatch(startLogging(this.state.email, this.state.password));
     }
 
-    handleLogout() {
+    _handleLogout() {
         firebase.auth().signOut();
     }
 
-    handlePasswordChange(e) {
+    _handlePasswordChange(e) {
         this.setState({password: e.target.value});
     }
 
-    handleEmailChange(e) {
+    _handleEmailChange(e) {
         this.setState({email: e.target.value});
     }
 
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.props.dispatch(actions.userLogged(user));
+                this.props.dispatch(userLogged(user));
             } else {
-                this.props.dispatch(actions.userLogout());
+                this.props.dispatch(userLogout());
             }
         });
     }
 
     render() {
         return (<App
-          handleLoginWithGoogle={this.handleLoginWithGoogle}
           handleLoginWithCredentials={this.handleLoginWithCredentials}
           handleLogout={this.handleLogout}
           loading={this.props.loading}

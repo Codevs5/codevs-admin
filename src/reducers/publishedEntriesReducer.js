@@ -10,7 +10,11 @@ function publishedEntries(state = [], action) {
             return updateEntry(state, action);
         case c.ENTRY_REMOVE:
             return removeEntry(state, action.payload);
-            
+        case c.CREATE_ENTRY:
+            return [
+              ...state,
+              action.payload
+            ];            
         default:
             return state;
     }

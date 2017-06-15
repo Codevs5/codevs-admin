@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 
 import { fetchAllUsers } from '../actions/userListActions.js';
 import UsersList from '../components/users/UsersList.js';
+import LoadingList from '../components/layout/LoadingList.js';
+import ErrorComponent from '../components/layout/ErrorComponent.js';
 
 class UserListContainer extends Component{
   constructor(props){
@@ -16,9 +18,14 @@ class UserListContainer extends Component{
 
 
   render(){
-    return (
-      <UsersList error={this.props.error} loading={this.props.loading} users={this.props.users}/>
-    );
+    if (this.props.error)
+        return (<ErrorComponent/>);
+    else if (this.props.loading)
+        return (<LoadingList/>);
+    else
+      return (
+        <UsersList users={this.props.users}/>
+      );
   }
 }
 

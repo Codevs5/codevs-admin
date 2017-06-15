@@ -2,36 +2,45 @@ import React, {Component, PropTypes} from 'react';
 import * as firebase from 'firebase';
 import {connect} from 'react-redux';
 
-import PublishedEntries from '../components/entries/PublishedEntries.js';
-import {fetchEntries, updateEntry} from '../actions/publishedEntriesActions.js';
+import { fetchEntries, updateEntry } from '../actions/publishedEntriesActions';
+
+import PublishedEntries from '../components/entries/PublishedEntries';
+import LoadingList from '../components/layout/LoadingList';
+import ErrorComponent from '../components/layout/ErrorComponent';
 
 class PublishedEntriesContainer extends Component {
     constructor(props) {
         super(props);
-        this.changeVisibility = this.changeVisibility.bind(this);
+        this.changeVisibility = (id, visible) => this._changeVisibility(id, visible);
     }
+
     componentDidMount() {
         this.props.dispatch(fetchEntries());
     }
-    changeVisibility(id, visible) {
+    _changeVisibility(id, visible) {
         this.props.dispatch(updateEntry(id, {visible: visible}));
     }
 
     render() {
+      if (this.props.loading) {
+          return (<LoadingList/>);
+      } else if (this.props.error) {
+          return (
+              <ErrorComponent />
+          );
+      }else{
         return (<PublishedEntries
           entries={this.props.publishedEntries}
           changeVisibility={this.changeVisibility}
-          loading={this.props.status.loading}
-          error={this.props.status.error}
           />);
+      }
     }
 }
 
-const mapStateToProps = (state, props) => {
-    return {
+const mapStateToProps = (state, props) => ({
       publishedEntries: state.publishedEntries,
-      status: state.status
-    };
-};
+      loading: state.status.loading,
+      error: state.status.error
+});
 
 export default connect(mapStateToProps)(PublishedEntriesContainer);

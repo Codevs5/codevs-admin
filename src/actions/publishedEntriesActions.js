@@ -1,143 +1,195 @@
 import * as firebase from 'firebase';
-import * as actions from './statusActions.js';
+import {
+  startLoading,
+  fetchingSuccess,
+  fetchingRejected,
+  updateSuccess,
+  updateRejected,
+  uploadImage as uploadImageAction,
+  uploadImageRejected,
+  uploadImageSuccess
+} from './statusActions.js';
 import * as c from '../constants/publishedTypes.js';
 import {ipcRenderer} from 'electron';
 
-export function fetchEntries() {
-    return (dispatch) => {
-        dispatch(actions.startLoading());
-        const dbRef = firebase.database().ref('/entries/info');
-        dbRef.orderByChild('date').once('value').then(data => {
-            data = data.val();
-            let items = [];
-            for (let key in data) {
-                let copy = Object.assign(data[key], {});
-                let author = 'Anónimo';
-                if(data[key].author && data[key].author.name) {
-                  author = data[key].author.name;
-                }
-                else if(data[key].author && !typeof data[key].author === 'object') {
-                  author = data[key].author;
-                }
-                delete copy.author;
-                items.push({
-                    ...copy,
-                    author: author,
-                    id: key,
-                });
-            }
-            dispatch({type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items});
-            dispatch(actions.fetchingSuccess());
-        }).catch(err => {
-            dispatch(actions.fetchingRejected(err))
-        });
-    }
+/**
+ * Retrieve all entries from database.
+ */
+export const fetchEntries = () => (dispatch) => {
+  dispatch(startLoading());
+
+  const dbRef = firebase.database().ref('entries').child('info');
+
+  dbRef.orderByChild('date')
+    .once('value')
+    .then(snap => snap.val())
+    .then((data) => entriesParser(data))
+    .then((items) => dispatch({type: 'FETCH_P_ENTRIES_FULLFILLED', payload: items}))
+    .then(() => dispatch(fetchingSuccess()))
+    .catch(err => dispatch(fetchingRejected(err)));
 };
 
-export function updateEntry(id, data) {
-    return (dispatch) => {
-        const dbRef = firebase.database().ref(`/entries/info/${id}`);
-        dbRef.update(data).then(() => {
-            dispatch({
-                type: 'UPDATE_ENTRY',
-                payload: {
-                    id,
-                    data
-                }
-            });
-            dispatch(actions.updateSuccess())
-        }).catch((err) => dispatch(actions.updateRejected(err)));
+/**
+ * For each entries it returns the entry content with the id as an array
+ * of objects.
+ * @param  {[Object]} data [JSON with all the entries]
+ * @return {[Array]}      [Parsed array with the entries]
+ */
+const entriesParser = (data) => Object.keys(data).map((key, i) => ({
+  ...data[key],
+  id: key
+}));
+
+/**
+ * Function to update the entry info
+ * @param  {[String]} id   [Entry id]
+ * @param  {[Object]} data [Object with the content to update]
+ * @return {[Promise]}
+ */
+export const updateEntry = (id, data) => (dispatch) => {
+  const dbRef = firebase.database().ref('entries').child('info').child(id);
+  dbRef.update(data)
+    .then(() => updateEntryAction(id, data))
+    .then(() => dispatch(updateSuccess()))
+    .catch((err) => dispatch(updateRejected(err)));
+};
+
+/*
+ * Action to update the entry
+ */
+const updateEntryAction = (id, data) => ({
+  type: c.UPDATE_ENTRY,
+  payload: {
+    id,
+    data
+  }
+});
+
+/**
+ * Function to handle the upload of the image
+ * @param  {[String]} id   [Entry id]
+ * @param  {[File]} file [File with the image]
+ *
+ */
+export const uploadImage = (id, file) => (dispatch) => {
+  dispatch(uploadImageAction());
+  let reader = new FileReader();
+
+  reader.onloadend = () => {
+    const mainImgUpload = {
+      file: file,
+      imagePreviewUrl: reader.result
     };
-}
+    startUpload(dispatch, mainImgUpload, id);
+  };
+  reader.readAsDataURL(file);
+};
 
-export function uploadImage(id, file) {
-    return (dispatch) => {
-        dispatch(actions.uploadImage());
-        let reader = new FileReader();
-
-        reader.onloadend = () => {
-            const mainImgUpload = {
-                file: file,
-                imagePreviewUrl: reader.result
-            };
-            startUpload(dispatch, mainImgUpload, id);
-        };
-        reader.readAsDataURL(file);
-    };
-}
-
+/**
+ * Function to upload the image to firebase's bucket
+ */
 const startUpload = (dispatch, mainImgUpload, id) => {
-    const stRef = firebase.storage().ref(`entries/${id}`);
-
-    const metadata = {
-        contentType: 'image/png'
-    };
-    const uploadTask = stRef.child('main.png').put(mainImgUpload.file, metadata);
-    uploadTask.then(() => uploadFinished(id, dispatch)).catch((err) => dispatch(actions.uploadImageRejected(err)));
+  const stRef = firebase.storage().ref('entries').child(id);
+  const metadata = { contentType: 'image/png' };
+  //Main.png is always the name of the entries header pic.
+  const uploadTask = stRef.child('main.png').put(mainImgUpload.file, metadata);
+  uploadTask
+    .then(() => uploadFinished(id, dispatch))
+    .catch((err) => dispatch(uploadImageRejected(err)));
 };
 
+/**
+ * Function to add the image url in the database object
+ * @param  {[String]} id       [Entry id]
+ * @param  {[Function]} dispatch
+ * @return {[Promise]}
+ */
 const uploadFinished = (id, dispatch) => {
-    const dbRef = firebase.database().ref(`/entries/info/${id}/`);
-    const stRef = firebase.storage().ref(`/entries/${id}/main.png`);
-    stRef.getDownloadURL().then((url) => dbRef.update({imgSrc: url}).then(() => url)).then((url) => {
-        dispatch({
-            type: 'UPLOAD_IMAGE_FULLFILLED',
-            payload: {
-                data: {
-                    imageURL: url
-                }
-            }
-        });
-        dispatch(actions.uploadImageSuccess());
-    }).catch((err) => dispatch(actions.uploadImageRejected(err)));
+  const dbRef = firebase.database().ref('entries').child('info').child(id);
+  const stRef = firebase.storage().ref('entries').child(id).child('main.png');
+
+  stRef.getDownloadURL()
+    .then((url) => dbRef.update({imgSrc: url}))
+    .then(() => url)
+    .then((url) => dispatch(uploadImageFullfilled(url)))
+    .then(() => uploadImageSuccess())
+    .catch((err) => uploadImageRejected(err));
 };
 
-export function deleteEntry(id, history){
-  return (dispatch) => {
-    dispatch(actions.startLoading());
-    const dbRefInfo = firebase.database().ref(`/entries/info/${id}/`);
-    const dbRefContent = firebase.database().ref(`/entries/content/${id}/`);
+/*
+ * Action to add the image url
+ */
+const uploadImageFullfilled = (url) => ({
+  type: c.UPLOAD_IMAGE_FULLFILLED,
+  payload: {
+    data: url
+  }
+});
 
-    dbRefInfo.remove()
+/**
+ * Delete the entry from the database
+ * @param  {[String]} id      [Entry id]
+ * @param  {[Object]} history
+ * @return {[Promise]}
+ */
+export const deleteEntry = (id, history) => (dispatch) => {
+  dispatch(startLoading());
+
+  const dbRefInfo = firebase.database().ref('entries').child('info').child(id);
+  const dbRefContent = firebase.database().ref('entries').child('content').child(id);
+
+  dbRefInfo.remove()
     .then(() => dbRefContent.remove())
-    .then(() => {dispatch({
-      type: c.ENTRY_REMOVE,
-      payload: id
-    });
-    dispatch(actions.removeSuccess());
-    //Redirect!!!
-    history.goBack();
+    .then(() => dispatch(entryRemove(id)))
+    .then(() => history.goBack())
+    .then(() => dispatch(removeSuccess()))
+    .catch((err) => dispatch(updateRejected(err)));
+};
+
+/*
+ * Action to remove the entry from the state
+ */
+const entryRemove = (id) => ({
+  type: c.ENTRY_REMOVE,
+  payload: id
+});
 
 
-  }).catch(e => dispatch(actions.updateRejected(e)))
-  }
-}
+/**
+ * Create new empty entry
+ * @return {[Promise]}
+ */
+export const createEntry = () => (dispatch) => {
 
-export function createEntry(){
-  return(dispatch) => {
-    dispatch(actions.startLoading());
-    const user = firebase.auth().currentUser.uid;
+  dispatch(startLoading());
+  const user = firebase.auth().currentUser.uid;
+  const dbRefInfo = firebase.database().ref('entries').child('info');
+  const dbUser = firebase.database().ref('users').child(user);
 
-    const dbRefInfo = firebase.database().ref('entries/info');
-    firebase.database()
-      .ref('users')
-      .child(user)
-      .once('value')
-      .then((snap) => snap.val())
-      .then((data) => {
-        const entryInfo = {
-          author: {
-            name: data.metadata.firstname,
-            id: user
-          },
-          pinned: false,
-          visible: false,
-          date: new Date()
-        };
-        const key = dbRefInfo.push(entryInfo).key;
-        ipcRenderer.send('loadNewWin', {id: key});
-        return key;
-      })
-      .then(() => dispatch(actions.endLoading()));
-  }
-}
+  dbUser.once('value')
+    .then((snap) => snap.val())
+    .then((data) => {
+      const entryInfo = {
+        author: {
+          name: data.metadata.firstname,
+          id: user
+        },
+        pinned: false,
+        visible: false,
+        date: new Date(),
+        title: 'No title :('
+      };
+      const key = dbRefInfo.push(entryInfo).key;
+      ipcRenderer.send('loadNewWin', {id: key});
+      dispatch(addEntry({...entryInfo, id: key}));
+    })
+    .then(() => dispatch(endLoading()));
+};
+
+/*
+ * Action to add new entry to the state
+ */
+const addEntry = (entry) => ({
+  type: c.CREATE_ENTRY,
+  payload: entry
+});
